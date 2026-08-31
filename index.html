@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Blurb Checkout Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* Blurb brand type — referenced from Blurb's own CDN (same woff2 the live
+     site uses). Proxima Nova = body/UI; Futura PT = headings. */
+  @font-face { font-family: "Proxima Nova"; font-weight: 400; font-style: normal; font-display: swap; src: url("https://assets.blurb.com/_astro/fonts/9e5f165193baf73b.woff2") format("woff2"); }
+  @font-face { font-family: "Proxima Nova"; font-weight: 500; font-style: normal; font-display: swap; src: url("https://assets.blurb.com/_astro/fonts/a587ff669d60ac38.woff2") format("woff2"); }
+  @font-face { font-family: "Proxima Nova"; font-weight: 600; font-style: normal; font-display: swap; src: url("https://assets.blurb.com/_astro/fonts/400006e4c98b5bb1.woff2") format("woff2"); }
+  @font-face { font-family: "Proxima Nova"; font-weight: 700; font-style: normal; font-display: swap; src: url("https://assets.blurb.com/_astro/fonts/18fadc50cce629f8.woff2") format("woff2"); }
+  @font-face { font-family: "Futura PT"; font-weight: 400; font-style: normal; font-display: swap; src: url("https://assets.blurb.com/_astro/fonts/045346bd8370b80a.woff2") format("woff2"); }
+  @font-face { font-family: "Futura PT"; font-weight: 500; font-style: normal; font-display: swap; src: url("https://assets.blurb.com/_astro/fonts/19328e3f43ab4ed2.woff2") format("woff2"); }
+  @font-face { font-family: "Futura PT"; font-weight: 600; font-style: normal; font-display: swap; src: url("https://assets.blurb.com/_astro/fonts/902c6ec6193b5f43.woff2") format("woff2"); }
+
+  body { font-family: "Proxima Nova", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #f6f6f6; }
+  input, select, button, textarea { font-family: inherit; }
+  input:focus, select:focus { outline: 2px solid #107eb1; outline-offset: 1px; }
+  ::placeholder { color: #656565; opacity: 1; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+  .ms {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="/src/main.jsx"></script>
+</body>
+</html>
