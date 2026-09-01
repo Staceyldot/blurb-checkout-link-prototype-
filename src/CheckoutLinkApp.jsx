@@ -63,6 +63,22 @@ const BLURB_LOGO_EMAIL = "/assets/blurb-logo-email.png";  // full-color logo for
 const BOOK_SENSE    = "/assets/book-sense.png";
 const BOOK_GARDNERS = "/assets/book-gardners.png";
 
+/* Setup page Materials swatches (Figma node 4806:45519, "Unpublished / Filled"
+   state) — downsized to 200px max edge (from multi-MB Figma exports) since they
+   only ever render at 88px. */
+const LINEN_COLORS = [
+  { name: "Black",   img: "/assets/materials/linen-black.png" },
+  { name: "Oatmeal", img: "/assets/materials/linen-oatmeal.png", extra: 3 },
+  { name: "Charcoal", img: "/assets/materials/linen-charcoal.png", extra: 3 },
+];
+const ENDSHEET_COLORS = [
+  { name: "Standard Mid-Grey", img: "/assets/materials/endsheet-standard-mid-grey.png" },
+  { name: "Light Grey", img: "/assets/materials/endsheet-light-grey.png", extra: 3 },
+  { name: "Charcoal",   img: "/assets/materials/endsheet-charcoal.png", extra: 3 },
+  { name: "White",      img: "/assets/materials/endsheet-white.png", extra: 3 },
+  { name: "Black",      img: "/assets/materials/endsheet-black.png", extra: 3 },
+];
+
 /* Blurb brand type. Blurb self-hosts these on its own CDN (no Typekit kit);
    we reference the exact same woff2 files rather than copying them, and inject
    the @font-face rules at runtime only while this fork is mounted — so the
@@ -3195,6 +3211,23 @@ function MaterialsRow({ title, first, open, onToggle, children }) {
   );
 }
 
+/* Materials' Linen/Endsheet color swatches (Figma "Radio Card / Image") — a
+   thumbnail, name, and an optional upcharge, selectable like the plain-text
+   Cover finish buttons above them. */
+function RadioCardImage({ name, img, extra, selected, onSelect }) {
+  return (
+    <button onClick={onSelect} style={{ width:88, display:"flex", flexDirection:"column", alignItems:"center",
+      gap:8, padding:4, borderRadius:T.radius, background:T.surface, cursor:"pointer",
+      border: selected ? `1px solid ${T.borderActive}` : `1px solid ${T.border}`,
+      boxShadow: selected ? `0 0 0 1px ${T.borderActive}` : "none" }}>
+      <img src={img} alt="" style={{ width:88, height:88, borderRadius:2, objectFit:"cover", display:"block" }} />
+      <span style={{ fontFamily:FONT_SANS, fontSize:14, fontWeight:selected ? 700 : 600, color:T.textBold, textAlign:"center" }}>
+        {name}{extra ? ` +US $${extra}.00` : ""}
+      </span>
+    </button>
+  );
+}
+
 function SwitchToggle({ on, onToggle }) {
   return (
     <button onClick={onToggle} aria-pressed={on} style={{ width:52, height:28, borderRadius:14, border:"none",
@@ -3215,6 +3248,16 @@ const AI_DRAFT = {
 };
 const AI_TONES = ["Playful", "Warm", "Literary", "Bold"];
 const AI_SHIMMER = "linear-gradient(94deg, rgb(211,196,245) 0%, rgba(179,152,237,.88) 55%, rgb(204,189,245) 100%)";
+
+/* Author profile "filled" copy — matches Figma's Unpublished/Filled state
+   (node 4782:41541). Distinct from the shorter bio App.jsx/the PDP use for
+   this same author; this is what the setup form itself shows once filled in. */
+const AUTHOR_BIO = "Paige Hazelwood writes contemporary romance set in small towns where everyone knows your business and nobody minds theirs. A former librarian with a weakness for enemies-to-lovers tropes and excellent coffee, she began writing fiction after years of recommending books she wished existed. Her debut novel Pride and Preconceptions was inspired by a disastrous first impression that turned into something else entirely. She lives in Vermont with her very opinionated cat, Darcy.";
+const AUTHOR_SOCIALS = [
+  { platform: "Instagram", url: "instagram.com/paigehazelwoodauthor" },
+  { platform: "Website", url: "paigehazelwoodauthor.com" },
+  { platform: "Other", url: "substack.com/paigehazelwoodauthor" },
+];
 
 /* Matches Figma "AI Flow (Inline)" (node 5423:93216) — a right-side slide-over,
    same overlay/slide pattern as CartDrawer, with three phases: prompt, loading
@@ -3352,21 +3395,33 @@ function LinkSetupPage({ onContinue }) {
   const { isMobile } = useViewport();
   const [copied, setCopied] = useState(false);
   const [preview, setPreview] = useState("sample");
-  const [openMaterial, setOpenMaterial] = useState("cover");
+  const [openMaterials, setOpenMaterials] = useState({ cover: true, linen: false, endsheet: false });
+  const toggleMaterial = key => setOpenMaterials(m => ({ ...m, [key]: !m[key] }));
   const [finish, setFinish] = useState(null);
+  const [linenColor, setLinenColor] = useState(LINEN_COLORS[0].name);
+  const [endsheetColor, setEndsheetColor] = useState(ENDSHEET_COLORS[0].name);
   /* Picking a cover finish is the demo's stand-in for "enough required fields are
-     filled to publish" — matches Figma's Unpublished/Filled state (node 4782:41534),
-     where Publish in the sticky bar goes from disabled to active. Not real
+     filled to publish" — matches Figma's Unpublished/Filled state (node 4782:41534).
+     It also fills in the rest of the page (Listing content, Pricing, Author
+     profile, and expands the Linen/Endsheet color pickers) to match that same
+     Figma state, and flips the sticky bar's Publish button active. Not real
      validation across every required field, just this one representative trigger. */
   const [canPublish, setCanPublish] = useState(false);
-  const chooseFinish = f => { setFinish(f); setCanPublish(true); };
   const [authorVisible, setAuthorVisible] = useState(true);
-  const [sectionHidden, setSectionHidden] = useState(false);
 
   // Listing content fields — plain state so the AI draft panel has something to write into.
   const [listingTitle, setListingTitle] = useState("");
   const [aboutBook, setAboutBook] = useState("");
   const [keywords, setKeywords] = useState([]);
+
+  const chooseFinish = f => {
+    setFinish(f);
+    setCanPublish(true);
+    setOpenMaterials({ cover: true, linen: true, endsheet: true });
+    if (!listingTitle) setListingTitle(PRODUCT.title);
+    if (!aboutBook) setAboutBook(AI_DRAFT.description);
+    if (!keywords.length) setKeywords(AI_DRAFT.keywords);
+  };
 
   // "Draft this for me" panel — prompt -> loading -> results.
   const [aiOpen, setAiOpen] = useState(false);
@@ -3502,7 +3557,7 @@ function LinkSetupPage({ onContinue }) {
       {/* Materials */}
       <SetupSection title="Materials">
         <div style={{ maxWidth:685, borderBottom:`1px solid ${T.border}` }}>
-          <MaterialsRow title="Cover finish" first open={openMaterial === "cover"} onToggle={() => setOpenMaterial(openMaterial === "cover" ? null : "cover")}>
+          <MaterialsRow title="Cover finish" first open={openMaterials.cover} onToggle={() => toggleMaterial("cover")}>
             <div style={{ display:"flex", gap:8 }}>
               {["Gloss", "Matte"].map(f => (
                 <button key={f} onClick={() => chooseFinish(f)} style={{ flex:1, padding:"12px 16px", borderRadius:T.radius,
@@ -3513,11 +3568,23 @@ function LinkSetupPage({ onContinue }) {
               ))}
             </div>
           </MaterialsRow>
-          <MaterialsRow title="Linen cover colors" open={openMaterial === "linen"} onToggle={() => setOpenMaterial(openMaterial === "linen" ? null : "linen")}>
-            <SetupHint>No linen cover selected yet.</SetupHint>
+          <MaterialsRow title="Linen cover colors" open={openMaterials.linen} onToggle={() => toggleMaterial("linen")}>
+            {canPublish ? (
+              <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+                {LINEN_COLORS.map(c => (
+                  <RadioCardImage key={c.name} {...c} selected={linenColor === c.name} onSelect={() => setLinenColor(c.name)} />
+                ))}
+              </div>
+            ) : <SetupHint>No linen cover selected yet.</SetupHint>}
           </MaterialsRow>
-          <MaterialsRow title="Endsheet colors" open={openMaterial === "endsheet"} onToggle={() => setOpenMaterial(openMaterial === "endsheet" ? null : "endsheet")}>
-            <SetupHint>No endsheet color selected yet.</SetupHint>
+          <MaterialsRow title="Endsheet colors" open={openMaterials.endsheet} onToggle={() => toggleMaterial("endsheet")}>
+            {canPublish ? (
+              <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+                {ENDSHEET_COLORS.map(c => (
+                  <RadioCardImage key={c.name} {...c} selected={endsheetColor === c.name} onSelect={() => setEndsheetColor(c.name)} />
+                ))}
+              </div>
+            ) : <SetupHint>No endsheet color selected yet.</SetupHint>}
           </MaterialsRow>
         </div>
       </SetupSection>
@@ -3528,14 +3595,23 @@ function LinkSetupPage({ onContinue }) {
           <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
             <div style={{ flex:"1 1 140px", minWidth:140 }}>
               <div style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>Print cost</div>
-              <div style={{ fontFamily:FONT_HEADING, fontSize:32, fontWeight:600, color:T.textSubtle, margin:"4px 0" }}>$ --</div>
+              <div style={{ fontFamily:FONT_HEADING, fontSize:32, fontWeight:600, color:T.textSubtle, margin:"4px 0" }}>
+                {canPublish ? "$12.50" : "$ --"}
+              </div>
               <SetupHint>Set by format, size, and materials</SetupHint>
             </div>
-            {[
-              { label:"Listing Price", value:"$ --", hint:"Buyers pay" },
-              { label:"Profit margin", value:"-- %", hint:"Percent you earn" },
-              { label:"Profit", value:"$ --", hint:"What you earn" },
-            ].map(f => (
+            {(canPublish
+              ? [
+                  { label:"Listing Price", value:"$12.50", hint:"Buyers pay" },
+                  { label:"Profit margin", value:"20%", hint:"Percent you earn" },
+                  { label:"Profit", value:"$2.50", hint:"What you earn" },
+                ]
+              : [
+                  { label:"Listing Price", value:"$ --", hint:"Buyers pay" },
+                  { label:"Profit margin", value:"-- %", hint:"Percent you earn" },
+                  { label:"Profit", value:"$ --", hint:"What you earn" },
+                ]
+            ).map(f => (
               <div key={f.label} style={{ flex:"1 1 140px", minWidth:140, display:"flex", flexDirection:"column", gap:8 }}>
                 <div style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>{f.label}</div>
                 <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, fontFamily:FONT_SANS,
@@ -3567,10 +3643,14 @@ function LinkSetupPage({ onContinue }) {
           <SetupFieldRow label="Profile photo">
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
               <div style={{ position:"relative", width:80, height:80 }}>
-                <div style={{ width:80, height:80, borderRadius:"50%", background:"#f5f0ea", display:"flex",
-                  alignItems:"center", justifyContent:"center" }}>
-                  <Ms name="person" size={40} color={T.textDisabled} />
-                </div>
+                {canPublish ? (
+                  <img src={AUTHOR_PHOTO} alt="" style={{ width:80, height:80, borderRadius:"50%", objectFit:"cover", display:"block" }} />
+                ) : (
+                  <div style={{ width:80, height:80, borderRadius:"50%", background:"#f5f0ea", display:"flex",
+                    alignItems:"center", justifyContent:"center" }}>
+                    <Ms name="person" size={40} color={T.textDisabled} />
+                  </div>
+                )}
                 <button onClick={e => e.preventDefault()} style={{ position:"absolute", bottom:-4, right:2, width:28, height:28,
                   borderRadius:"50%", background:T.brand, border:"2px solid #f5f5f5", display:"flex", alignItems:"center",
                   justifyContent:"center", cursor:"pointer" }}>
@@ -3590,14 +3670,35 @@ function LinkSetupPage({ onContinue }) {
             </button>
           </SetupFieldRow>
           <SetupFieldRow label="About the author(s)">
-            <SetupTextField placeholder="Share a short bio..." hint="0/1000" height={150} />
+            {canPublish ? (
+              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, height:150,
+                  overflowY:"auto", fontFamily:FONT_SANS, fontSize:16, color:T.textBold }}>{AUTHOR_BIO}</div>
+                <SetupHint>{AUTHOR_BIO.length}/1000</SetupHint>
+              </div>
+            ) : (
+              <SetupTextField placeholder="Share a short bio..." hint="0/1000" height={150} />
+            )}
           </SetupFieldRow>
           <SetupFieldRow label="Social links">
-            <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-              <div style={{ width:125, flexShrink:0 }}><SetupDropdown /></div>
-              <div style={{ flex:1 }}><SetupTextField placeholder="Profile URL" /></div>
-              <Ms name="remove" color={T.textSubtle} />
-            </div>
+            {canPublish ? (
+              <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+                {AUTHOR_SOCIALS.map(s => (
+                  <div key={s.platform} style={{ display:"flex", gap:8, alignItems:"center" }}>
+                    <div style={{ width:125, flexShrink:0 }}><SetupDropdown value={s.platform} /></div>
+                    <div style={{ flex:1, border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
+                      fontFamily:FONT_SANS, fontSize:16, color:T.textBold }}>{s.url}</div>
+                    <Ms name="remove" color={T.textSubtle} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                <div style={{ width:125, flexShrink:0 }}><SetupDropdown /></div>
+                <div style={{ flex:1 }}><SetupTextField placeholder="Profile URL" /></div>
+                <Ms name="remove" color={T.textSubtle} />
+              </div>
+            )}
             <button onClick={e => e.preventDefault()} style={{ alignSelf:"flex-start", display:"flex", alignItems:"center",
               gap:8, border:`1px solid ${T.brand}`, borderRadius:T.radius, background:T.surface, padding:"8px 24px", cursor:"pointer" }}>
               <Ms name="add" size={20} color={T.brand} />
@@ -3607,34 +3708,27 @@ function LinkSetupPage({ onContinue }) {
         </div>
       </SetupSection>
 
-      {/* Section preview — empty state, no other published books yet */}
-      <SetupSection title="Section preview" action={
-        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-          <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textBold }}>Hidden to buyers</span>
-          <SwitchToggle on={sectionHidden} onToggle={() => setSectionHidden(v => !v)} />
-        </div>
-      }>
-        <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:18, fontWeight:600, color:T.textSubtle }}>
-          You don't have other published books yet. This section will appear once you do.
-        </p>
-      </SetupSection>
 
-      {/* Payment and tax info — required nudge */}
-      <SetupSection title="Payment and tax info" action={
-        <span style={{ background:"#ffe1e1", color:"#bd1818", fontFamily:FONT_SANS,
-          fontSize:14, fontWeight:600, borderRadius:999, padding:"4px 8px" }}>Required</span>
-      }>
-        <div style={{ display:"flex", flexWrap:"wrap", gap:16, alignItems:"flex-start", justifyContent:"space-between" }}>
-          <div>
-            <div style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:700, color:T.textSubtle }}>Add your payment details and taxpayer information.</div>
-            <div style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textSubtle }}>Required before your checkout link can go live.</div>
+      {/* Payment and tax info — required nudge, hidden once the page is filled in
+          (matches Figma's Unpublished/Filled state, node 4782:41534/41542, where
+          this instance is hidden). */}
+      {!canPublish && (
+        <SetupSection title="Payment and tax info" action={
+          <span style={{ background:"#ffe1e1", color:"#bd1818", fontFamily:FONT_SANS,
+            fontSize:14, fontWeight:600, borderRadius:999, padding:"4px 8px" }}>Required</span>
+        }>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:16, alignItems:"flex-start", justifyContent:"space-between" }}>
+            <div>
+              <div style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:700, color:T.textSubtle }}>Add your payment details and taxpayer information.</div>
+              <div style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textSubtle }}>Required before your checkout link can go live.</div>
+            </div>
+            <a href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:4,
+              color:T.textLink, fontWeight:600, fontSize:16, textDecoration:"underline", flexShrink:0 }}>
+              Set up payment &amp; tax info <Ms name="open_in_new" />
+            </a>
           </div>
-          <a href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:4,
-            color:T.textLink, fontWeight:600, fontSize:16, textDecoration:"underline", flexShrink:0 }}>
-            Set up payment &amp; tax info <Ms name="open_in_new" />
-          </a>
-        </div>
-      </SetupSection>
+        </SetupSection>
+      )}
 
       {/* Spacer so the last section isn't hidden behind the fixed sticky bar below */}
       <div style={{ height:72 }} />
