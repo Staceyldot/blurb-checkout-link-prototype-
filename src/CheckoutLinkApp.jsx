@@ -3003,6 +3003,29 @@ function SetupSection({ title, action, dividerless, children }) {
 
 /* Label column pinned to 154px and inputs capped at 524px, matching the Figma
    two-column field layout used throughout this page's sections. */
+/* Codex Design System tooltip — dark bubble, appears on hover/focus of its
+   trigger. `icon` on SetupFieldRow takes tooltip copy (the "Long (~15 words)"
+   variant, per the field-tooltip-length spec) rather than a bare boolean, so
+   each field can carry its own text instead of a generic hint. */
+function Tooltip({ text, children }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <span style={{ position:"relative", display:"inline-flex" }}
+      onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}
+      onFocus={() => setOpen(true)} onBlur={() => setOpen(false)}>
+      {children}
+      {open && (
+        <span role="tooltip" style={{ position:"absolute", bottom:"calc(100% + 8px)", left:"50%",
+          transform:"translateX(-50%)", width:170, background:T.textBold, color:"#fff",
+          fontFamily:FONT_SANS, fontSize:13, fontWeight:600, lineHeight:1.4, borderRadius:6,
+          padding:"8px 10px", zIndex:10, pointerEvents:"none" }}>
+          {text}
+        </span>
+      )}
+    </span>
+  );
+}
+
 function SetupFieldRow({ label, icon, children }) {
   const { isMobile } = useViewport();
   return (
@@ -3011,7 +3034,9 @@ function SetupFieldRow({ label, icon, children }) {
       <div style={{ width: isMobile ? "auto" : 154, flexShrink:0, paddingTop:8, display:"flex", gap:4, alignItems:"center",
         fontFamily:FONT_SANS, fontSize:18, fontWeight:600, color:T.textSubtle }}>
         {label}
-        {icon && <Ms name="info" size={16} color={T.textSubtle} />}
+        {icon && (typeof icon === "string"
+          ? <Tooltip text={icon}><Ms name="info" size={16} color={T.textSubtle} /></Tooltip>
+          : <Ms name="info" size={16} color={T.textSubtle} />)}
       </div>
       <div style={{ flex:"1 1 0", minWidth:0, maxWidth: isMobile ? "100%" : 524, display:"flex", flexDirection:"column", gap:8 }}>
         {children}
@@ -3024,14 +3049,30 @@ function SetupHint({ children }) {
   return <p style={{ margin:0, fontSize:14, color:T.textSubtle, fontFamily:FONT_SANS }}>{children}</p>;
 }
 
-function SetupTextField({ placeholder, hint, height }) {
+/* `value`/`onChange` make this a real controlled field (Listing title, About
+   the book) so the AI draft panel below has something live to write into.
+   Omitting them keeps the old static placeholder look for fields this pass
+   doesn't wire up. `maxLen` drives a live "n/max" hint, matching the counters
+   on the empty-state Figma spec. */
+function SetupTextField({ placeholder, hint, height, value, onChange, maxLen }) {
+  const controlled = onChange !== undefined;
+  const fieldStyle = { border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
+    background:T.surface, height, width:"100%", fontFamily:FONT_SANS, fontSize:16, color:T.textBold,
+    resize:"none" };
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-      <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
-        background:T.surface, height, display:"flex", alignItems: height ? "flex-start" : "center" }}>
-        <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textDisabled }}>{placeholder}</span>
-      </div>
-      {hint && <SetupHint>{hint}</SetupHint>}
+      {controlled ? (
+        height
+          ? <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+              maxLength={maxLen} style={fieldStyle} />
+          : <input value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+              maxLength={maxLen} style={fieldStyle} />
+      ) : (
+        <div style={{ ...fieldStyle, display:"flex", alignItems: height ? "flex-start" : "center" }}>
+          <span style={{ color:T.textDisabled }}>{placeholder}</span>
+        </div>
+      )}
+      {maxLen ? <SetupHint>{(value || "").length}/{maxLen}</SetupHint> : hint && <SetupHint>{hint}</SetupHint>}
     </div>
   );
 }
@@ -3047,6 +3088,50 @@ function SetupDropdown({ value = "Select.." }) {
 }
 
 function SetupDot() { return <Ms name="fiber_manual_record" size={6} color={T.textSubtle} style={{ flexShrink:0 }} />; }
+
+function Chip({ label, onRemove }) {
+  return (
+    <span style={{ display:"inline-flex", alignItems:"center", gap:4, maxWidth:312, paddingLeft:12,
+      border:`1px solid ${T.borderActive}`, borderRadius:999, background:T.surface }}>
+      <span style={{ fontFamily:FONT_SANS, fontSize:14, fontWeight:600, color:T.textBold, whiteSpace:"nowrap",
+        overflow:"hidden", textOverflow:"ellipsis" }}>{label}</span>
+      <button onClick={onRemove} aria-label={`Remove ${label}`} style={{ width:32, height:32, flexShrink:0,
+        background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>
+        <Ms name="close" size={16} color={T.textBold} />
+      </button>
+    </span>
+  );
+}
+
+/* Keywords is a chip input rather than a plain text field once it holds values —
+   matches the Figma "Chip Group" pattern reused in both the setup page field and
+   the AI draft panel's results step. Enter adds the trimmed value; caps at 7 to
+   match the field's own hint copy. */
+function SetupKeywordsField({ keywords, setKeywords }) {
+  const [draft, setDraft] = useState("");
+  const addKeyword = () => {
+    const v = draft.trim();
+    if (!v || keywords.length >= 7 || keywords.includes(v)) return;
+    setKeywords([...keywords, v]);
+    setDraft("");
+  };
+  const removeKeyword = i => setKeywords(keywords.filter((_, idx) => idx !== i));
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+      <input value={draft} onChange={e => setDraft(e.target.value)}
+        onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addKeyword(); } }}
+        placeholder="Add a keyword.." disabled={keywords.length >= 7}
+        style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, width:"100%",
+          fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background: keywords.length >= 7 ? T.disabled : T.surface }} />
+      {keywords.length > 0 && (
+        <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+          {keywords.map((k, i) => <Chip key={k} label={k} onRemove={() => removeKeyword(i)} />)}
+        </div>
+      )}
+      <SetupHint>Press Enter to add each keyword. Up to 7 keywords.</SetupHint>
+    </div>
+  );
+}
 
 function BookDetailsRow() {
   const { isMobile } = useViewport();
@@ -3117,6 +3202,149 @@ function SwitchToggle({ on, onToggle }) {
   );
 }
 
+/* Generated content is fixed rather than templated from the prompt/tone — this is a
+   prototype demoing the review-and-apply interaction (Figma node 5423:93216), not a
+   real drafting model, so the "result" is always the same copy the design specs. */
+const AI_DRAFT = {
+  title: "Pride and Preconceptions, Gift Edition",
+  description: "Can you fall for the right person when you’ve already decided everything about them is wrong?\nElara Vance is a landscape architect who relies on sharp first impressions. When tech entrepreneur Julian Cross arrives to turn her town’s historic community garden into a corporate campus, she instantly writes him off as arrogant, cold, and profit-driven. Julian sees Elara as an impractical idealist blocking essential economic progress.\nForced to negotiate, their meetings are a masterclass in sharp retorts. Elara is convinced Julian treats people like equations; Julian believes Elara's pride won't let her compromise.\nBut as forced proximity blurs the lines of their rivalry, they discover unexpected depth beneath each other's armor. To find common ground, they must tear down the hardest walls of all: the preconceptions they built around one another.\nA witty, enemies-to-lovers contemporary romance for fans of Emily Henry. Pride and Preconceptions explores the delightful danger of judging a book by its cover—and the courage it takes to be proven wrong.",
+  keywords: ["contemporary romance", "enemies to lovers", "slow burn", "second chances", "first impressions", "small town romance", "women's fiction"],
+};
+const AI_TONES = ["Playful", "Warm", "Literary", "Bold"];
+const AI_SHIMMER = "linear-gradient(94deg, rgb(211,196,245) 0%, rgba(179,152,237,.88) 55%, rgb(204,189,245) 100%)";
+
+/* Matches Figma "AI Flow (Inline)" (node 5423:93216) — a right-side slide-over,
+   same overlay/slide pattern as CartDrawer, with three phases: prompt, loading
+   (shimmer placeholders over the same layout the results will fill), and
+   results (generated fields, each with its own on/off toggle, plus removable
+   keyword chips). Fixed content, not templated from the prompt/tone — this
+   demos the review-and-apply interaction, not a real model. */
+function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setTitleOn, descOn, setDescOn,
+  keywords, onRemoveKeyword, onClose, onStartDraft, onApply }) {
+  return (
+    <>
+      <div onClick={onClose}
+        style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.45)", zIndex:120,
+          opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none", transition:"opacity .25s" }} />
+      <div style={{ position:"fixed", top:0, right:0, bottom:0, width:400, maxWidth:"92vw", background:"#f3f0fd",
+        zIndex:130, transform: open ? "translateX(0)" : "translateX(100%)", transition:"transform .3s ease",
+        display:"flex", flexDirection:"column", fontFamily:FONT_SANS }}>
+        <div style={{ display:"flex", justifyContent:"flex-end", padding:24, flexShrink:0 }}>
+          <button onClick={onClose} aria-label="Close" style={{ background:"none", border:"none", cursor:"pointer", display:"flex" }}>
+            <Ms name="close" size={24} color={T.textBold} />
+          </button>
+        </div>
+
+        <div style={{ flex:1, overflowY:"auto", padding:"0 24px 24px", display:"flex", flexDirection:"column", gap:16 }}>
+          {phase === "prompt" && (
+            <>
+              <div style={{ textAlign:"center", display:"flex", flexDirection:"column", gap:8 }}>
+                <span style={{ fontWeight:700, fontSize:16, color:T.textSubtle }}>Draft a description and keywords</span>
+                <span style={{ fontSize:16, color:T.textSubtle }}>
+                  Tell us about your book, and we'll draft the rest, edit it afterwards.<br />
+                  The more detail you give, the better the results.
+                </span>
+              </div>
+              <textarea value={input} onChange={e => setInput(e.target.value)}
+                placeholder="e.g. It's a modern rom-com retelling of Pride and Prejudice. Witty, a little chaotic, second-chance romance vibes."
+                style={{ width:"100%", height:193, border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
+                  fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface, resize:"none" }} />
+              <div>
+                <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:8 }}>
+                  <span style={{ fontSize:12, color:T.textSubtle }}>Tone (optional)</span>
+                  <Ms name="info" size={16} color={T.textSubtle} />
+                </div>
+                <div style={{ display:"flex", flexWrap:"wrap", gap:12 }}>
+                  {AI_TONES.map(t => (
+                    <button key={t} onClick={() => setTone(t)} style={{ width:140, padding:8, borderRadius:T.radius,
+                      border: tone === t ? `2px solid ${T.borderActive}` : `1px solid ${T.border}`,
+                      background:T.surface, display:"flex", flexDirection:"column", alignItems:"center", gap:8, cursor:"pointer" }}>
+                      <Ms name="menu_book" size={20} color={T.textBold} />
+                      <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>{t}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {(phase === "loading" || phase === "results") && (
+            <>
+              <p style={{ margin:0, fontSize:16, color:T.textBold }}>Drafted with AI. Review and edit before you go live.</p>
+
+              <div style={{ display:"flex", gap:8, alignItems:"flex-start", width:"100%" }}>
+                <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column", gap:8 }}>
+                  <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>Listing title</span>
+                  <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface,
+                    fontSize:16, color:T.textBold, minHeight:40 }}>
+                    {phase === "results" ? AI_DRAFT.title : ""}
+                  </div>
+                  {phase === "results" && <SetupHint>{AI_DRAFT.title.length}/70</SetupHint>}
+                </div>
+                {phase === "results" && (
+                  <button onClick={() => setTitleOn(v => !v)} aria-label="Use this title" style={{ marginTop:32,
+                    flexShrink:0, background:"none", border:"none", cursor:"pointer", display:"flex" }}>
+                    <Ms name={titleOn ? "radio_button_checked" : "radio_button_unchecked"} color={titleOn ? T.brand : T.border} />
+                  </button>
+                )}
+              </div>
+
+              <div style={{ display:"flex", gap:8, alignItems:"flex-start", width:"100%" }}>
+                <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column", gap:8 }}>
+                  <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>About the book</span>
+                  <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface,
+                    fontSize:16, color:T.textBold, height:150, overflowY:"auto", whiteSpace:"pre-wrap" }}>
+                    {phase === "results" && AI_DRAFT.description}
+                    {phase === "loading" && (
+                      <div style={{ display:"flex", flexDirection:"column", gap:8, paddingTop:4 }}>
+                        {[100, 100, 80].map((w, i) => (
+                          <div key={i} style={{ height:16, width:`${w}%`, borderRadius:4, backgroundImage:AI_SHIMMER }} />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {phase === "results" && <SetupHint>{AI_DRAFT.description.length}/1466</SetupHint>}
+                </div>
+                {phase === "results" && (
+                  <button onClick={() => setDescOn(v => !v)} aria-label="Use this description" style={{ marginTop:32,
+                    flexShrink:0, background:"none", border:"none", cursor:"pointer", display:"flex" }}>
+                    <Ms name={descOn ? "radio_button_checked" : "radio_button_unchecked"} color={descOn ? T.brand : T.border} />
+                  </button>
+                )}
+              </div>
+
+              <div>
+                <div style={{ fontSize:16, fontWeight:600, color:T.textBold }}>Keywords</div>
+                <SetupHint>Remove any that don't apply to your book.</SetupHint>
+                <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginTop:8 }}>
+                  {phase === "results" && keywords.map((k, i) => <Chip key={k} label={k} onRemove={() => onRemoveKeyword(i)} />)}
+                  {phase === "loading" && [190, 146, 134].map((w, i) => (
+                    <div key={i} style={{ height:32, width:w, borderRadius:36, backgroundImage:AI_SHIMMER }} />
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        <div style={{ borderTop:`1px solid ${T.borderSubtle}`, padding:24, display:"flex", flexDirection:"column",
+          alignItems:"flex-start", gap:8, flexShrink:0 }}>
+          {phase === "prompt" ? (
+            <Btn fullWidth disabled={!input.trim()} onClick={onStartDraft}>Draft content</Btn>
+          ) : (
+            <Btn fullWidth disabled={phase !== "results"} onClick={onApply}>Apply selected</Btn>
+          )}
+          <p style={{ margin:0, fontSize:12, color:T.textSubtle }}>
+            {phase === "prompt"
+              ? "Generated with AI. It may make mistakes. Review before using."
+              : "AI can make mistakes. Double-check the content for issues."}
+          </p>
+        </div>
+      </div>
+    </>
+  );
+}
+
 function LinkSetupPage({ onContinue }) {
   const { isMobile } = useViewport();
   const [copied, setCopied] = useState(false);
@@ -3125,6 +3353,41 @@ function LinkSetupPage({ onContinue }) {
   const [finish, setFinish] = useState("Gloss");
   const [authorVisible, setAuthorVisible] = useState(true);
   const [sectionHidden, setSectionHidden] = useState(false);
+
+  // Listing content fields — plain state so the AI draft panel has something to write into.
+  const [listingTitle, setListingTitle] = useState("");
+  const [aboutBook, setAboutBook] = useState("");
+  const [keywords, setKeywords] = useState([]);
+
+  // "Draft this for me" panel — prompt -> loading -> results.
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiPhase, setAiPhase] = useState("prompt");
+  const [aiInput, setAiInput] = useState("");
+  const [aiTone, setAiTone] = useState("Literary");
+  const [aiTitleOn, setAiTitleOn] = useState(true);
+  const [aiDescOn, setAiDescOn] = useState(true);
+  const [aiKeywords, setAiKeywords] = useState([]);
+
+  const openAiPanel = () => { setAiOpen(true); setAiPhase("prompt"); };
+  const closeAiPanel = () => { setAiOpen(false); setAiPhase("prompt"); setAiInput(""); };
+  const startDraft = () => {
+    setAiPhase("loading");
+    setTimeout(() => {
+      setAiKeywords(AI_DRAFT.keywords);
+      setAiTitleOn(true);
+      setAiDescOn(true);
+      setAiPhase("results");
+    }, 1600);
+  };
+  const removeAiKeyword = i => setAiKeywords(aiKeywords.filter((_, idx) => idx !== i));
+  const applyDraft = () => {
+    if (aiTitleOn) setListingTitle(AI_DRAFT.title);
+    if (aiDescOn) setAboutBook(AI_DRAFT.description);
+    if (aiKeywords.length) {
+      setKeywords(prev => Array.from(new Set([...prev, ...aiKeywords])).slice(0, 7));
+    }
+    closeAiPanel();
+  };
 
   const slug = PRODUCT.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   const linkUrl = `blurb.com/hub/482910-${slug}`;
@@ -3138,7 +3401,7 @@ function LinkSetupPage({ onContinue }) {
     <div style={{ minHeight:"100vh", background:T.bg, fontFamily:FONT_SANS }}>
       {/* Order-a-copy nudge — sellers can't buy their own link, so this is the way to
           get a proof copy before going live. */}
-      <div style={{ padding: isMobile ? "16px 20px" : "24px 80px" }}>
+      <div style={{ padding: isMobile ? "16px 20px" : "24px 80px", background:T.surface }}>
         <div style={{ background:T.panel, borderRadius:T.radius, padding:16, display:"flex",
           flexWrap:"wrap", gap:12, alignItems:"flex-start", justifyContent:"space-between" }}>
           <div style={{ display:"flex", gap:8, alignItems:"flex-start", flex:"1 1 320px", minWidth:0 }}>
@@ -3195,7 +3458,7 @@ function LinkSetupPage({ onContinue }) {
 
       {/* Listing content — empty state */}
       <SetupSection title="Listing content" action={
-        <button onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:8,
+        <button onClick={openAiPanel} style={{ display:"flex", alignItems:"center", gap:8,
           border:"1px solid #7a3dc4", borderRadius:T.radius, background:T.surface, padding:"8px 24px", cursor:"pointer",
           flexShrink:0 }}>
           <Ms name="auto_awesome" size={20} color="#7a3dc4" />
@@ -3203,14 +3466,14 @@ function LinkSetupPage({ onContinue }) {
         </button>
       }>
         <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-          <SetupFieldRow label="Listing title" icon>
-            <SetupTextField placeholder="e.g., Where Silence Speaks" hint="0/70" />
+          <SetupFieldRow label="Listing title" icon="This is the title buyers see. It doesn't affect your book's printed title or ISBN.">
+            <SetupTextField placeholder="e.g., Where Silence Speaks" value={listingTitle} onChange={setListingTitle} maxLen={70} />
           </SetupFieldRow>
           <SetupFieldRow label="About the book">
-            <SetupTextField placeholder="e.g. keep it playful, mention it’s a gift edition" hint="0/1466" height={150} />
+            <SetupTextField placeholder="e.g. keep it playful, mention it’s a gift edition" value={aboutBook} onChange={setAboutBook} maxLen={1466} height={150} />
           </SetupFieldRow>
-          <SetupFieldRow label="Keywords" icon>
-            <SetupTextField placeholder="Add a keyword.." hint="Press Enter to add each keyword. Up to 7 keywords." />
+          <SetupFieldRow label="Keywords" icon="Keywords help buyers find your book on Google. Use words shopper would search for.">
+            <SetupKeywordsField keywords={keywords} setKeywords={setKeywords} />
           </SetupFieldRow>
         </div>
       </SetupSection>
@@ -3367,6 +3630,11 @@ function LinkSetupPage({ onContinue }) {
       {/* Spacer so the last section isn't hidden behind the fixed sticky bar below */}
       <div style={{ height:72 }} />
       <StickyCtaBar onPreview={onContinue} />
+
+      <DraftPanel open={aiOpen} phase={aiPhase} input={aiInput} setInput={setAiInput}
+        tone={aiTone} setTone={setAiTone} titleOn={aiTitleOn} setTitleOn={setAiTitleOn}
+        descOn={aiDescOn} setDescOn={setAiDescOn} keywords={aiKeywords} onRemoveKeyword={removeAiKeyword}
+        onClose={closeAiPanel} onStartDraft={startDraft} onApply={applyDraft} />
     </div>
   );
 }
