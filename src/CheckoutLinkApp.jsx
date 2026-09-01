@@ -2958,7 +2958,7 @@ function DemoBar({ view, onJump, onSwitchFlow, variant, onVariantChange, express
 }
 
 /* ═══════════════════════════ ROOT ═══════════════════════════ */
-/* ?stage=<pdp|checkout|confirm|email> opens the fork on that screen.
+/* ?stage=<setup|pdp|checkout|confirm|email> opens the fork on that screen.
 
    The seller-side link setup page and the hosted PDP live in a different
    prototype, so a demo of the whole journey has to cross from there into this
@@ -2967,14 +2967,17 @@ function DemoBar({ view, onJump, onSwitchFlow, variant, onVariantChange, express
    the product. The stage keys are the stepper's own, so the URL and the demo bar
    can't disagree about what the stages are.
 
-   Unrecognised values fall back to the PDP rather than throwing: a mistyped demo
-   URL should still open on something. Like the regular flow's params this seeds
-   the first render only — using the stepper afterwards doesn't rewrite the URL. */
+   Default (and fallback for an unrecognised value) is Setup — a shopper clicking
+   a real checkout link lands on the PDP, but this demo build opens on Setup so it
+   tells the whole story, seller side first, without needing ?stage=setup typed
+   in. A mistyped demo URL should still open on something rather than throw.
+   Like the regular flow's params this seeds the first render only — using the
+   stepper afterwards doesn't rewrite the URL. */
 const STAGE_KEYS = STAGES.map(s => s.key);
 const initialStage = () => {
-  if (typeof window === "undefined") return "pdp";
+  if (typeof window === "undefined") return "setup";
   const s = (new URLSearchParams(window.location.search).get("stage") || "").trim().toLowerCase();
-  return STAGE_KEYS.includes(s) ? s : "pdp";
+  return STAGE_KEYS.includes(s) ? s : "setup";
 };
 
 /* ═══════════════════════════ LINK SETUP (seller-side) ═══════════════════════════
@@ -3350,7 +3353,13 @@ function LinkSetupPage({ onContinue }) {
   const [copied, setCopied] = useState(false);
   const [preview, setPreview] = useState("sample");
   const [openMaterial, setOpenMaterial] = useState("cover");
-  const [finish, setFinish] = useState("Gloss");
+  const [finish, setFinish] = useState(null);
+  /* Picking a cover finish is the demo's stand-in for "enough required fields are
+     filled to publish" — matches Figma's Unpublished/Filled state (node 4782:41534),
+     where Publish in the sticky bar goes from disabled to active. Not real
+     validation across every required field, just this one representative trigger. */
+  const [canPublish, setCanPublish] = useState(false);
+  const chooseFinish = f => { setFinish(f); setCanPublish(true); };
   const [authorVisible, setAuthorVisible] = useState(true);
   const [sectionHidden, setSectionHidden] = useState(false);
 
@@ -3496,7 +3505,7 @@ function LinkSetupPage({ onContinue }) {
           <MaterialsRow title="Cover finish" first open={openMaterial === "cover"} onToggle={() => setOpenMaterial(openMaterial === "cover" ? null : "cover")}>
             <div style={{ display:"flex", gap:8 }}>
               {["Gloss", "Matte"].map(f => (
-                <button key={f} onClick={() => setFinish(f)} style={{ flex:1, padding:"12px 16px", borderRadius:T.radius,
+                <button key={f} onClick={() => chooseFinish(f)} style={{ flex:1, padding:"12px 16px", borderRadius:T.radius,
                   border: finish === f ? `1px solid ${T.borderActive}` : `1px solid ${T.border}`,
                   background:T.surface, fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold, cursor:"pointer" }}>
                   {f}
@@ -3629,7 +3638,7 @@ function LinkSetupPage({ onContinue }) {
 
       {/* Spacer so the last section isn't hidden behind the fixed sticky bar below */}
       <div style={{ height:72 }} />
-      <StickyCtaBar onPreview={onContinue} />
+      <StickyCtaBar onPreview={onContinue} canPublish={canPublish} />
 
       <DraftPanel open={aiOpen} phase={aiPhase} input={aiInput} setInput={setAiInput}
         tone={aiTone} setTone={setAiTone} titleOn={aiTitleOn} setTitleOn={setAiTitleOn}
@@ -3645,7 +3654,7 @@ function LinkSetupPage({ onContinue }) {
    reaches. "Preview listing" is also the demo's bridge into the PDP: previewing
    the listing IS what a shopper does next, so it doubles as forward navigation
    here rather than needing a separate, Figma-less "continue" control. */
-function StickyCtaBar({ onPreview }) {
+function StickyCtaBar({ onPreview, canPublish }) {
   const { isMobile } = useViewport();
   return (
     <div style={{ position:"fixed", left:0, right:0, bottom:0, zIndex:30, background:T.surface,
@@ -3659,7 +3668,7 @@ function StickyCtaBar({ onPreview }) {
       </button>
       <div style={{ display:"flex", gap:8, flexShrink:0 }}>
         <Btn variant="secondary" onClick={() => {}}>Save draft</Btn>
-        <Btn disabled>Publish</Btn>
+        <Btn disabled={!canPublish} onClick={() => {}}>Publish</Btn>
       </div>
     </div>
   );
