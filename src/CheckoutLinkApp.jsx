@@ -356,7 +356,7 @@ function Btn({ children, onClick, variant="primary", disabled, fullWidth }) {
   const variants = {
     primary:   { background:T.brand, color:"#fff" },
     secondary: { background:"transparent", color:T.brand, border:`1px solid ${T.brand}` },
-    disabled:  { background:T.disabled, color:T.textDisabled },
+    disabled:  { background:T.disabled, color:T.textDisabled, border:`1px solid ${T.border}` },
   };
   const s = disabled ? variants.disabled : variants[variant];
   return (
@@ -2865,11 +2865,11 @@ function DemoSettings({ variant, onVariantChange, format, onFormatChange, expres
               and "why can't I change this?" is the question the hint answers. */}
           <SettingRow label="This link offers"
             hint={oneVariant
-              ? "A checkout link sells the printed book. The PDF is bought from the regular Blurb flow."
+              ? "An Instant Store sells the printed book. The PDF is bought from the regular Blurb flow."
               : "What the seller enabled. Changing it restarts the demo."}>
             <select value={variant} onChange={e => onVariantChange(e.target.value)}
               disabled={oneVariant}
-              aria-label="Formats offered on this checkout link"
+              aria-label="Formats offered on this Instant Store"
               style={{ ...DEMO_SELECT, width:"100%",
                 ...(oneVariant && { color:T.textDisabled, background:T.bg, cursor:"not-allowed" }) }}>
               {Object.values(LINK_VARIANTS).map(v => <option key={v.id} value={v.id}>{v.label}</option>)}
@@ -2920,12 +2920,12 @@ function DemoSettings({ variant, onVariantChange, format, onFormatChange, expres
    Mirrors FlowSwitcher in App.jsx — keep the options in step. */
 function FlowSwitcher({ onSwitchFlow }) {
   if (!onSwitchFlow)
-    return <strong style={{ fontSize:12, color:T.textBold }}>Checkout Link demo</strong>;
+    return <strong style={{ fontSize:12, color:T.textBold }}>Instant Store demo</strong>;
   return (
     <select value="checkout-link" onChange={e => onSwitchFlow(e.target.value)} aria-label="Switch prototype"
       title="Switch to another prototype in this build" style={DEMO_SELECT}>
       <option value="regular">Regular flow</option>
-      <option value="checkout-link">Checkout Link demo</option>
+      <option value="checkout-link">Instant Store demo</option>
     </select>
   );
 }
@@ -3027,7 +3027,11 @@ function SetupSection({ title, action, dividerless, children }) {
    trigger. `icon` on SetupFieldRow takes tooltip copy (the "Long (~15 words)"
    variant, per the field-tooltip-length spec) rather than a bare boolean, so
    each field can carry its own text instead of a generic hint. */
-function Tooltip({ text, children }) {
+/* `align="left"` anchors the tooltip's left edge to the icon instead of centering
+   it — needed for icons that sit near the left edge of a narrow, horizontally
+   clipping container (like the DraftPanel's scrollable body, where overflow-y:auto
+   makes overflow-x compute to auto too), so a wide tooltip doesn't get cut off. */
+function Tooltip({ text, children, width = 170, align = "center" }) {
   const [open, setOpen] = useState(false);
   return (
     <span style={{ position:"relative", display:"inline-flex" }}
@@ -3035,8 +3039,9 @@ function Tooltip({ text, children }) {
       onFocus={() => setOpen(true)} onBlur={() => setOpen(false)}>
       {children}
       {open && (
-        <span role="tooltip" style={{ position:"absolute", bottom:"calc(100% + 8px)", left:"50%",
-          transform:"translateX(-50%)", width:170, background:T.textBold, color:"#fff",
+        <span role="tooltip" style={{ position:"absolute", bottom:"calc(100% + 8px)",
+          ...(align === "left" ? { left:0 } : { left:"50%", transform:"translateX(-50%)" }),
+          width, background:T.textBold, color:"#fff",
           fontFamily:FONT_SANS, fontSize:13, fontWeight:600, lineHeight:1.4, borderRadius:6,
           padding:"8px 10px", zIndex:10, pointerEvents:"none" }}>
           {text}
@@ -3247,7 +3252,12 @@ const AI_DRAFT = {
   description: "Can you fall for the right person when you’ve already decided everything about them is wrong?\nElara Vance is a landscape architect who relies on sharp first impressions. When tech entrepreneur Julian Cross arrives to turn her town’s historic community garden into a corporate campus, she instantly writes him off as arrogant, cold, and profit-driven. Julian sees Elara as an impractical idealist blocking essential economic progress.\nForced to negotiate, their meetings are a masterclass in sharp retorts. Elara is convinced Julian treats people like equations; Julian believes Elara's pride won't let her compromise.\nBut as forced proximity blurs the lines of their rivalry, they discover unexpected depth beneath each other's armor. To find common ground, they must tear down the hardest walls of all: the preconceptions they built around one another.\nA witty, enemies-to-lovers contemporary romance for fans of Emily Henry. Pride and Preconceptions explores the delightful danger of judging a book by its cover—and the courage it takes to be proven wrong.",
   keywords: ["contemporary romance", "enemies to lovers", "slow burn", "second chances", "first impressions", "small town romance", "women's fiction"],
 };
-const AI_TONES = ["Playful", "Warm", "Literary", "Bold"];
+const AI_TONES = [
+  { label: "Playful", icon: "sentiment_very_satisfied" },
+  { label: "Warm", icon: "favorite" },
+  { label: "Literary", icon: "history_edu" },
+  { label: "Bold", icon: "local_fire_department" },
+];
 const AI_SHIMMER = "linear-gradient(94deg, rgb(211,196,245) 0%, rgba(179,152,237,.88) 55%, rgb(204,189,245) 100%)";
 
 /* Author profile "filled" copy — matches Figma's Unpublished/Filled state
@@ -3285,7 +3295,7 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
         <div style={{ flex:1, overflowY:"auto", padding:"0 24px 24px", display:"flex", flexDirection:"column", gap:16 }}>
           {phase === "prompt" && (
             <>
-              <div style={{ textAlign:"center", display:"flex", flexDirection:"column", gap:8 }}>
+              <div style={{ textAlign:"left", display:"flex", flexDirection:"column", gap:8 }}>
                 <span style={{ fontWeight:700, fontSize:16, color:T.textSubtle }}>Draft a description and keywords</span>
                 <span style={{ fontSize:16, color:T.textSubtle }}>
                   Tell us about your book, and we'll draft the rest, edit it afterwards.<br />
@@ -3299,15 +3309,17 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
               <div>
                 <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:8 }}>
                   <span style={{ fontSize:12, color:T.textSubtle }}>Tone (optional)</span>
-                  <Ms name="info" size={16} color={T.textSubtle} />
+                  <Tooltip width={260} align="left" text="Playful: light, fun, and a little cheeky. Warm: friendly and inviting, like talking to a friend. Literary: descriptive and evocative, with polished prose. Bold: confident and direct, straight to the point.">
+                    <Ms name="info" size={16} color={T.textSubtle} />
+                  </Tooltip>
                 </div>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:12 }}>
                   {AI_TONES.map(t => (
-                    <button key={t} onClick={() => setTone(t)} style={{ width:140, padding:8, borderRadius:T.radius,
-                      border: tone === t ? `2px solid ${T.borderActive}` : `1px solid ${T.border}`,
+                    <button key={t.label} onClick={() => setTone(t.label)} style={{ width:140, padding:8, borderRadius:T.radius,
+                      border: tone === t.label ? `2px solid ${T.borderActive}` : `1px solid ${T.border}`,
                       background:T.surface, display:"flex", flexDirection:"column", alignItems:"center", gap:8, cursor:"pointer" }}>
-                      <Ms name="menu_book" size={20} color={T.textBold} />
-                      <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>{t}</span>
+                      <Ms name={t.icon} size={20} color={T.textBold} />
+                      <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>{t.label}</span>
                     </button>
                   ))}
                 </div>
@@ -3323,8 +3335,9 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
                 <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column", gap:8 }}>
                   <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>Listing title</span>
                   <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface,
-                    fontSize:16, color:T.textBold, minHeight:40 }}>
-                    {phase === "results" ? AI_DRAFT.title : ""}
+                    fontSize:16, color:T.textBold, minHeight:40, display:"flex", alignItems:"center" }}>
+                    {phase === "results" && AI_DRAFT.title}
+                    {phase === "loading" && <div style={{ height:16, width:"70%", borderRadius:4, backgroundImage:AI_SHIMMER }} />}
                   </div>
                   {phase === "results" && <SetupHint>{AI_DRAFT.title.length}/70</SetupHint>}
                 </div>
@@ -3409,6 +3422,8 @@ function LinkSetupPage({ onContinue }) {
      validation across every required field, just this one representative trigger. */
   const [canPublish, setCanPublish] = useState(false);
   const [publishOpen, setPublishOpen] = useState(false);
+  const [published, setPublished] = useState(false);
+  const doPublish = () => { setPublished(true); setPublishOpen(true); };
   const [authorVisible, setAuthorVisible] = useState(true);
 
   // Listing content fields — plain state so the AI draft panel has something to write into.
@@ -3466,23 +3481,31 @@ function LinkSetupPage({ onContinue }) {
   return (
     <div style={{ minHeight:"100vh", background:T.bg, fontFamily:FONT_SANS }}>
       {/* Order-a-copy nudge — sellers can't buy their own link, so this is the way to
-          get a proof copy before going live. */}
+          get a proof copy before going live. Switches to a warning once the link is
+          actually published: it's live, but still can't take an order until a proof
+          copy is ordered. */}
       <div style={{ padding: isMobile ? "16px 20px" : "24px 80px", background:T.surface }}>
-        <div style={{ background:T.panel, borderRadius:T.radius, padding:16, display:"flex",
+        <div style={{ background: published ? "#fdf6db" : T.panel, borderRadius:T.radius, padding:16, display:"flex",
           flexWrap:"wrap", gap:12, alignItems:"flex-start", justifyContent:"space-between" }}>
           <div style={{ display:"flex", gap:8, alignItems:"flex-start", flex:"1 1 320px", minWidth:0 }}>
-            <Ms name="info" color={T.brand} style={{ marginTop:2 }} />
+            {published
+              ? <Ms name="warning" color="#8a6d1f" style={{ marginTop:2 }} />
+              : <Ms name="info" color={T.brand} style={{ marginTop:2 }} />}
             <div>
-              <div style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:600, color:T.textBold }}>Order a copy before you go live</div>
+              <div style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:600, color:T.textBold }}>
+                {published ? "Your link is live, but buyers can't purchase yet." : "Order a copy before you go live"}
+              </div>
               <div style={{ fontFamily:FONT_SANS, fontSize:14, color:T.textSubtle, marginTop:2 }}>
-                Buyers can't purchase until you do. You'll save 50% with code FREECOPY.
+                {published
+                  ? "Order a copy now and save 50% with code FREECOPY."
+                  : "Buyers can't purchase until you do. You'll save 50% with code FREECOPY."}
               </div>
             </div>
           </div>
           <button onClick={e => e.preventDefault()} style={{ background:"none", border:"none", cursor:"pointer",
             display:"flex", alignItems:"center", gap:4, color:T.brand, fontWeight:600, fontSize:14,
             borderBottom:`1px solid ${T.brand}`, paddingBottom:2, flexShrink:0 }}>
-            Order a copy <Ms name="arrow_forward" size={16} color={T.brand} />
+            {published ? "Order a copy now" : "Order a copy"} <Ms name="arrow_forward" size={16} color={T.brand} />
           </button>
         </div>
       </div>
@@ -3491,7 +3514,7 @@ function LinkSetupPage({ onContinue }) {
       <div style={{ background:T.surface, padding: isMobile ? "16px 20px 24px" : "32px 80px 24px" }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
           <div style={{ fontFamily:FONT_SANS, fontSize:14, display:"flex", alignItems:"center", gap:4 }}>
-            <a href="#" onClick={e => e.preventDefault()} style={{ color:T.textLink }}>Checkout links</a>
+            <a href="#" onClick={e => e.preventDefault()} style={{ color:T.textLink }}>Instant Store</a>
             <Ms name="chevron_right" size={16} color={T.textSubtle} />
             <span style={{ color:T.textSubtle }}>{PRODUCT.title}</span>
           </div>
@@ -3639,7 +3662,7 @@ function LinkSetupPage({ onContinue }) {
         </div>
       }>
         <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
-          <SetupFieldRow label={<>Copy from<br />checkout link</>} icon>
+          <SetupFieldRow label={<>Copy from<br />Instant Store</>} icon>
             <SetupDropdown />
           </SetupFieldRow>
           <SetupFieldRow label="Profile photo">
@@ -3722,7 +3745,7 @@ function LinkSetupPage({ onContinue }) {
           <div style={{ display:"flex", flexWrap:"wrap", gap:16, alignItems:"flex-start", justifyContent:"space-between" }}>
             <div>
               <div style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:700, color:T.textSubtle }}>Add your payment details and taxpayer information.</div>
-              <div style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textSubtle }}>Required before your checkout link can go live.</div>
+              <div style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textSubtle }}>Required before your Instant Store can go live.</div>
             </div>
             <a href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:4,
               color:T.textLink, fontWeight:600, fontSize:16, textDecoration:"underline", flexShrink:0 }}>
@@ -3734,7 +3757,7 @@ function LinkSetupPage({ onContinue }) {
 
       {/* Spacer so the last section isn't hidden behind the fixed sticky bar below */}
       <div style={{ height:72 }} />
-      <StickyCtaBar onPreview={onContinue} canPublish={canPublish} onPublish={() => setPublishOpen(true)} />
+      <StickyCtaBar onPreview={onContinue} canPublish={canPublish} onPublish={doPublish} />
 
       <DraftPanel open={aiOpen} phase={aiPhase} input={aiInput} setInput={setAiInput}
         tone={aiTone} setTone={setAiTone} titleOn={aiTitleOn} setTitleOn={setAiTitleOn}

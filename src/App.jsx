@@ -2688,7 +2688,7 @@ function DemoSettings({ userType, onUserTypeChange, expressStyle, onExpressStyle
               says where the setting has an effect. */}
           <SettingRow label="Express treatment"
             hint={expressApplies
-              ? "The two express treatments on the cart, the same pair the Checkout Link demo compares."
+              ? "The two express treatments on the cart, the same pair the Instant Store demo compares."
               : "Only the cart offers express wallets — the checkout's own express row is a separate step."}>
             <select value={expressStyle} onChange={e => onExpressStyleChange(e.target.value)}
               disabled={!expressApplies} aria-label="Express checkout button treatment"
@@ -2723,7 +2723,7 @@ function FlowSwitcher({ onSwitchPrototype }) {
     <select value="regular" onChange={e => onSwitchPrototype(e.target.value)} aria-label="Switch prototype"
       title="Switch to another prototype in this build" style={DEMO_SELECT}>
       <option value="regular">Regular flow</option>
-      <option value="checkout-link">Checkout Link demo</option>
+      <option value="checkout-link">Instant Store demo</option>
     </select>
   );
 }
