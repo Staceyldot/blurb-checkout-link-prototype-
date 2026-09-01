@@ -3296,7 +3296,7 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
           {phase === "prompt" && (
             <>
               <div style={{ textAlign:"left", display:"flex", flexDirection:"column", gap:8 }}>
-                <span style={{ fontWeight:700, fontSize:16, color:T.textSubtle }}>Draft a description and keywords</span>
+                <span style={{ fontWeight:700, fontSize:16, color:T.textSubtle }}>Draft a listing title, description, and keywords</span>
                 <span style={{ fontSize:16, color:T.textSubtle }}>
                   Tell us about your book, and we'll draft the rest, edit it afterwards.<br />
                   The more detail you give, the better the results.
@@ -3315,7 +3315,7 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
                 </div>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:12 }}>
                   {AI_TONES.map(t => (
-                    <button key={t.label} onClick={() => setTone(t.label)} style={{ width:140, padding:8, borderRadius:T.radius,
+                    <button key={t.label} onClick={() => setTone(t.label)} style={{ flex:"1 1 calc(50% - 6px)", padding:8, borderRadius:T.radius,
                       border: tone === t.label ? `2px solid ${T.borderActive}` : `1px solid ${T.border}`,
                       background:T.surface, display:"flex", flexDirection:"column", alignItems:"center", gap:8, cursor:"pointer" }}>
                       <Ms name={t.icon} size={20} color={T.textBold} />
@@ -3390,7 +3390,17 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
         <div style={{ borderTop:`1px solid ${T.borderSubtle}`, padding:24, display:"flex", flexDirection:"column",
           alignItems:"flex-start", gap:8, flexShrink:0 }}>
           {phase === "prompt" ? (
-            <Btn fullWidth disabled={!input.trim()} onClick={onStartDraft}>Draft content</Btn>
+            <>
+              <span style={{ fontSize:12, color:T.textSubtle }}>3 of 5 uses left today</span>
+              <button onClick={input.trim() ? onStartDraft : undefined} disabled={!input.trim()}
+                style={{ width:"100%", padding:"10px 24px", borderRadius:T.radius, fontSize:15, fontWeight:600,
+                  cursor: input.trim() ? "pointer" : "not-allowed",
+                  background: input.trim() ? T.surface : T.disabled,
+                  color: input.trim() ? T.textBold : T.textDisabled,
+                  border: `1px solid ${input.trim() ? "#7a3dc4" : T.border}` }}>
+                Draft content
+              </button>
+            </>
           ) : (
             <Btn fullWidth disabled={phase !== "results"} onClick={onApply}>Apply selected</Btn>
           )}
