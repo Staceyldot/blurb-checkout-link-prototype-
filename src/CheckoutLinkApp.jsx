@@ -62,6 +62,7 @@ const AUTHOR_PHOTO = "/assets/author-paige.png";
 const BLURB_LOGO_EMAIL = "/assets/blurb-logo-email.png";  // full-color logo for the email header
 const BOOK_SENSE    = "/assets/book-sense.png";
 const BOOK_GARDNERS = "/assets/book-gardners.png";
+const PUBLISH_CELEBRATION = "/assets/publish-celebration.png";
 
 /* Setup page Materials swatches (Figma node 4806:45519, "Unpublished / Filled"
    state) — downsized to 200px max edge (from multi-MB Figma exports) since they
@@ -3407,6 +3408,7 @@ function LinkSetupPage({ onContinue }) {
      Figma state, and flips the sticky bar's Publish button active. Not real
      validation across every required field, just this one representative trigger. */
   const [canPublish, setCanPublish] = useState(false);
+  const [publishOpen, setPublishOpen] = useState(false);
   const [authorVisible, setAuthorVisible] = useState(true);
 
   // Listing content fields — plain state so the AI draft panel has something to write into.
@@ -3732,12 +3734,15 @@ function LinkSetupPage({ onContinue }) {
 
       {/* Spacer so the last section isn't hidden behind the fixed sticky bar below */}
       <div style={{ height:72 }} />
-      <StickyCtaBar onPreview={onContinue} canPublish={canPublish} />
+      <StickyCtaBar onPreview={onContinue} canPublish={canPublish} onPublish={() => setPublishOpen(true)} />
 
       <DraftPanel open={aiOpen} phase={aiPhase} input={aiInput} setInput={setAiInput}
         tone={aiTone} setTone={setAiTone} titleOn={aiTitleOn} setTitleOn={setAiTitleOn}
         descOn={aiDescOn} setDescOn={setAiDescOn} keywords={aiKeywords} onRemoveKeyword={removeAiKeyword}
         onClose={closeAiPanel} onStartDraft={startDraft} onApply={applyDraft} />
+
+      <PublishModal open={publishOpen} onClose={() => setPublishOpen(false)} onViewLive={onContinue}
+        copied={copied} onCopyLink={copyLink} />
     </div>
   );
 }
@@ -3748,7 +3753,7 @@ function LinkSetupPage({ onContinue }) {
    reaches. "Preview listing" is also the demo's bridge into the PDP: previewing
    the listing IS what a shopper does next, so it doubles as forward navigation
    here rather than needing a separate, Figma-less "continue" control. */
-function StickyCtaBar({ onPreview, canPublish }) {
+function StickyCtaBar({ onPreview, canPublish, onPublish }) {
   const { isMobile } = useViewport();
   return (
     <div style={{ position:"fixed", left:0, right:0, bottom:0, zIndex:30, background:T.surface,
@@ -3762,9 +3767,50 @@ function StickyCtaBar({ onPreview, canPublish }) {
       </button>
       <div style={{ display:"flex", gap:8, flexShrink:0 }}>
         <Btn variant="secondary" onClick={() => {}}>Save draft</Btn>
-        <Btn disabled={!canPublish} onClick={() => {}}>Publish</Btn>
+        <Btn disabled={!canPublish} onClick={onPublish}>Publish</Btn>
       </div>
     </div>
+  );
+}
+
+/* "Your link is live" success modal (Figma node 5285:83721), shown after
+   Publish. Same overlay pattern as CartDrawer/DraftPanel, centered instead of
+   a side drawer since this is a one-off confirmation, not a form. */
+function PublishModal({ open, onClose, onViewLive, copied, onCopyLink }) {
+  if (!open) return null;
+  return (
+    <>
+      <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.45)", zIndex:140 }} />
+      <div style={{ position:"fixed", top:"50%", left:"50%", transform:"translate(-50%,-50%)", zIndex:150,
+        width:500, maxWidth:"92vw", background:T.surface, borderRadius:T.radius, padding:24,
+        boxShadow:"0 8px 32px rgba(0,0,0,.16)", display:"flex", flexDirection:"column", alignItems:"center", gap:24,
+        fontFamily:FONT_SANS }}>
+        <div style={{ display:"flex", justifyContent:"flex-end", width:"100%" }}>
+          <button onClick={onClose} aria-label="Close" style={{ background:"none", border:"none", cursor:"pointer", display:"flex" }}>
+            <Ms name="close" size={24} color={T.textBold} />
+          </button>
+        </div>
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16 }}>
+          <img src={PUBLISH_CELEBRATION} alt="" style={{ width:296, maxWidth:"100%" }} />
+          <p style={{ margin:0, fontFamily:FONT_HEADING, fontSize:32, fontWeight:500, color:T.textBold, textAlign:"center" }}>
+            Your link is live
+          </p>
+        </div>
+        <p style={{ margin:0, fontSize:16, color:T.textSubtle, textAlign:"center" }}>
+          Buyers can now order {PRODUCT.title}.
+        </p>
+        <button onClick={onCopyLink} style={{ background:"none", border:"none", cursor:"pointer",
+          display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:18,
+          textDecoration:"underline" }}>
+          <Ms name={copied ? "check" : "link"} color={copied ? T.success : T.textLink} />
+          {copied ? "Copied!" : "Copy link"}
+        </button>
+        <div style={{ display:"flex", gap:12, justifyContent:"flex-end", width:"100%" }}>
+          <Btn variant="secondary" onClick={onViewLive}>View live page</Btn>
+          <Btn onClick={() => {}}><Ms name="share" size={20} color="#fff" style={{ marginRight:4 }} />Share on social</Btn>
+        </div>
+      </div>
+    </>
   );
 }
 
