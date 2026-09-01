@@ -2977,25 +2977,394 @@ const initialStage = () => {
   return STAGE_KEYS.includes(s) ? s : "pdp";
 };
 
-/* Stands in for the seller-side link setup page, which is owned elsewhere and
-   isn't part of this package (see README §2). It's here only so the demo
-   stepper can show the whole journey — a shopper's first stop is a link the
-   seller already generated, not this screen. */
-function LinkSetupPlaceholder({ onContinue }) {
+/* ═══════════════════════════ LINK SETUP (seller-side) ═══════════════════════════
+   The seller-side link setup page is owned elsewhere (see README §2) — this is a
+   prototype-side reconstruction of it, matched to Figma "Empty / Checkout Link Set
+   Up / Desktop" (node 2440:7709), so the demo stepper can show the whole journey
+   starting from where a seller would actually land before generating the link a
+   shopper clicks. Dashboard chrome (Blurb's own top nav + icon sidebar) is left out
+   on purpose — this app already has its own top bar (DemoBar) for wayfinding, and
+   stacking two nav bars would read as broken, not faithful. */
+
+function SetupSection({ title, action, dividerless, children }) {
+  const { isMobile } = useViewport();
   return (
-    <div style={{ minHeight:"100vh", background:T.bg, display:"flex", alignItems:"center",
-      justifyContent:"center", padding:20, fontFamily:FONT_SANS }}>
-      <div style={{ maxWidth:440, width:"100%", background:T.surface, border:`1px solid ${T.borderSubtle}`,
-        borderRadius:T.radius, padding:32, textAlign:"center" }}>
-        <Ms name="link" size={28} color={T.brand} />
-        <h1 style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:600, color:T.textBold, margin:"12px 0 8px" }}>
-          Link setup
+    <div style={{ background:T.surface, width:"100%", padding: isMobile ? "24px 20px" : "32px 80px" }}>
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16,
+        borderBottom: dividerless ? "none" : `1px solid ${T.borderSubtle}`, paddingBottom: dividerless ? 0 : 16,
+        marginBottom: dividerless ? 0 : 16 }}>
+        <h2 style={{ fontFamily:FONT_HEADING, fontSize:24, fontWeight:600, color:T.textBold, margin:0 }}>{title}</h2>
+        {action}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+/* Label column pinned to 154px and inputs capped at 524px, matching the Figma
+   two-column field layout used throughout this page's sections. */
+function SetupFieldRow({ label, icon, children }) {
+  const { isMobile } = useViewport();
+  return (
+    <div style={{ display:"flex", gap:16, alignItems:"flex-start", width:"100%",
+      flexDirection: isMobile ? "column" : "row" }}>
+      <div style={{ width: isMobile ? "auto" : 154, flexShrink:0, paddingTop:8, display:"flex", gap:4, alignItems:"center",
+        fontFamily:FONT_SANS, fontSize:18, fontWeight:600, color:T.textSubtle }}>
+        {label}
+        {icon && <Ms name="info" size={16} color={T.textSubtle} />}
+      </div>
+      <div style={{ flex:"1 1 0", minWidth:0, maxWidth: isMobile ? "100%" : 524, display:"flex", flexDirection:"column", gap:8 }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function SetupHint({ children }) {
+  return <p style={{ margin:0, fontSize:14, color:T.textSubtle, fontFamily:FONT_SANS }}>{children}</p>;
+}
+
+function SetupTextField({ placeholder, hint, height }) {
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+      <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
+        background:T.surface, height, display:"flex", alignItems: height ? "flex-start" : "center" }}>
+        <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textDisabled }}>{placeholder}</span>
+      </div>
+      {hint && <SetupHint>{hint}</SetupHint>}
+    </div>
+  );
+}
+
+function SetupDropdown({ value = "Select.." }) {
+  return (
+    <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, height:40,
+      display:"flex", alignItems:"center", justifyContent:"space-between", background:T.surface }}>
+      <span style={{ fontFamily:FONT_SANS, fontSize:16, color: value === "Select.." ? T.textDisabled : T.textBold }}>{value}</span>
+      <Ms name="expand_more" size={20} color={T.textBold} />
+    </div>
+  );
+}
+
+function SetupDot() { return <Ms name="fiber_manual_record" size={6} color={T.textSubtle} style={{ flexShrink:0 }} />; }
+
+function BookDetailsRow() {
+  const { isMobile } = useViewport();
+  const bits = [PRODUCT.format, PRODUCT.options, PRODUCT.pages, "Language English", "Published October 2022"];
+  return (
+    <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:8, rowGap:6,
+      fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textSubtle }}>
+      {bits.map((b, i) => (
+        <React.Fragment key={i}>
+          {i > 0 && <SetupDot />}
+          <span>{b}</span>
+        </React.Fragment>
+      ))}
+      <SetupDot />
+      <span style={{ display:"flex", alignItems:"center", gap:4 }}>
+        ISBN 9798211886148 <Ms name="content_copy" size={16} color={T.textSubtle} />
+      </span>
+      {!isMobile && <SetupDot />}
+      <a href="#" onClick={e => e.preventDefault()}
+        style={{ color:T.textLink, fontWeight:600, textDecoration:"underline" }}>View project</a>
+    </div>
+  );
+}
+
+function PreviewCard({ icon, title, sub, selected, onSelect, showLink }) {
+  return (
+    <button onClick={onSelect} style={{ width:140, height:150, flexShrink:0, textAlign:"left", cursor:"pointer",
+      display:"flex", flexDirection:"column", gap:8, padding:8, borderRadius:T.radius, background:T.surface,
+      border: selected ? `1px solid ${T.borderActive}` : `1px solid ${T.border}`,
+      boxShadow: selected ? `0 0 0 1px ${T.borderActive}` : "none" }}>
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+        <Ms name={icon} size={20} color={T.textBold} />
+        <Ms name={selected ? "radio_button_checked" : "radio_button_unchecked"} size={20} color={selected ? T.brand : T.border} />
+      </div>
+      <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+        <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>{title}</span>
+        <span style={{ fontFamily:FONT_SANS, fontSize:14, color:T.textSubtle }}>{sub}</span>
+      </div>
+      {showLink && selected && (
+        <div style={{ flex:1, display:"flex", alignItems:"flex-end" }}>
+          <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textLink, textDecoration:"underline" }}>See pages</span>
+        </div>
+      )}
+    </button>
+  );
+}
+
+function MaterialsRow({ title, first, open, onToggle, children }) {
+  return (
+    <div style={{ borderTop: first ? "none" : `1px solid ${T.border}` }}>
+      <button onClick={onToggle} style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between",
+        background:"none", border:"none", cursor:"pointer", padding:"12px 0", textAlign:"left" }}>
+        <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>{title}</span>
+        <Ms name={open ? "expand_less" : "expand_more"} />
+      </button>
+      <Collapse open={open}><div style={{ paddingBottom:24 }}>{children}</div></Collapse>
+    </div>
+  );
+}
+
+function SwitchToggle({ on, onToggle }) {
+  return (
+    <button onClick={onToggle} aria-pressed={on} style={{ width:52, height:28, borderRadius:14, border:"none",
+      cursor:"pointer", padding:2, background: on ? T.brand : "#c4c4c4", display:"flex",
+      justifyContent: on ? "flex-end" : "flex-start", transition:"background .15s" }}>
+      <span style={{ width:24, height:24, borderRadius:"50%", background:"#fff", display:"block" }} />
+    </button>
+  );
+}
+
+function LinkSetupPage({ onContinue }) {
+  const { isMobile } = useViewport();
+  const [copied, setCopied] = useState(false);
+  const [preview, setPreview] = useState("sample");
+  const [openMaterial, setOpenMaterial] = useState("cover");
+  const [finish, setFinish] = useState("Gloss");
+  const [authorVisible, setAuthorVisible] = useState(true);
+  const [sectionHidden, setSectionHidden] = useState(false);
+
+  const slug = PRODUCT.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  const linkUrl = `blurb.com/hub/482910-${slug}`;
+  const copyLink = () => {
+    if (navigator.clipboard) navigator.clipboard.writeText(`https://${linkUrl}`).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  return (
+    <div style={{ minHeight:"100vh", background:T.bg, fontFamily:FONT_SANS }}>
+      {/* Order-a-copy nudge — sellers can't buy their own link, so this is the way to
+          get a proof copy before going live. */}
+      <div style={{ padding: isMobile ? "16px 20px" : "24px 80px" }}>
+        <div style={{ background:T.panel, borderRadius:T.radius, padding:16, display:"flex",
+          flexWrap:"wrap", gap:12, alignItems:"flex-start", justifyContent:"space-between" }}>
+          <div style={{ display:"flex", gap:8, alignItems:"flex-start", flex:"1 1 320px", minWidth:0 }}>
+            <Ms name="info" color={T.brand} style={{ marginTop:2 }} />
+            <div>
+              <div style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:600, color:T.textBold }}>Order a copy before you go live</div>
+              <div style={{ fontFamily:FONT_SANS, fontSize:14, color:T.textSubtle, marginTop:2 }}>
+                Buyers can't purchase until you do. You'll save 50% with code FREECOPY.
+              </div>
+            </div>
+          </div>
+          <button onClick={e => e.preventDefault()} style={{ background:"none", border:"none", cursor:"pointer",
+            display:"flex", alignItems:"center", gap:4, color:T.brand, fontWeight:600, fontSize:14,
+            borderBottom:`1px solid ${T.brand}`, paddingBottom:2, flexShrink:0 }}>
+            Order a copy <Ms name="arrow_forward" size={16} color={T.brand} />
+          </button>
+        </div>
+      </div>
+
+      {/* Header: breadcrumb, title, and the auto-generated link field */}
+      <div style={{ background:T.surface, padding: isMobile ? "16px 20px 24px" : "32px 80px 24px" }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
+          <div style={{ fontFamily:FONT_SANS, fontSize:14, display:"flex", alignItems:"center", gap:4 }}>
+            <a href="#" onClick={e => e.preventDefault()} style={{ color:T.textLink }}>Checkout links</a>
+            <Ms name="chevron_right" size={16} color={T.textSubtle} />
+            <span style={{ color:T.textSubtle }}>{PRODUCT.title}</span>
+          </div>
+          <button onClick={e => e.preventDefault()} style={{ width:40, height:40, border:`1px solid ${T.border}`,
+            borderRadius:T.radius, background:T.surface, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
+            <Ms name="more_vert" />
+          </button>
+        </div>
+        <h1 style={{ fontFamily:FONT_HEADING, fontSize: isMobile ? 26 : 32, fontWeight:600, color:T.textBold, margin:"0 0 16px" }}>
+          {PRODUCT.title}
         </h1>
-        <p style={{ fontSize:14, color:T.textSubtle, lineHeight:1.5, margin:"0 0 20px" }}>
-          The seller builds their Checkout Link here — picks the book, what format it sells,
-          and copies the shareable link. That page is owned elsewhere and isn't part of this
-          prototype; this stop just marks where it sits in the journey.
+        <div style={{ maxWidth:560 }}>
+          <button onClick={copyLink} style={{ width:"100%", display:"flex", alignItems:"center", gap:8,
+            border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface, cursor:"pointer" }}>
+            <span style={{ flex:1, textAlign:"left", fontFamily:FONT_SANS, fontSize:16, minWidth:0, overflow:"hidden",
+              textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+              <span style={{ color:T.textDisabled }}>blurb.com/hub/482910-</span>
+              <span style={{ color:T.textBold }}>{slug}</span>
+            </span>
+            <Ms name={copied ? "check" : "content_copy"} color={copied ? T.success : T.textBold} />
+          </button>
+          <SetupHint>{copied ? "Copied!" : "Auto-generated from your book title. Edit it anytime."}</SetupHint>
+        </div>
+      </div>
+
+      {/* Book details */}
+      <SetupSection title="Book details">
+        <BookDetailsRow />
+      </SetupSection>
+
+      {/* Listing content — empty state */}
+      <SetupSection title="Listing content" action={
+        <button onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:8,
+          border:"1px solid #7a3dc4", borderRadius:T.radius, background:T.surface, padding:"8px 24px", cursor:"pointer",
+          flexShrink:0 }}>
+          <Ms name="auto_awesome" size={20} color="#7a3dc4" />
+          <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>Optimize listing</span>
+        </button>
+      }>
+        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+          <SetupFieldRow label="Listing title" icon>
+            <SetupTextField placeholder="e.g., Where Silence Speaks" hint="0/70" />
+          </SetupFieldRow>
+          <SetupFieldRow label="About the book">
+            <SetupTextField placeholder="e.g. keep it playful, mention it’s a gift edition" hint="0/1466" height={150} />
+          </SetupFieldRow>
+          <SetupFieldRow label="Keywords" icon>
+            <SetupTextField placeholder="Add a keyword.." hint="Press Enter to add each keyword. Up to 7 keywords." />
+          </SetupFieldRow>
+        </div>
+      </SetupSection>
+
+      {/* Book preview settings */}
+      <SetupSection title="Book preview settings">
+        <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
+          <PreviewCard icon="menu_book" title="Sample preview" sub="First 15 pages" showLink
+            selected={preview === "sample"} onSelect={() => setPreview("sample")} />
+          <PreviewCard icon="import_contacts" title="Full preview" sub="All pages"
+            selected={preview === "full"} onSelect={() => setPreview("full")} />
+          <PreviewCard icon="visibility_off" title="No preview" sub="Cover only"
+            selected={preview === "none"} onSelect={() => setPreview("none")} />
+        </div>
+      </SetupSection>
+
+      {/* Materials */}
+      <SetupSection title="Materials">
+        <div style={{ maxWidth:685, borderBottom:`1px solid ${T.border}` }}>
+          <MaterialsRow title="Cover finish" first open={openMaterial === "cover"} onToggle={() => setOpenMaterial(openMaterial === "cover" ? null : "cover")}>
+            <div style={{ display:"flex", gap:8 }}>
+              {["Gloss", "Matte"].map(f => (
+                <button key={f} onClick={() => setFinish(f)} style={{ flex:1, padding:"12px 16px", borderRadius:T.radius,
+                  border: finish === f ? `1px solid ${T.borderActive}` : `1px solid ${T.border}`,
+                  background:T.surface, fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold, cursor:"pointer" }}>
+                  {f}
+                </button>
+              ))}
+            </div>
+          </MaterialsRow>
+          <MaterialsRow title="Linen cover colors" open={openMaterial === "linen"} onToggle={() => setOpenMaterial(openMaterial === "linen" ? null : "linen")}>
+            <SetupHint>No linen cover selected yet.</SetupHint>
+          </MaterialsRow>
+          <MaterialsRow title="Endsheet colors" open={openMaterial === "endsheet"} onToggle={() => setOpenMaterial(openMaterial === "endsheet" ? null : "endsheet")}>
+            <SetupHint>No endsheet color selected yet.</SetupHint>
+          </MaterialsRow>
+        </div>
+      </SetupSection>
+
+      {/* Pricing — empty state */}
+      <SetupSection title="Pricing">
+        <div style={{ maxWidth:685, display:"flex", flexDirection:"column", gap:16 }}>
+          <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
+            <div style={{ flex:"1 1 140px", minWidth:140 }}>
+              <div style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>Print cost</div>
+              <div style={{ fontFamily:FONT_HEADING, fontSize:32, fontWeight:600, color:T.textSubtle, margin:"4px 0" }}>$ --</div>
+              <SetupHint>Set by format, size, and materials</SetupHint>
+            </div>
+            {[
+              { label:"Listing Price", value:"$ --", hint:"Buyers pay" },
+              { label:"Profit margin", value:"-- %", hint:"Percent you earn" },
+              { label:"Profit", value:"$ --", hint:"What you earn" },
+            ].map(f => (
+              <div key={f.label} style={{ flex:"1 1 140px", minWidth:140, display:"flex", flexDirection:"column", gap:8 }}>
+                <div style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>{f.label}</div>
+                <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, fontFamily:FONT_SANS,
+                  fontSize:16, color:T.textBold }}>{f.value}</div>
+                <SetupHint>{f.hint}</SetupHint>
+              </div>
+            ))}
+          </div>
+          <SetupHint>Editing one updates the others automatically.</SetupHint>
+          <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:18, color:T.textBold }}>
+            Shipping isn't included here. It's added at checkout based on buyer location.
+          </p>
+        </div>
+      </SetupSection>
+
+      {/* Author profile */}
+      <SetupSection title="Author profile" action={
+        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <SwitchToggle on={authorVisible} onToggle={() => setAuthorVisible(v => !v)} />
+          <span style={{ fontFamily:FONT_SANS, fontSize:18, fontWeight:700, color:T.textBold }}>
+            {authorVisible ? "Visible to buyers" : "Hidden from buyers"}
+          </span>
+        </div>
+      }>
+        <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
+          <SetupFieldRow label={<>Copy from<br />checkout link</>} icon>
+            <SetupDropdown />
+          </SetupFieldRow>
+          <SetupFieldRow label="Profile photo">
+            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+              <div style={{ position:"relative", width:80, height:80 }}>
+                <div style={{ width:80, height:80, borderRadius:"50%", background:"#f5f0ea", display:"flex",
+                  alignItems:"center", justifyContent:"center" }}>
+                  <Ms name="person" size={40} color={T.textDisabled} />
+                </div>
+                <button onClick={e => e.preventDefault()} style={{ position:"absolute", bottom:-4, right:2, width:28, height:28,
+                  borderRadius:"50%", background:T.brand, border:"2px solid #f5f5f5", display:"flex", alignItems:"center",
+                  justifyContent:"center", cursor:"pointer" }}>
+                  <Ms name="photo_camera" size={14} color="#fff" />
+                </button>
+              </div>
+              <SetupHint>Accepts JPG, PNG, GIF, or BMP, up to 1MB.</SetupHint>
+            </div>
+          </SetupFieldRow>
+          <SetupFieldRow label="Author(s)">
+            <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, fontFamily:FONT_SANS,
+              fontSize:16, color:T.textBold }}>{PRODUCT.author}</div>
+            <button onClick={e => e.preventDefault()} style={{ alignSelf:"flex-start", display:"flex", alignItems:"center",
+              gap:8, border:`1px solid ${T.brand}`, borderRadius:T.radius, background:T.surface, padding:"8px 24px", cursor:"pointer" }}>
+              <Ms name="add" size={20} color={T.brand} />
+              <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.brand }}>Add author</span>
+            </button>
+          </SetupFieldRow>
+          <SetupFieldRow label="About the author(s)">
+            <SetupTextField placeholder="Share a short bio..." hint="0/1000" height={150} />
+          </SetupFieldRow>
+          <SetupFieldRow label="Social links">
+            <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+              <div style={{ width:125, flexShrink:0 }}><SetupDropdown /></div>
+              <div style={{ flex:1 }}><SetupTextField placeholder="Profile URL" /></div>
+              <Ms name="remove" color={T.textSubtle} />
+            </div>
+            <button onClick={e => e.preventDefault()} style={{ alignSelf:"flex-start", display:"flex", alignItems:"center",
+              gap:8, border:`1px solid ${T.brand}`, borderRadius:T.radius, background:T.surface, padding:"8px 24px", cursor:"pointer" }}>
+              <Ms name="add" size={20} color={T.brand} />
+              <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.brand }}>Add link</span>
+            </button>
+          </SetupFieldRow>
+        </div>
+      </SetupSection>
+
+      {/* Section preview — empty state, no other published books yet */}
+      <SetupSection title="Section preview" action={
+        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textBold }}>Hidden to buyers</span>
+          <SwitchToggle on={sectionHidden} onToggle={() => setSectionHidden(v => !v)} />
+        </div>
+      }>
+        <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:18, fontWeight:600, color:T.textSubtle }}>
+          You don't have other published books yet. This section will appear once you do.
         </p>
+      </SetupSection>
+
+      {/* Payment and tax info — required nudge */}
+      <SetupSection title="Payment and tax info" action={
+        <span style={{ background:"#ffe1e1", color:"#bd1818", fontFamily:FONT_SANS,
+          fontSize:14, fontWeight:600, borderRadius:999, padding:"4px 8px" }}>Required</span>
+      }>
+        <div style={{ display:"flex", flexWrap:"wrap", gap:16, alignItems:"flex-start", justifyContent:"space-between" }}>
+          <div>
+            <div style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:700, color:T.textSubtle }}>Add your payment details and taxpayer information.</div>
+            <div style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textSubtle }}>Required before your checkout link can go live.</div>
+          </div>
+          <a href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:4,
+            color:T.textLink, fontWeight:600, fontSize:16, textDecoration:"underline", flexShrink:0 }}>
+            Set up payment &amp; tax info <Ms name="open_in_new" />
+          </a>
+        </div>
+      </SetupSection>
+
+      <div style={{ padding: isMobile ? "24px 20px 40px" : "32px 80px 48px", display:"flex", justifyContent:"center" }}>
         <Btn onClick={onContinue}>Continue to product page</Btn>
       </div>
     </div>
@@ -3141,7 +3510,7 @@ function CheckoutLinkApp({ onSwitchFlow }) {
         skippedStages={checkoutSkipped ? ["checkout"] : []} />
 
       {view === "setup" && (
-        <LinkSetupPlaceholder onContinue={() => jump("pdp")} />
+        <LinkSetupPage onContinue={() => jump("pdp")} />
       )}
 
       {view === "pdp" && (
