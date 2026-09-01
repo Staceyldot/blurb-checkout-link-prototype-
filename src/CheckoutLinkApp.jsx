@@ -3364,8 +3364,34 @@ function LinkSetupPage({ onContinue }) {
         </div>
       </SetupSection>
 
-      <div style={{ padding: isMobile ? "24px 20px 40px" : "32px 80px 48px", display:"flex", justifyContent:"center" }}>
-        <Btn onClick={onContinue}>Continue to product page</Btn>
+      {/* Spacer so the last section isn't hidden behind the fixed sticky bar below */}
+      <div style={{ height:72 }} />
+      <StickyCtaBar onPreview={onContinue} />
+    </div>
+  );
+}
+
+/* Matches Figma "Sticky CTA Bar" (node 4411:46727), annotated "visible in empty
+   state" — Publish stays disabled until the required fields (Listing title,
+   Payment & tax info, etc.) are filled in, which this empty-state prototype never
+   reaches. "Preview listing" is also the demo's bridge into the PDP: previewing
+   the listing IS what a shopper does next, so it doubles as forward navigation
+   here rather than needing a separate, Figma-less "continue" control. */
+function StickyCtaBar({ onPreview }) {
+  const { isMobile } = useViewport();
+  return (
+    <div style={{ position:"fixed", left:0, right:0, bottom:0, zIndex:30, background:T.surface,
+      borderTop:`1px solid ${T.borderSubtle}`, boxShadow:"0 -4px 16px rgba(0,0,0,0.08)",
+      display:"flex", alignItems:"center", justifyContent:"space-between", gap:16,
+      padding: isMobile ? "16px 20px" : "16px 80px" }}>
+      <button onClick={onPreview} style={{ background:"none", border:"none", cursor:"pointer",
+        display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:16,
+        fontFamily:FONT_SANS, textDecoration:"underline", padding:0 }}>
+        Preview listing <Ms name="open_in_new" />
+      </button>
+      <div style={{ display:"flex", gap:8, flexShrink:0 }}>
+        <Btn variant="secondary" onClick={() => {}}>Save draft</Btn>
+        <Btn disabled>Publish</Btn>
       </div>
     </div>
   );
