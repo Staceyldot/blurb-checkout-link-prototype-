@@ -3199,7 +3199,7 @@ function LinkSetupPage({ onContinue }) {
           border:"1px solid #7a3dc4", borderRadius:T.radius, background:T.surface, padding:"8px 24px", cursor:"pointer",
           flexShrink:0 }}>
           <Ms name="auto_awesome" size={20} color="#7a3dc4" />
-          <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>Optimize listing</span>
+          <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>Draft this for me</span>
         </button>
       }>
         <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
