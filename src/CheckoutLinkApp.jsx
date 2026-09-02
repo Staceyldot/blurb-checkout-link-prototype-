@@ -3013,7 +3013,7 @@ function SetupSection({ title, action, dividerless, children }) {
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16,
         borderBottom: dividerless ? "none" : `1px solid ${T.borderSubtle}`, paddingBottom: dividerless ? 0 : 16,
         marginBottom: dividerless ? 0 : 16 }}>
-        <h2 style={{ fontFamily:FONT_HEADING, fontSize:24, fontWeight:600, color:T.textBold, margin:0 }}>{title}</h2>
+        <h2 style={{ fontFamily:FONT_HEADING, fontSize:24, fontWeight:500, color:T.textBold, margin:0 }}>{title}</h2>
         {action}
       </div>
       {children}
@@ -3632,7 +3632,7 @@ function LinkSetupPage({ onContinue }) {
             <Ms name="more_vert" />
           </button>
         </div>
-        <h1 style={{ fontFamily:FONT_HEADING, fontSize: isMobile ? 26 : 32, fontWeight:600, color:T.textBold, margin:"0 0 16px" }}>
+        <h1 style={{ fontFamily:FONT_HEADING, fontSize: isMobile ? 26 : 32, fontWeight:500, color:T.textBold, margin:"0 0 16px" }}>
           {PRODUCT.title}
         </h1>
         <div style={{ maxWidth:560 }}>
