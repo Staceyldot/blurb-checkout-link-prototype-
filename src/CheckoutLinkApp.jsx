@@ -3153,7 +3153,11 @@ function SetupKeywordsField({ keywords, setKeywords }) {
           {keywords.map((k, i) => <Chip key={k} label={k} onRemove={() => removeKeyword(i)} />)}
         </div>
       )}
-      <SetupHint>Press Enter to add each keyword. Up to 7 keywords.</SetupHint>
+      <SetupHint>
+        {keywords.length >= 7
+          ? "Maximum keywords reached. Remove one to add another."
+          : "Press Enter to add each keyword. Up to 7 keywords."}
+      </SetupHint>
     </div>
   );
 }
@@ -3337,14 +3341,17 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
               <div style={{ textAlign:"left", display:"flex", flexDirection:"column", gap:8 }}>
                 <span style={{ fontWeight:700, fontSize:16, color:T.textSubtle }}>Draft a listing title, description, and keywords</span>
                 <span style={{ fontSize:16, color:T.textSubtle }}>
-                  Tell us about your book, and we'll draft the rest, edit it afterwards.<br />
-                  The more detail you give, the better the results.
+                  Tell us about your book. We'll draft the rest.<br />
+                  The more detail, the better.
                 </span>
               </div>
-              <textarea value={input} onChange={e => setInput(e.target.value)}
-                placeholder="e.g. It's a modern rom-com retelling of Pride and Prejudice. Witty, a little chaotic, second-chance romance vibes."
-                style={{ width:"100%", height:193, minHeight:193, border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
-                  fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface, resize:"vertical" }} />
+              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                <textarea value={input} onChange={e => setInput(e.target.value)}
+                  placeholder="e.g. It's a modern rom-com retelling of Pride and Prejudice. Witty, a little chaotic, second-chance romance vibes."
+                  style={{ width:"100%", height:193, minHeight:193, border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
+                    fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface, resize:"vertical" }} />
+                <SetupHint>We don't read your book. Don't include sensitive information here.</SetupHint>
+              </div>
               <div>
                 <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:8 }}>
                   <span style={{ fontSize:12, color:T.textSubtle }}>Tone (optional)</span>
@@ -3368,7 +3375,7 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
 
           {(phase === "loading" || phase === "results") && (
             <>
-              <p style={{ margin:0, fontSize:16, color:T.textBold }}>We drafted your listing. Review and edit each field before applying.</p>
+              <p style={{ margin:0, fontSize:16, color:T.textBold }}>Here's what we came up with. Check what you'd like to use.</p>
 
               <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:8 }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
@@ -3671,7 +3678,7 @@ function LinkSetupPage({ onContinue }) {
                 <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textBold }}>Thanks for the feedback</span>
               </div>
             ) : (
-              <div style={{ background:"#f7f7f7", borderRadius:T.radius, padding:16, display:"flex",
+              <div style={{ background:"#F3F0FD", borderRadius:T.radius, padding:16, display:"flex",
                 alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
                 <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>Was this AI draft helpful?</span>
                 <div style={{ display:"flex", gap:20 }}>
