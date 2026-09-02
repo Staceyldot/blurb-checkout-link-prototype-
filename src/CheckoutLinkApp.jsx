@@ -3512,6 +3512,9 @@ function LinkSetupPage({ onContinue }) {
   const [publishOpen, setPublishOpen] = useState(false);
   const [published, setPublished] = useState(false);
   const doPublish = () => { setPublished(true); setPublishOpen(true); };
+  const [toast, setToast] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackChoice, setFeedbackChoice] = useState(null);
   const [authorVisible, setAuthorVisible] = useState(true);
 
   // Listing content fields — plain state so the AI draft panel has something to write into.
@@ -3556,6 +3559,8 @@ function LinkSetupPage({ onContinue }) {
       setKeywords(prev => Array.from(new Set([...prev, ...aiKeywords])).slice(0, 7));
     }
     closeAiPanel();
+    setToast(true);
+    setTimeout(() => { setToast(false); setShowFeedback(true); }, 3000);
   };
 
   const slug = PRODUCT.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -3655,6 +3660,30 @@ function LinkSetupPage({ onContinue }) {
           <SetupFieldRow label="Keywords" icon="Keywords help buyers find your book on Google. Use words shopper would search for.">
             <SetupKeywordsField keywords={keywords} setKeywords={setKeywords} />
           </SetupFieldRow>
+          {showFeedback && (
+            feedbackChoice ? (
+              <div style={{ background:"#f3f0fd", borderRadius:T.radius, padding:16 }}>
+                <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textBold }}>Thanks for the feedback</span>
+              </div>
+            ) : (
+              <div style={{ background:"#f7f7f7", borderRadius:T.radius, padding:16, display:"flex",
+                alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
+                <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>Was this AI draft helpful?</span>
+                <div style={{ display:"flex", gap:20 }}>
+                  <button onClick={() => setFeedbackChoice("helpful")} style={{ display:"flex", alignItems:"center", gap:6,
+                    background:"none", border:"none", cursor:"pointer", fontFamily:FONT_SANS, fontSize:16, fontWeight:600,
+                    color:T.textBold }}>
+                    <Ms name="thumb_up" size={20} color={T.textBold} /> Helpful
+                  </button>
+                  <button onClick={() => setFeedbackChoice("not-helpful")} style={{ display:"flex", alignItems:"center", gap:6,
+                    background:"none", border:"none", cursor:"pointer", fontFamily:FONT_SANS, fontSize:16, fontWeight:600,
+                    color:T.textBold }}>
+                    <Ms name="thumb_down" size={20} color={T.textBold} /> Not helpful
+                  </button>
+                </div>
+              </div>
+            )
+          )}
         </div>
       </SetupSection>
 
@@ -3860,6 +3889,8 @@ function LinkSetupPage({ onContinue }) {
 
     <PublishModal open={publishOpen} onClose={() => setPublishOpen(false)} onViewLive={onContinue}
       copied={copied} onCopyLink={copyLink} />
+
+    <Toast show={toast}>Draft applied to your listing.</Toast>
     </>
   );
 }
@@ -3893,6 +3924,20 @@ function StickyCtaBar({ onPreview, canPublish, onPublish, panelOpen }) {
 /* "Your link is live" success modal (Figma node 5285:83721), shown after
    Publish. Same overlay pattern as CartDrawer/DraftPanel, centered instead of
    a side drawer since this is a one-off confirmation, not a form. */
+/* Confirms the AI draft actually landed in the real fields once the panel closes
+   — otherwise "Apply selected" reads as a dead end with no feedback. */
+function Toast({ show, children }) {
+  return (
+    <div style={{ position:"fixed", top:20, left:"50%", transform: show ? "translate(-50%,0)" : "translate(-50%,-12px)",
+      zIndex:160, background:T.successBg, border:`1px solid ${T.success}`, borderRadius:8,
+      padding:"12px 20px", display:"flex", alignItems:"center", gap:10,
+      opacity: show ? 1 : 0, pointerEvents:"none", transition:"opacity .25s ease, transform .25s ease" }}>
+      <Ms name="check_circle" size={20} color={T.success} />
+      <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textBold }}>{children}</span>
+    </div>
+  );
+}
+
 function PublishModal({ open, onClose, onViewLive, copied, onCopyLink }) {
   if (!open) return null;
   return (
