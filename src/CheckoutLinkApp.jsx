@@ -3958,8 +3958,8 @@ function PublishModal({ open, onClose, onViewLive, copied, onCopyLink }) {
           </button>
         </div>
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16 }}>
-          <img src={PUBLISH_CELEBRATION} alt="" style={{ width:296, maxWidth:"100%" }} />
-          <p style={{ margin:0, fontFamily:FONT_HEADING, fontSize:32, fontWeight:500, color:T.textBold, textAlign:"center" }}>
+          <img src={PUBLISH_CELEBRATION} alt="" style={{ width:216, height:177, maxWidth:"100%" }} />
+          <p style={{ margin:0, fontFamily:FONT_HEADING, fontSize:24, fontWeight:400, lineHeight:1.2, color:T.textBold, textAlign:"center" }}>
             Your link is live
           </p>
         </div>
