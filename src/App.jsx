@@ -2808,7 +2808,7 @@ const coverThumb = w => ({ width:w, height:"auto", objectFit:"contain", borderRa
    demo one product rather than two unrelated ones. Kept in step with
    CheckoutLinkApp's PRODUCT by hand — the two files don't share constants. */
 const BOOK_SEED = {
-  title:"Liberal Libations", author:"Paige Hazelwood", type:"Photo Book",
+  title:"Liberal Libations", author:"Kim Newton Arispe", type:"Photo Book",
   options:"Standard Landscape, 10×8 in (25×20 cm)", pages:20,
   binding:"Hardcover, ImageWrap",
   spec:"Premium Paper, matte finish",

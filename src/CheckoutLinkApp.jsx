@@ -56,7 +56,7 @@ const VISA        = "/assets/visa.svg";
 const MASTERCARD  = "/assets/mastercard.svg";
 const AMEX        = "/assets/amex.svg";
 const DISCOVER    = "/assets/discover.svg";
-const BOOK_COVER  = "/assets/book-pride.png";
+const BOOK_COVER  = "/assets/book-liberal-libations.png";
 const BLURB_MARK  = "/assets/blurb-mark.svg";
 const AUTHOR_PHOTO = "/assets/author-paige.png";
 const BLURB_LOGO_EMAIL = "/assets/blurb-logo-email.png";  // full-color logo for the email header
@@ -109,7 +109,7 @@ const FONT_HEADING = "'Futura PT', 'Futura', 'Century Gothic', -apple-system, Bl
    its own bundle pricing. */
 const PRODUCT = {
   title:  "Liberal Libations",
-  author: "Paige Hazelwood",
+  author: "Kim Newton Arispe",
   format: "Hardcover, ImageWrap",
   paper:  "Premium Paper, matte finish",
   options:"Standard Landscape, 10×8 in (25×20 cm)",
@@ -1166,7 +1166,7 @@ function ProductPage({ variant, format, setFormat, expressStyle, onAddToCart, on
   const [detailsModal, setDetailsModal] = useState(false); // Print vs PDF comparison
   const [readMore, setReadMore] = useState(false);
 
-  const bio = "Paige Hazelwood writes contemporary romance set in small towns where everyone knows your business — and nobody minds sharing it. A former landscape architect turned full-time author, she draws on a life among community gardens and negotiating tables for her stories of sharp wits and softer landings.";
+  const bio = "Kim Newton Arispe writes contemporary romance set in small towns where everyone knows your business — and nobody minds sharing it. A former landscape architect turned full-time author, she draws on a life among community gardens and negotiating tables for her stories of sharp wits and softer landings.";
   const detail = [
     ...(hasPrint(format) ? ["Hardcover, ImageWrap", "10x8 in, 25x20 cm"] : []),
     ...(hasDigital(format) ? [`PDF, ${PDF_FILE.size}`] : []),
@@ -1181,11 +1181,14 @@ function ProductPage({ variant, format, setFormat, expressStyle, onAddToCart, on
       <div style={{ maxWidth:1280, margin:"0 auto", width:"100%", padding: isDesktop ? "40px 40px 0" : "24px 20px 0" }}>
         {/* Hero */}
         <div style={{ display:"flex", gap:40, alignItems:"flex-start", flexDirection: isDesktop ? "row" : "column" }}>
-          {/* Cover */}
+          {/* Cover — square bordered frame per Figma (node 3709:17913), not a
+              free-floating cover with a drop shadow. */}
           <div style={{ flex:1, display:"flex", flexDirection:"column", gap:14, alignItems:"flex-start", width:"100%" }}>
-            {/* Cover asset has no baked shadow — the preview component adds the drop shadow */}
-            <img src={BOOK_COVER} alt={PRODUCT.title}
-              style={{ width:"100%", maxWidth:535, height:"auto", display:"block", borderRadius:4, boxShadow:"0 12px 30px rgba(0,0,0,.22)" }} />
+            <div style={{ width:"100%", maxWidth:628, aspectRatio:"1 / 1", border:`1px solid ${T.disabled}`,
+              display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
+              <img src={BOOK_COVER} alt={PRODUCT.title}
+                style={{ maxWidth:"100%", maxHeight:"100%", objectFit:"contain", display:"block" }} />
+            </div>
             <button style={{ background:"none", border:"none", cursor:"pointer", padding:0,
               display:"flex", alignItems:"center", gap:4, color:T.textLink }}>
               <span style={{ fontSize:16, fontWeight:600, textDecoration:"underline" }}>Share</span>
@@ -1201,15 +1204,13 @@ function ProductPage({ variant, format, setFormat, expressStyle, onAddToCart, on
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
               <p style={{ fontSize:16, fontWeight:600, color:T.textBold }}>About the book</p>
               <p style={{ fontSize:16, color:T.textSubtle, lineHeight:1.5 }}>
-                Can you fall for the right person when you've already decided everything about them is wrong?
-                Elara Vance is a landscape architect who relies on sharp first impressions. When tech entrepreneur
-                Julian Cross arrives to turn her town's historic community garden into a corporate campus, she
-                instantly writes him off as arrogant, cold, and profit-driven.
+                Liberal Libations empowers the cocktail enthusiast to craft bar-quality cocktails for a large
+                crowd or for an intimate gathering. Make-ahead batch recipes mean less time mixing drinks and
+                more time enjoying each sip with friends. Over 85 recipes feature timeless classics and playful
+                originals.
                 {readMore && (
-                  <> {" "}Forced to negotiate, their meetings are a masterclass in sharp retorts. But as forced
-                  proximity blurs the lines of their rivalry, they discover unexpected depth beneath each other's
-                  armor. To find common ground, they must tear down the hardest walls of all: the preconceptions
-                  they built around one another.</>
+                  <> {" "}Each recipe includes make-ahead instructions, garnish ideas, and pairing suggestions,
+                  so hosting stays effortless whether you're serving four or forty.</>
                 )}
               </p>
               <button onClick={() => setReadMore(r => !r)}
@@ -3295,11 +3296,11 @@ const AI_SHIMMER = "linear-gradient(94deg, rgb(211,196,245) 0%, rgba(179,152,237
 /* Author profile "filled" copy — matches Figma's Unpublished/Filled state
    (node 4782:41541). Distinct from the shorter bio App.jsx/the PDP use for
    this same author; this is what the setup form itself shows once filled in. */
-const AUTHOR_BIO = "Paige Hazelwood writes contemporary romance set in small towns where everyone knows your business and nobody minds theirs. A former librarian with a weakness for enemies-to-lovers tropes and excellent coffee, she began writing fiction after years of recommending books she wished existed. Her debut novel Liberal Libations was inspired by a disastrous first impression that turned into something else entirely. She lives in Vermont with her very opinionated cat, Darcy.";
+const AUTHOR_BIO = "Kim Newton Arispe writes contemporary romance set in small towns where everyone knows your business and nobody minds theirs. A former librarian with a weakness for enemies-to-lovers tropes and excellent coffee, she began writing fiction after years of recommending books she wished existed. Her debut novel Liberal Libations was inspired by a disastrous first impression that turned into something else entirely. She lives in Vermont with her very opinionated cat, Darcy.";
 const AUTHOR_SOCIALS = [
-  { platform: "Instagram", url: "instagram.com/paigehazelwoodauthor" },
-  { platform: "Website", url: "paigehazelwoodauthor.com" },
-  { platform: "Other", url: "substack.com/paigehazelwoodauthor" },
+  { platform: "Instagram", url: "instagram.com/kimnewtonarispeauthor" },
+  { platform: "Website", url: "kimnewtonarispeauthor.com" },
+  { platform: "Other", url: "substack.com/kimnewtonarispeauthor" },
 ];
 
 /* Matches Figma "AI Flow (Inline)" (node 5423:93216) — a right-side slide-over,
