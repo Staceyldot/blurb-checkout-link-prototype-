@@ -3276,16 +3276,51 @@ const AUTHOR_SOCIALS = [
    results (generated fields, each with its own on/off toggle, plus removable
    keyword chips). Fixed content, not templated from the prompt/tone — this
    demos the review-and-apply interaction, not a real model. */
+/* The AI panel's own CTA style — outlined rather than the app's solid-fill
+   primary Btn, so it reads as a distinct "AI action" affordance: white with a
+   purple border when enabled, gray with a gray outline when disabled. */
+function AiOutlineButton({ children, onClick, disabled }) {
+  return (
+    <button onClick={disabled ? undefined : onClick} disabled={disabled}
+      style={{ width:"100%", padding:"10px 24px", borderRadius:T.radius, fontSize:15, fontWeight:600,
+        cursor: disabled ? "not-allowed" : "pointer",
+        background: disabled ? T.disabled : T.surface,
+        color: disabled ? T.textDisabled : T.textBold,
+        border: `1px solid ${disabled ? T.border : "#7a3dc4"}` }}>
+      {children}
+    </button>
+  );
+}
+
+/* "Use this" — picks which generated fields Apply selected commits. A checkbox
+   reads better than the earlier radio dot: each field is an independent
+   include/exclude choice, not one mutually-exclusive pick from a set. */
+function UseThisCheckbox({ checked, onChange }) {
+  return (
+    <button onClick={onChange} style={{ display:"flex", alignItems:"center", gap:8,
+      background:"none", border:"none", cursor:"pointer", padding:0, flexShrink:0 }}>
+      <span style={{ width:20, height:20, borderRadius:4, border:`1px solid ${T.textBold}`,
+        background: checked ? T.textBold : T.surface, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+        {checked && <Ms name="check" size={14} color="#fff" />}
+      </span>
+      <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>Use this</span>
+    </button>
+  );
+}
+
+/* No scrim, no fixed overlay: this panel is a real flex sibling of the main
+   content column (see LinkSetupPage's return), so opening it shrinks the page
+   rather than floating over it. The outer div's width is what animates and
+   participates in layout; the inner div is pinned to a fixed 400px and stuck to
+   the viewport top so it stays in view while the (much taller) main column
+   scrolls past it. */
 function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setTitleOn, descOn, setDescOn,
   keywords, onRemoveKeyword, onClose, onStartDraft, onApply }) {
   return (
-    <>
-      <div onClick={onClose}
-        style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.45)", zIndex:120,
-          opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none", transition:"opacity .25s" }} />
-      <div style={{ position:"fixed", top:0, right:0, bottom:0, width:400, maxWidth:"92vw", background:"#f3f0fd",
-        zIndex:130, transform: open ? "translateX(0)" : "translateX(100%)", transition:"transform .3s ease",
-        display:"flex", flexDirection:"column", fontFamily:FONT_SANS }}>
+    <div style={{ position:"sticky", top:0, height:"100vh", flexShrink:0,
+      width: open ? 400 : 0, maxWidth: open ? "92vw" : 0, overflow:"hidden", transition:"width .3s ease" }}>
+      <div style={{ width:400, maxWidth:"92vw", height:"100%",
+        background:"#f3f0fd", display:"flex", flexDirection:"column", fontFamily:FONT_SANS }}>
         <div style={{ display:"flex", justifyContent:"flex-end", padding:24, flexShrink:0 }}>
           <button onClick={onClose} aria-label="Close" style={{ background:"none", border:"none", cursor:"pointer", display:"flex" }}>
             <Ms name="close" size={24} color={T.textBold} />
@@ -3329,48 +3364,38 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
 
           {(phase === "loading" || phase === "results") && (
             <>
-              <p style={{ margin:0, fontSize:16, color:T.textBold }}>Drafted with AI. Review and edit before you go live.</p>
+              <p style={{ margin:0, fontSize:16, color:T.textBold }}>We drafted your listing. Review and edit each field before applying.</p>
 
-              <div style={{ display:"flex", gap:8, alignItems:"flex-start", width:"100%" }}>
-                <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column", gap:8 }}>
+              <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:8 }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
                   <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>Listing title</span>
-                  <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface,
-                    fontSize:16, color:T.textBold, minHeight:40, display:"flex", alignItems:"center" }}>
-                    {phase === "results" && AI_DRAFT.title}
-                    {phase === "loading" && <div style={{ height:16, width:"70%", borderRadius:4, backgroundImage:AI_SHIMMER }} />}
-                  </div>
-                  {phase === "results" && <SetupHint>{AI_DRAFT.title.length}/70</SetupHint>}
+                  {phase === "results" && <UseThisCheckbox checked={titleOn} onChange={() => setTitleOn(v => !v)} />}
                 </div>
-                {phase === "results" && (
-                  <button onClick={() => setTitleOn(v => !v)} aria-label="Use this title" style={{ marginTop:32,
-                    flexShrink:0, background:"none", border:"none", cursor:"pointer", display:"flex" }}>
-                    <Ms name={titleOn ? "radio_button_checked" : "radio_button_unchecked"} color={titleOn ? T.brand : T.border} />
-                  </button>
-                )}
+                <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface,
+                  fontSize:16, color:T.textBold, minHeight:40, display:"flex", alignItems:"center" }}>
+                  {phase === "results" && AI_DRAFT.title}
+                  {phase === "loading" && <div style={{ height:16, width:"70%", borderRadius:4, backgroundImage:AI_SHIMMER }} />}
+                </div>
+                {phase === "results" && <SetupHint>{AI_DRAFT.title.length}/70</SetupHint>}
               </div>
 
-              <div style={{ display:"flex", gap:8, alignItems:"flex-start", width:"100%" }}>
-                <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column", gap:8 }}>
+              <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:8 }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
                   <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>About the book</span>
-                  <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface,
-                    fontSize:16, color:T.textBold, height:150, overflowY:"auto", whiteSpace:"pre-wrap" }}>
-                    {phase === "results" && AI_DRAFT.description}
-                    {phase === "loading" && (
-                      <div style={{ display:"flex", flexDirection:"column", gap:8, paddingTop:4 }}>
-                        {[100, 100, 80].map((w, i) => (
-                          <div key={i} style={{ height:16, width:`${w}%`, borderRadius:4, backgroundImage:AI_SHIMMER }} />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  {phase === "results" && <SetupHint>{AI_DRAFT.description.length}/1466</SetupHint>}
+                  {phase === "results" && <UseThisCheckbox checked={descOn} onChange={() => setDescOn(v => !v)} />}
                 </div>
-                {phase === "results" && (
-                  <button onClick={() => setDescOn(v => !v)} aria-label="Use this description" style={{ marginTop:32,
-                    flexShrink:0, background:"none", border:"none", cursor:"pointer", display:"flex" }}>
-                    <Ms name={descOn ? "radio_button_checked" : "radio_button_unchecked"} color={descOn ? T.brand : T.border} />
-                  </button>
-                )}
+                <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface,
+                  fontSize:16, color:T.textBold, height:150, overflowY:"auto", whiteSpace:"pre-wrap" }}>
+                  {phase === "results" && AI_DRAFT.description}
+                  {phase === "loading" && (
+                    <div style={{ display:"flex", flexDirection:"column", gap:8, paddingTop:4 }}>
+                      {[100, 100, 80].map((w, i) => (
+                        <div key={i} style={{ height:16, width:`${w}%`, borderRadius:4, backgroundImage:AI_SHIMMER }} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {phase === "results" && <SetupHint>{AI_DRAFT.description.length}/1466</SetupHint>}
               </div>
 
               <div>
@@ -3392,17 +3417,10 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
           {phase === "prompt" ? (
             <>
               <span style={{ fontSize:12, color:T.textSubtle }}>3 of 5 uses left today</span>
-              <button onClick={input.trim() ? onStartDraft : undefined} disabled={!input.trim()}
-                style={{ width:"100%", padding:"10px 24px", borderRadius:T.radius, fontSize:15, fontWeight:600,
-                  cursor: input.trim() ? "pointer" : "not-allowed",
-                  background: input.trim() ? T.surface : T.disabled,
-                  color: input.trim() ? T.textBold : T.textDisabled,
-                  border: `1px solid ${input.trim() ? "#7a3dc4" : T.border}` }}>
-                Draft content
-              </button>
+              <AiOutlineButton onClick={onStartDraft} disabled={!input.trim()}>Draft content</AiOutlineButton>
             </>
           ) : (
-            <Btn fullWidth disabled={phase !== "results"} onClick={onApply}>Apply selected</Btn>
+            <AiOutlineButton onClick={onApply} disabled={phase !== "results"}>Apply selected</AiOutlineButton>
           )}
           <p style={{ margin:0, fontSize:12, color:T.textSubtle }}>
             {phase === "prompt"
@@ -3411,7 +3429,67 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
           </p>
         </div>
       </div>
-    </>
+    </div>
+  );
+}
+
+/* Blurb's own dashboard side nav (Figma "Side Navigation / Blurb", node 2499:5383,
+   expanded state) — "Instant Stores" is the active item since that's the Sell
+   section this Setup page lives under. Sticky like the DraftPanel so it stays in
+   view while the (much taller) main column scrolls past it. */
+const SIDE_NAV_SECTIONS = [
+  { key: "projects", label: "Projects", items: ["All projects", "Online editor projects"] },
+  { key: "sell", label: "Sell", items: ["Instant Stores", "Earnings", "Monthly profit reports", "Payment settings"], active: "Instant Stores" },
+  { key: "account", label: "Account", items: ["My orders", "Account settings", "Address book", "My profile"] },
+];
+
+function SideNavItem({ label, active, badge }) {
+  return (
+    <a href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:8,
+      height:48, padding:"0 12px", borderRadius:T.radius, textDecoration:"none",
+      background: active ? "#f1f9fe" : "transparent" }}>
+      <span style={{ flex:1, fontFamily:FONT_SANS, fontSize:16, fontWeight:600,
+        color: active ? T.borderActive : T.textSubtle }}>{label}</span>
+      {badge && (
+        <span style={{ fontFamily:FONT_SANS, fontSize:12, fontWeight:600, color:T.textBold,
+          border:`1px solid ${T.textBold}`, borderRadius:999, padding:"2px 6px" }}>New</span>
+      )}
+    </a>
+  );
+}
+
+function SideNavSection({ section, open, onToggle }) {
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+      <button onClick={onToggle} style={{ display:"flex", alignItems:"center", gap:8, height:48,
+        padding:"0 12px", background:"none", border:"none", cursor:"pointer", width:"100%", textAlign:"left" }}>
+        <span style={{ flex:1, fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textSubtle }}>{section.label}</span>
+        <Ms name={open ? "expand_less" : "expand_more"} color={T.textSubtle} />
+      </button>
+      <Collapse open={open}>
+        <div style={{ display:"flex", flexDirection:"column", gap:8, paddingLeft:8 }}>
+          {section.items.map(item => (
+            <SideNavItem key={item} label={item} active={item === section.active} badge={item === section.active} />
+          ))}
+        </div>
+      </Collapse>
+    </div>
+  );
+}
+
+function SideNav() {
+  const [open, setOpen] = useState({ projects: false, sell: true, account: false });
+  return (
+    <div style={{ position:"sticky", top:0, height:"100vh", width:280, flexShrink:0, overflowY:"auto",
+      background:T.surface, borderRight:`1px solid ${T.borderSubtle}`, padding:"24px 16px" }}>
+      <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+        <SideNavItem label="Home" />
+        {SIDE_NAV_SECTIONS.map(section => (
+          <SideNavSection key={section.key} section={section} open={open[section.key]}
+            onToggle={() => setOpen(o => ({ ...o, [section.key]: !o[section.key] }))} />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -3489,7 +3567,10 @@ function LinkSetupPage({ onContinue }) {
   };
 
   return (
-    <div style={{ minHeight:"100vh", background:T.bg, fontFamily:FONT_SANS }}>
+    <>
+    <div style={{ display:"flex", alignItems:"flex-start" }}>
+    <SideNav />
+    <div style={{ flex:1, minWidth:0, minHeight:"100vh", background:T.bg, fontFamily:FONT_SANS }}>
       {/* Order-a-copy nudge — sellers can't buy their own link, so this is the way to
           get a proof copy before going live. Switches to a warning once the link is
           actually published: it's live, but still can't take an order until a proof
@@ -3767,16 +3848,19 @@ function LinkSetupPage({ onContinue }) {
 
       {/* Spacer so the last section isn't hidden behind the fixed sticky bar below */}
       <div style={{ height:72 }} />
-      <StickyCtaBar onPreview={onContinue} canPublish={canPublish} onPublish={doPublish} />
-
-      <DraftPanel open={aiOpen} phase={aiPhase} input={aiInput} setInput={setAiInput}
-        tone={aiTone} setTone={setAiTone} titleOn={aiTitleOn} setTitleOn={setAiTitleOn}
-        descOn={aiDescOn} setDescOn={setAiDescOn} keywords={aiKeywords} onRemoveKeyword={removeAiKeyword}
-        onClose={closeAiPanel} onStartDraft={startDraft} onApply={applyDraft} />
-
-      <PublishModal open={publishOpen} onClose={() => setPublishOpen(false)} onViewLive={onContinue}
-        copied={copied} onCopyLink={copyLink} />
     </div>
+
+    <DraftPanel open={aiOpen} phase={aiPhase} input={aiInput} setInput={setAiInput}
+      tone={aiTone} setTone={setAiTone} titleOn={aiTitleOn} setTitleOn={setAiTitleOn}
+      descOn={aiDescOn} setDescOn={setAiDescOn} keywords={aiKeywords} onRemoveKeyword={removeAiKeyword}
+      onClose={closeAiPanel} onStartDraft={startDraft} onApply={applyDraft} />
+    </div>
+
+    <StickyCtaBar onPreview={onContinue} canPublish={canPublish} onPublish={doPublish} panelOpen={aiOpen} />
+
+    <PublishModal open={publishOpen} onClose={() => setPublishOpen(false)} onViewLive={onContinue}
+      copied={copied} onCopyLink={copyLink} />
+    </>
   );
 }
 
@@ -3786,13 +3870,13 @@ function LinkSetupPage({ onContinue }) {
    reaches. "Preview listing" is also the demo's bridge into the PDP: previewing
    the listing IS what a shopper does next, so it doubles as forward navigation
    here rather than needing a separate, Figma-less "continue" control. */
-function StickyCtaBar({ onPreview, canPublish, onPublish }) {
+function StickyCtaBar({ onPreview, canPublish, onPublish, panelOpen }) {
   const { isMobile } = useViewport();
   return (
-    <div style={{ position:"fixed", left:0, right:0, bottom:0, zIndex:30, background:T.surface,
+    <div style={{ position:"fixed", left:280, right: panelOpen ? 400 : 0, bottom:0, zIndex:30, background:T.surface,
       borderTop:`1px solid ${T.borderSubtle}`, boxShadow:"0 -4px 16px rgba(0,0,0,0.08)",
       display:"flex", alignItems:"center", justifyContent:"space-between", gap:16,
-      padding: isMobile ? "16px 20px" : "16px 80px" }}>
+      padding: isMobile ? "16px 20px" : "16px 80px", transition:"right .3s ease" }}>
       <button onClick={onPreview} style={{ background:"none", border:"none", cursor:"pointer",
         display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:16,
         fontFamily:FONT_SANS, textDecoration:"underline", padding:0 }}>
