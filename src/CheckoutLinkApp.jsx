@@ -3389,7 +3389,8 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
                   {phase === "results" && <UseThisCheckbox checked={descOn} onChange={() => setDescOn(v => !v)} />}
                 </div>
                 <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface,
-                  fontSize:16, color:T.textBold, height:150, overflowY:"auto", whiteSpace:"pre-wrap" }}>
+                  fontSize:16, color:T.textBold, height:150, minHeight:150, overflowY:"auto", whiteSpace:"pre-wrap",
+                  resize:"vertical" }}>
                   {phase === "results" && AI_DRAFT.description}
                   {phase === "loading" && (
                     <div style={{ display:"flex", flexDirection:"column", gap:8, paddingTop:4 }}>
