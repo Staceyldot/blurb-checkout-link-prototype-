@@ -626,32 +626,36 @@ function QuantityStepper({ qty, setQty, size=40, onBelowMin }) {
   );
 }
 
-/* Placeholder book page — lorem ipsum body text + page number (not the real
-   book's content), used by the flipbook. */
-const LOREM = ("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit. ").repeat(4);
-const BOOK_FONT = "'Georgia', 'Times New Roman', serif";
-const slice = (seed, len) => { const s = (seed * 197) % (LOREM.length - len - 1); return LOREM.slice(s, s + len); };
+/* Real first-chapter preview pages, rasterized from the seller's supplied PDF
+   (Blurb_8x10_Liberal Libations_FirstChapter_Spreads.pdf, 16 pages: one solo
+   page + 15 two-page spreads). Page 1 is solo (recto, no verso in the file);
+   pages 2-31 come two-at-a-time from spread-01.jpg … spread-15.jpg, each a
+   single pre-composited image covering both pages of that spread. */
+const PREVIEW_LAST_PAGE = 31;
+function previewSource(n) {
+  if (n === 1) return { src: "/assets/preview/page-01.jpg" };
+  if (n < 2 || n > PREVIEW_LAST_PAGE) return null;
+  const spread = Math.floor(n / 2);
+  return { src: `/assets/preview/spread-${String(spread).padStart(2, "0")}.jpg`, side: n % 2 === 0 ? "left" : "right" };
+}
 function PreviewPage({ n }) {
-  if (n < 2 || n > 15) return <div style={{ width:"100%", height:"100%", background:"#fff" }} />;
-  const chapterOpener = n % 2 === 0;        // left (even) pages open a chapter
-  const chapter = n / 2;
-  const bodyStyle = { margin:0, fontSize:"clamp(6px,2.5cqw,13px)", lineHeight:1.5, textAlign:"justify",
-    textIndent:"8%", overflow:"hidden" };
+  const page = previewSource(n);
+  if (!page) return <div style={{ width:"100%", height:"100%", background:"#fff" }} />;
+  if (!page.side) {
+    return (
+      <div style={{ width:"100%", height:"100%", overflow:"hidden", background:"#fff" }}>
+        <img src={page.src} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+      </div>
+    );
+  }
+  // Half of a pre-composited two-page spread: the image is rendered at 200%
+  // width and pinned to the edge matching this page's side, so the other
+  // half is clipped off by the container's overflow — the spread never has
+  // to be pre-split into separate left/right files.
   return (
-    <div style={{ width:"100%", height:"100%", background:"#fff", padding:"9% 9% 6%", boxSizing:"border-box",
-      display:"flex", flexDirection:"column", fontFamily:BOOK_FONT, color:"#2b2b2b", overflow:"hidden" }}>
-      {chapterOpener ? (
-        <>
-          <div style={{ height:"27%", flexShrink:0 }} />
-          <div style={{ fontFamily:BOOK_FONT, fontWeight:700, fontSize:"clamp(30px,11cqw,86px)", lineHeight:1, marginBottom:"12%" }}>{chapter}</div>
-          <p style={{ ...bodyStyle }}>{slice(chapter * 13, 360)}</p>
-          <div style={{ flex:1 }} />
-        </>
-      ) : (
-        <p style={{ ...bodyStyle, flex:1 }}>{slice(n, 1000)}</p>
-      )}
-      <div style={{ fontSize:"clamp(8px,1.5cqw,11px)", color:"#777", marginTop:"4%",
-        textAlign: chapterOpener ? "left" : "right" }}>{n}</div>
+    <div style={{ width:"100%", height:"100%", overflow:"hidden", position:"relative", background:"#fff" }}>
+      <img src={page.src} alt="" style={{ position:"absolute", top:0, [page.side]:0, width:"200%", height:"100%",
+        objectFit:"cover", display:"block" }} />
     </div>
   );
 }
@@ -659,13 +663,13 @@ function PreviewPage({ n }) {
 /* Two-page book spread with a CSS 3D page-turn (animation reference only —
    Blurb's live flipbook). Matches Figma 4401:3307's static look. */
 function Flipbook({ maxWidth = 900 }) {
-  const LAST = 6;   // 7 spreads: [2,3] … [14,15] (page 1 is the title page, not previewed)
+  const LAST = 15;   // slot 0: (blank, page 1) · slots 1-15: spreads [2,3] … [30,31]
   const [spread, setSpread] = useState(0);
   const [flip, setFlip]     = useState(null);  // "next" | "prev"
   const [angle, setAngle]   = useState(0);
 
-  const leftNum = spread * 2 + 2;   // left pages even (verso)
-  const rightNum = leftNum + 1;     // right pages odd (recto)
+  const leftNum = spread === 0 ? 0 : spread * 2;   // left pages even (verso); 0 = no page (blank)
+  const rightNum = spread === 0 ? 1 : leftNum + 1; // right pages odd (recto)
 
   useEffect(() => {
     if (!flip) return;
@@ -732,7 +736,7 @@ function Flipbook({ maxWidth = 900 }) {
         <button onClick={() => start("prev")} disabled={spread <= 0} aria-label="Previous pages" style={circle(spread <= 0)}>
           <Ms name="chevron_left" size={22} color={T.textBold} />
         </button>
-        <span style={{ background:"#f4f4f4", borderRadius:4, padding:"4px 10px", fontSize:14, fontWeight:600, color:T.textBold }}>{leftNum}/15</span>
+        <span style={{ background:"#f4f4f4", borderRadius:4, padding:"4px 10px", fontSize:14, fontWeight:600, color:T.textBold }}>{leftNum || rightNum}/{PREVIEW_LAST_PAGE}</span>
         <button onClick={() => start("next")} disabled={spread >= LAST} aria-label="Next pages" style={circle(spread >= LAST)}>
           <Ms name="chevron_right" size={22} color={T.textBold} />
         </button>
@@ -758,9 +762,13 @@ function BookPreview() {
     <div style={{ marginTop:56, display:"flex", flexDirection:"column", gap:48 }}>
       <div style={{ display:"flex", alignItems: isMobile ? "flex-start" : "center", justifyContent:"space-between",
         gap:16, flexWrap:"wrap", borderBottom:"1px solid #dcdcdc", paddingBottom:12 }}>
-        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-          <h2 style={{ fontFamily:FONT_HEADING, fontSize: isMobile ? 32 : 44, fontWeight:500, lineHeight:1.2, color:T.textBold }}>Book preview</h2>
-          <p style={{ fontSize:18, color:T.textSubtle, lineHeight:1.4 }}>First 15 pages</p>
+        <div style={{ display:"flex", alignItems:"center", gap:16 }}>
+          <img src={BOOK_COVER} alt={PRODUCT.title}
+            style={{ width:56, height:56, objectFit:"contain", border:`1px solid ${T.disabled}`, borderRadius:4, flexShrink:0, background:"#fff" }} />
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            <h2 style={{ fontFamily:FONT_HEADING, fontSize: isMobile ? 32 : 44, fontWeight:500, lineHeight:1.2, color:T.textBold }}>Book preview</h2>
+            <p style={{ fontSize:18, color:T.textSubtle, lineHeight:1.4 }}>{PRODUCT.title} · First {PREVIEW_LAST_PAGE} pages</p>
+          </div>
         </div>
         <button onClick={() => setFullscreen(true)}
           style={{ display:"flex", alignItems:"center", gap:8, background:"#fff", border:`1px solid ${T.textBold}`,
@@ -1162,7 +1170,7 @@ function ProductPage({ variant, format, setFormat, expressStyle, onAddToCart, on
   const wallets = useWallets();
   const { isDesktop } = useViewport();
   const [qty, setQty] = useState(1);
-  const [detailsOpen, setDetailsOpen] = useState(true);   // "Book details" accordion
+  const [detailsOpen, setDetailsOpen] = useState(false);   // "Book details" accordion
   const [detailsModal, setDetailsModal] = useState(false); // Print vs PDF comparison
   const [readMore, setReadMore] = useState(false);
 
@@ -1203,7 +1211,8 @@ function ProductPage({ variant, format, setFormat, expressStyle, onAddToCart, on
 
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
               <p style={{ fontSize:16, fontWeight:600, color:T.textBold }}>About the book</p>
-              <p style={{ fontSize:16, color:T.textSubtle, lineHeight:1.5 }}>
+              <p style={{ fontSize:16, color:T.textSubtle, lineHeight:1.5,
+                ...(!readMore && { display:"-webkit-box", WebkitLineClamp:3, WebkitBoxOrient:"vertical", overflow:"hidden" }) }}>
                 Liberal Libations empowers the cocktail enthusiast to craft bar-quality cocktails for a large
                 crowd or for an intimate gathering. Make-ahead batch recipes mean less time mixing drinks and
                 more time enjoying each sip with friends. Over 85 recipes feature timeless classics and playful
@@ -1216,7 +1225,7 @@ function ProductPage({ variant, format, setFormat, expressStyle, onAddToCart, on
               <button onClick={() => setReadMore(r => !r)}
                 style={{ alignSelf:"flex-start", background:"none", border:"none", cursor:"pointer", padding:0,
                   color:T.textLink, fontWeight:600, fontSize:16, textDecoration:"underline" }}>
-                {readMore ? "Read less" : "Read more"}
+                {readMore ? "Show less" : "Read more"}
               </button>
             </div>
 
