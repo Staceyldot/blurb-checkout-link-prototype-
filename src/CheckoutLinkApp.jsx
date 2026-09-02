@@ -552,10 +552,13 @@ function Footer() {
 /* PDP footer — matches Figma node 4401:3325 exactly:
    a white trust bar (Blurb mark + "Printed and shipped by Blurb") stacked
    over a dark #292929 legal bar (copyright + 5 links, 12px white, 24px gaps). */
+/* PDP-only footer (Figma node 5449:73820) — distinct from the shared Footer
+   used on the rest of the flow (cart/checkout/confirm), so this one carries
+   its own copy/link set rather than reusing FooterLink/legalLinks. */
 function PdpFooter() {
   const { isMobile } = useViewport();
   const padX = isMobile ? 20 : 80;
-  const legalLinks = ["Privacy policy", "Return policy", "Terms of Service", "Cookie Policy", "Support"];
+  const legalLinks = ["Company", "Work at Blurb", "Pricing", "Privacy policy", "Cookie policy", "Support", "Sitemap"];
   return (
     <div style={{ display:"flex", flexDirection:"column", width:"100%", background:"#292929" }}>
       {/* Trust bar */}
@@ -564,14 +567,14 @@ function PdpFooter() {
           <span style={{ display:"flex", padding:"2px 3px" }}>
             <img src={BLURB_MARK} alt="Blurb" style={{ height:24, width:"auto", display:"block" }} />
           </span>
-          <span style={{ fontSize:14, color:T.textBold, lineHeight:1.4 }}>Printed and shipped by Blurb</span>
+          <span style={{ fontSize:14, color:T.textBold, lineHeight:1.4 }}>Built with Blurb</span>
         </div>
       </div>
       {/* Legal bar */}
       <div style={{ background:"#292929", display:"flex", alignItems:"center", gap:40, padding:`16px ${padX}px`, width:"100%" }}>
         <div style={{ display:"flex", alignItems:"center", gap:24, flexWrap: isMobile ? "wrap" : "nowrap",
           fontSize:12, color:"#ffffff", lineHeight:1.4, whiteSpace:"nowrap" }}>
-          <span>©2015-2026 RPI Print, Inc.</span>
+          <span>©2026 Blurb, Inc. All rights reserved.</span>
           {legalLinks.map(l => (
             <a key={l} href="#" style={{ color:"#ffffff", textDecoration:"none" }}
               onMouseEnter={e => e.currentTarget.style.textDecoration="underline"}
@@ -631,7 +634,7 @@ function QuantityStepper({ qty, setQty, size=40, onBelowMin }) {
    page + 15 two-page spreads). Page 1 is solo (recto, no verso in the file);
    pages 2-31 come two-at-a-time from spread-01.jpg … spread-15.jpg, each a
    single pre-composited image covering both pages of that spread. */
-const PREVIEW_LAST_PAGE = 31;
+const PREVIEW_LAST_PAGE = 15;   // preview stops here even though the PDF has content through page 31
 function previewSource(n) {
   if (n === 1) return { src: "/assets/preview/page-01.jpg" };
   if (n < 2 || n > PREVIEW_LAST_PAGE) return null;
@@ -663,7 +666,7 @@ function PreviewPage({ n }) {
 /* Two-page book spread with a CSS 3D page-turn (animation reference only —
    Blurb's live flipbook). Matches Figma 4401:3307's static look. */
 function Flipbook({ maxWidth = 900 }) {
-  const LAST = 15;   // slot 0: (blank, page 1) · slots 1-15: spreads [2,3] … [30,31]
+  const LAST = 7;   // slot 0: (blank, page 1) · slots 1-7: spreads [2,3] … [14,15] — stops at page 15
   const [spread, setSpread] = useState(0);
   const [flip, setFlip]     = useState(null);  // "next" | "prev"
   const [angle, setAngle]   = useState(0);
@@ -736,7 +739,7 @@ function Flipbook({ maxWidth = 900 }) {
         <button onClick={() => start("prev")} disabled={spread <= 0} aria-label="Previous pages" style={circle(spread <= 0)}>
           <Ms name="chevron_left" size={22} color={T.textBold} />
         </button>
-        <span style={{ fontSize:14, color:T.textBold }}>Page {rightNum} of {PREVIEW_LAST_PAGE}</span>
+        <span style={{ fontSize:14, color:T.textBold }}>Page {rightNum > PREVIEW_LAST_PAGE ? leftNum : rightNum} of {PREVIEW_LAST_PAGE}</span>
         <button onClick={() => start("next")} disabled={spread >= LAST} aria-label="Next pages" style={circle(spread >= LAST)}>
           <Ms name="chevron_right" size={22} color={T.textBold} />
         </button>
@@ -1211,7 +1214,9 @@ function ProductPage({ variant, format, setFormat, expressStyle, onAddToCart, on
 
           {/* Details */}
           <div style={{ flex:1, display:"flex", flexDirection:"column", gap:22, width:"100%" }}>
-            <h1 style={{ fontFamily:FONT_HEADING, fontSize:44, fontWeight:400, lineHeight:1.2, color:T.textBold }}>{PRODUCT.title}</h1>
+            <h1 style={{ fontFamily:FONT_HEADING, fontSize:44, fontWeight:400, lineHeight:1.2, color:T.textBold }}>
+              {PRODUCT.title}: Transform Single-Serving Cocktails into Make-Ahead Batches
+            </h1>
             <p style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:500, lineHeight:1.2, color:T.textBold }}>by <span style={{ color:T.textSubtle }}>{PRODUCT.author}</span></p>
 
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
@@ -1338,7 +1343,7 @@ function ProductPage({ variant, format, setFormat, expressStyle, onAddToCart, on
 
       <div style={{ maxWidth:1280, margin:"0 auto", width:"100%", padding: isDesktop ? "0 40px" : "0 20px" }}>
         {/* More from author (Figma 4401:3324) */}
-        <div style={{ marginTop:0, paddingBottom:56, display:"flex", flexDirection:"column", gap:48 }}>
+        <div style={{ marginTop:0, paddingTop:80, paddingBottom:80, display:"flex", flexDirection:"column", gap:48 }}>
           <h2 style={{ fontFamily:FONT_HEADING, fontSize: isDesktop ? 44 : 32, fontWeight:500, lineHeight:1.2, color:T.textBold }}>More from {PRODUCT.author}</h2>
           <div style={{ display:"flex", flexWrap:"wrap", gap:24 }}>
             {[["Sense and Sentimentality","Two sisters. Two very different ideas of love. One summer that changes everything.","$28.00",BOOK_SENSE],
