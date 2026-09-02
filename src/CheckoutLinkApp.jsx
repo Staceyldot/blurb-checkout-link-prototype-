@@ -779,7 +779,7 @@ function BookPreview() {
           <Ms name="fullscreen" size={24} color={T.textBold} /> View fullscreen
         </button>
       </div>
-      <Flipbook />
+      <Flipbook maxWidth={573} />
 
       {/* True viewport takeover (Figma node 3709:18023) — white background,
           no scrim, since there's nothing behind it to dim. Real title/page
