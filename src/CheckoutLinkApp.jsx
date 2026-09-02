@@ -58,7 +58,7 @@ const AMEX        = "/assets/amex.svg";
 const DISCOVER    = "/assets/discover.svg";
 const BOOK_COVER  = "/assets/book-liberal-libations.png";
 const BLURB_MARK  = "/assets/blurb-mark.svg";
-const AUTHOR_PHOTO = "/assets/author-paige.png";
+const AUTHOR_PHOTO = "/assets/author-kim.png";
 const BLURB_LOGO_EMAIL = "/assets/blurb-logo-email.png";  // full-color logo for the email header
 const BOOK_SENSE    = "/assets/book-sense.png";
 const BOOK_GARDNERS = "/assets/book-gardners.png";
@@ -707,7 +707,7 @@ function Flipbook({ maxWidth = 900 }) {
   const face = { position:"absolute", inset:0, backfaceVisibility:"hidden", overflow:"hidden", background:"#fff", containerType:"inline-size" };
 
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:16, alignItems:"center", width:"100%" }}>
+    <div style={{ display:"flex", flexDirection:"column", gap:40, alignItems:"center", width:"100%" }}>
       <div style={{ position:"relative", width:"100%", maxWidth, aspectRatio:"900 / 573", perspective:2000, margin:"0 auto" }}>
         {/* Static spread underneath the leaf */}
         <div style={{ position:"absolute", inset:0, display:"flex", borderRadius:8, overflow:"hidden",
@@ -736,7 +736,7 @@ function Flipbook({ maxWidth = 900 }) {
         <button onClick={() => start("prev")} disabled={spread <= 0} aria-label="Previous pages" style={circle(spread <= 0)}>
           <Ms name="chevron_left" size={22} color={T.textBold} />
         </button>
-        <span style={{ background:"#f4f4f4", borderRadius:4, padding:"4px 10px", fontSize:14, fontWeight:600, color:T.textBold }}>{leftNum || rightNum}/{PREVIEW_LAST_PAGE}</span>
+        <span style={{ fontSize:14, color:T.textBold }}>Page {rightNum} of {PREVIEW_LAST_PAGE}</span>
         <button onClick={() => start("next")} disabled={spread >= LAST} aria-label="Next pages" style={circle(spread >= LAST)}>
           <Ms name="chevron_right" size={22} color={T.textBold} />
         </button>
@@ -761,14 +761,10 @@ function BookPreview() {
   return (
     <div style={{ marginTop:56, display:"flex", flexDirection:"column", gap:48 }}>
       <div style={{ display:"flex", alignItems: isMobile ? "flex-start" : "center", justifyContent:"space-between",
-        gap:16, flexWrap:"wrap", borderBottom:"1px solid #dcdcdc", paddingBottom:12 }}>
-        <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-          <img src={BOOK_COVER} alt={PRODUCT.title}
-            style={{ width:56, height:56, objectFit:"contain", border:`1px solid ${T.disabled}`, borderRadius:4, flexShrink:0, background:"#fff" }} />
-          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-            <h2 style={{ fontFamily:FONT_HEADING, fontSize: isMobile ? 32 : 44, fontWeight:500, lineHeight:1.2, color:T.textBold }}>Book preview</h2>
-            <p style={{ fontSize:18, color:T.textSubtle, lineHeight:1.4 }}>{PRODUCT.title} · First {PREVIEW_LAST_PAGE} pages</p>
-          </div>
+        gap:16, flexWrap:"wrap" }}>
+        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+          <h2 style={{ fontFamily:FONT_HEADING, fontSize: isMobile ? 32 : 44, fontWeight:500, lineHeight:1.2, color:T.textBold }}>Book preview</h2>
+          <p style={{ fontSize:18, color:T.textSubtle, lineHeight:1.4 }}>First {PREVIEW_LAST_PAGE} pages</p>
         </div>
         <button onClick={() => setFullscreen(true)}
           style={{ display:"flex", alignItems:"center", gap:8, background:"#fff", border:`1px solid ${T.textBold}`,
