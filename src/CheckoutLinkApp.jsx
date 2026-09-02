@@ -1174,7 +1174,16 @@ function ProductPage({ variant, format, setFormat, expressStyle, onAddToCart, on
   const [detailsModal, setDetailsModal] = useState(false); // Print vs PDF comparison
   const [readMore, setReadMore] = useState(false);
 
-  const bio = "Kim Newton Arispe writes contemporary romance set in small towns where everyone knows your business — and nobody minds sharing it. A former landscape architect turned full-time author, she draws on a life among community gardens and negotiating tables for her stories of sharp wits and softer landings.";
+  const bio = "Kim Newton Arispe has appreciated the power of a good cocktail from an early age when she watched her grandparents gather with friends to sip margaritas and share stories. Years later, her passion for bringing people together over cocktails led her to create the website, Random Acts of Comfort, where she makes bar-quality beverages accessible to the home bartender. When she's not crafting cocktails for a party or a charity fundraiser, you'll find her on video teaching Instagram and Facebook followers how to create seasonal drinks for easy entertaining. As a native Texan living in Seattle, she enjoys mixing up margaritas and hunting for good Tex-Mex with her husband of 20 years.";
+  const [authorReadMore, setAuthorReadMore] = useState(false);
+  const AUTHOR_SOCIAL_ROWS = [
+    { icon:"/assets/social/website.svg",   label:"www.randomactsofcomfort.net" },
+    { icon:"/assets/social/facebook.svg",  label:"Facebook" },
+    { icon:"/assets/social/instagram.svg", label:"Instagram" },
+    { icon:"/assets/social/x.svg",         label:"X" },
+    { icon:"/assets/social/tiktok.svg",    label:"TikTok" },
+    { icon:"/assets/social/link.svg",      label:"Substack" },
+  ];
   const detail = [
     ...(hasPrint(format) ? ["Hardcover, ImageWrap", "10x8 in, 25x20 cm"] : []),
     ...(hasDigital(format) ? [`PDF, ${PDF_FILE.size}`] : []),
@@ -1296,26 +1305,44 @@ function ProductPage({ variant, format, setFormat, expressStyle, onAddToCart, on
         </div>
 
         <BookPreview />
+      </div>
 
-        {/* Author profile */}
-        <div style={{ marginTop:56, display:"flex", gap:20, alignItems:"flex-start", flexWrap:"wrap" }}>
-          <img src={AUTHOR_PHOTO} alt={PRODUCT.author}
-            style={{ width:72, height:72, borderRadius:"50%", objectFit:"cover", flexShrink:0 }} />
-          <div style={{ flex:1, minWidth:280 }}>
-            <h3 style={{ fontFamily:FONT_HEADING, fontSize:22, fontWeight:500, color:T.textBold }}>About the author</h3>
-            <p style={{ fontSize:15, color:T.textSubtle, lineHeight:1.6, marginTop:8, maxWidth:640 }}>{bio}</p>
-            <div style={{ display:"flex", gap:18, marginTop:12, flexWrap:"wrap" }}>
-              {[["language","www.d-toi.website.com"],["thumb_up","Facebook"],["photo_camera","Instagram"],["close","X"],["music_note","TikTok"]].map(([ic,label]) => (
-                <span key={label} style={{ display:"flex", alignItems:"center", gap:6, fontSize:14, color:T.textLink }}>
-                  <Ms name={ic} size={18} color={T.textLink} /> {label}
-                </span>
-              ))}
+      {/* Author profile — full-bleed band per Figma (node 3709:17922), not
+          confined to the 1280 content column like the rest of the page. */}
+      <div style={{ marginTop:56, background:"#f9f6f3", padding: isDesktop ? "80px 40px" : "40px 20px" }}>
+        <div style={{ maxWidth:1280, margin:"0 auto", display:"flex", gap:24, flexWrap:"wrap" }}>
+          <div style={{ flex:"1 1 500px", maxWidth:845, display:"flex", flexDirection:"column", gap:16 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:16 }}>
+              <img src={AUTHOR_PHOTO} alt={PRODUCT.author}
+                style={{ width:40, height:40, borderRadius:"50%", objectFit:"cover", flexShrink:0 }} />
+              <h2 style={{ fontFamily:FONT_HEADING, fontSize: isDesktop ? 44 : 28, fontWeight:500, lineHeight:1.2, color:T.textBold, margin:0 }}>About the author</h2>
+            </div>
+            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+              <p style={{ margin:0, fontSize:16, color:T.textSubtle, lineHeight:1.5,
+                ...(!authorReadMore && { display:"-webkit-box", WebkitLineClamp:3, WebkitBoxOrient:"vertical", overflow:"hidden" }) }}>
+                {bio}
+              </p>
+              <button onClick={() => setAuthorReadMore(r => !r)}
+                style={{ alignSelf:"flex-start", background:"none", border:"none", cursor:"pointer", padding:0,
+                  color:T.textLink, fontWeight:600, fontSize:16, textDecoration:"underline" }}>
+                {authorReadMore ? "Show less" : "Read more"}
+              </button>
             </div>
           </div>
+          <div style={{ flex:"0 0 250px", display:"flex", flexDirection:"column", paddingTop: isDesktop ? 64 : 0 }}>
+            {AUTHOR_SOCIAL_ROWS.map(s => (
+              <div key={s.label} style={{ display:"flex", alignItems:"center", gap:8, padding:"4px 0" }}>
+                <img src={s.icon} alt="" style={{ width:20, height:20, flexShrink:0 }} />
+                <span style={{ fontSize:16, color:T.textBold, lineHeight:"24px" }}>{s.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
+      </div>
 
+      <div style={{ maxWidth:1280, margin:"0 auto", width:"100%", padding: isDesktop ? "0 40px" : "0 20px" }}>
         {/* More from author (Figma 4401:3324) */}
-        <div style={{ marginTop:56, paddingBottom:56, display:"flex", flexDirection:"column", gap:48 }}>
+        <div style={{ marginTop:0, paddingBottom:56, display:"flex", flexDirection:"column", gap:48 }}>
           <h2 style={{ fontFamily:FONT_HEADING, fontSize: isDesktop ? 44 : 32, fontWeight:500, lineHeight:1.2, color:T.textBold }}>More from {PRODUCT.author}</h2>
           <div style={{ display:"flex", flexWrap:"wrap", gap:24 }}>
             {[["Sense and Sentimentality","Two sisters. Two very different ideas of love. One summer that changes everything.","$28.00",BOOK_SENSE],
