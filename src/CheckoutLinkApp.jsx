@@ -108,7 +108,7 @@ const FONT_HEADING = "'Futura PT', 'Futura', 'Century Gothic', -apple-system, Bl
    The prices are deliberately NOT in step: this is a Checkout Link listing with
    its own bundle pricing. */
 const PRODUCT = {
-  title:  "Pride and Preconceptions",
+  title:  "Liberal Libations",
   author: "Paige Hazelwood",
   format: "Hardcover, ImageWrap",
   paper:  "Premium Paper, matte finish",
@@ -3162,6 +3162,34 @@ function SetupKeywordsField({ keywords, setKeywords }) {
   );
 }
 
+/* Pricing calculator field — Listing Price, Profit margin, and Profit are
+   three views onto the same number (given a fixed print cost), so editing
+   any one recomputes the other two. `onChange` gets the raw typed string;
+   the recalculation lives in LinkSetupPage since it needs all three setters. */
+function PriceField({ label, hint, prefix, suffix, value, onChange, error, disabled }) {
+  return (
+    <div style={{ flex:"1 1 140px", minWidth:140, display:"flex", flexDirection:"column", gap:8 }}>
+      <div style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>{label}</div>
+      <div style={{ border:`1px solid ${error ? T.textError : T.border}`, borderRadius:T.radius, padding:8, display:"flex",
+        alignItems:"center", gap:4, fontFamily:FONT_SANS, fontSize:16, color: disabled ? T.textDisabled : T.textBold }}>
+        {prefix && <span>{prefix}</span>}
+        <input value={value} onChange={e => onChange(e.target.value)} inputMode="decimal" disabled={disabled}
+          style={{ border:"none", outline:"none", flex:1, minWidth:0, width:"100%", fontFamily:"inherit",
+            fontSize:"inherit", color:"inherit", background:"transparent", padding:0 }} />
+        {suffix && <span>{suffix}</span>}
+      </div>
+      {error ? (
+        <div style={{ display:"flex", alignItems:"center", gap:6, background:T.errorBg, borderRadius:T.radius, padding:"6px 10px" }}>
+          <Ms name="warning" size={16} color={T.textError} />
+          <span style={{ fontFamily:FONT_SANS, fontSize:13, color:T.textError }}>{error}</span>
+        </div>
+      ) : (
+        <SetupHint>{hint}</SetupHint>
+      )}
+    </div>
+  );
+}
+
 function BookDetailsRow() {
   const { isMobile } = useViewport();
   const bits = [PRODUCT.format, PRODUCT.options, PRODUCT.pages, "Language English", "Published October 2022"];
@@ -3252,8 +3280,8 @@ function SwitchToggle({ on, onToggle }) {
    prototype demoing the review-and-apply interaction (Figma node 5423:93216), not a
    real drafting model, so the "result" is always the same copy the design specs. */
 const AI_DRAFT = {
-  title: "Pride and Preconceptions, Gift Edition",
-  description: "Can you fall for the right person when you’ve already decided everything about them is wrong?\nElara Vance is a landscape architect who relies on sharp first impressions. When tech entrepreneur Julian Cross arrives to turn her town’s historic community garden into a corporate campus, she instantly writes him off as arrogant, cold, and profit-driven. Julian sees Elara as an impractical idealist blocking essential economic progress.\nForced to negotiate, their meetings are a masterclass in sharp retorts. Elara is convinced Julian treats people like equations; Julian believes Elara's pride won't let her compromise.\nBut as forced proximity blurs the lines of their rivalry, they discover unexpected depth beneath each other's armor. To find common ground, they must tear down the hardest walls of all: the preconceptions they built around one another.\nA witty, enemies-to-lovers contemporary romance for fans of Emily Henry. Pride and Preconceptions explores the delightful danger of judging a book by its cover—and the courage it takes to be proven wrong.",
+  title: "Liberal Libations, Gift Edition",
+  description: "Can you fall for the right person when you’ve already decided everything about them is wrong?\nElara Vance is a landscape architect who relies on sharp first impressions. When tech entrepreneur Julian Cross arrives to turn her town’s historic community garden into a corporate campus, she instantly writes him off as arrogant, cold, and profit-driven. Julian sees Elara as an impractical idealist blocking essential economic progress.\nForced to negotiate, their meetings are a masterclass in sharp retorts. Elara is convinced Julian treats people like equations; Julian believes Elara's pride won't let her compromise.\nBut as forced proximity blurs the lines of their rivalry, they discover unexpected depth beneath each other's armor. To find common ground, they must tear down the hardest walls of all: the preconceptions they built around one another.\nA witty, enemies-to-lovers contemporary romance for fans of Emily Henry. Liberal Libations explores the delightful danger of judging a book by its cover—and the courage it takes to be proven wrong.",
   keywords: ["contemporary romance", "enemies to lovers", "slow burn", "second chances", "first impressions", "small town romance", "women's fiction"],
 };
 const AI_TONES = [
@@ -3267,7 +3295,7 @@ const AI_SHIMMER = "linear-gradient(94deg, rgb(211,196,245) 0%, rgba(179,152,237
 /* Author profile "filled" copy — matches Figma's Unpublished/Filled state
    (node 4782:41541). Distinct from the shorter bio App.jsx/the PDP use for
    this same author; this is what the setup form itself shows once filled in. */
-const AUTHOR_BIO = "Paige Hazelwood writes contemporary romance set in small towns where everyone knows your business and nobody minds theirs. A former librarian with a weakness for enemies-to-lovers tropes and excellent coffee, she began writing fiction after years of recommending books she wished existed. Her debut novel Pride and Preconceptions was inspired by a disastrous first impression that turned into something else entirely. She lives in Vermont with her very opinionated cat, Darcy.";
+const AUTHOR_BIO = "Paige Hazelwood writes contemporary romance set in small towns where everyone knows your business and nobody minds theirs. A former librarian with a weakness for enemies-to-lovers tropes and excellent coffee, she began writing fiction after years of recommending books she wished existed. Her debut novel Liberal Libations was inspired by a disastrous first impression that turned into something else entirely. She lives in Vermont with her very opinionated cat, Darcy.";
 const AUTHOR_SOCIALS = [
   { platform: "Instagram", url: "instagram.com/paigehazelwoodauthor" },
   { platform: "Website", url: "paigehazelwoodauthor.com" },
@@ -3535,6 +3563,47 @@ function LinkSetupPage({ onContinue }) {
   const [aboutBook, setAboutBook] = useState("");
   const [keywords, setKeywords] = useState([]);
 
+  /* Pricing calculator. Print cost is fixed (set by format/size/materials,
+     not editable here); Listing Price, Profit margin, and Profit are three
+     views onto the same number, so editing any one recomputes the other two. */
+  const PRINT_COST = 12.50;
+  const [listingPrice, setListingPrice] = useState(PRINT_COST.toFixed(2));
+  const [profitMargin, setProfitMargin] = useState("0.0");
+  const [profit, setProfit] = useState("0.00");
+  // Which field (if any) currently holds text that can't be parsed as a valid
+  // number — e.g. letters. The other two fields go blank ("--") and disabled
+  // until it's fixed, since they can't be computed from garbage input.
+  const [invalidPriceField, setInvalidPriceField] = useState(null); // "price" | "margin" | "profit" | null
+  const round2 = n => Math.round(n * 100) / 100;
+  const toNum = v => (v.trim() === "" ? NaN : Number(v.trim()));
+  const updatePriceFromPrice = v => {
+    setListingPrice(v);
+    const price = toNum(v);
+    if (isNaN(price) || price <= 0) { setInvalidPriceField("price"); setProfitMargin("--"); setProfit("--"); return; }
+    setInvalidPriceField(null);
+    const p = round2(price - PRINT_COST);
+    setProfit(p.toFixed(2));
+    setProfitMargin(round2((p / price) * 100).toFixed(1));
+  };
+  const updatePriceFromMargin = v => {
+    setProfitMargin(v);
+    const margin = toNum(v);
+    if (isNaN(margin) || margin < 0 || margin >= 100) { setInvalidPriceField("margin"); setListingPrice("--"); setProfit("--"); return; }
+    setInvalidPriceField(null);
+    const price = round2(PRINT_COST / (1 - margin / 100));
+    setListingPrice(price.toFixed(2));
+    setProfit(round2(price - PRINT_COST).toFixed(2));
+  };
+  const updatePriceFromProfit = v => {
+    setProfit(v);
+    const p = toNum(v);
+    if (isNaN(p) || p < 0) { setInvalidPriceField("profit"); setListingPrice("--"); setProfitMargin("--"); return; }
+    setInvalidPriceField(null);
+    const price = round2(PRINT_COST + p);
+    setListingPrice(price.toFixed(2));
+    setProfitMargin(round2((p / price) * 100).toFixed(1));
+  };
+
   const chooseFinish = f => {
     setFinish(f);
     setCanPublish(true);
@@ -3754,31 +3823,38 @@ function LinkSetupPage({ onContinue }) {
             <div style={{ flex:"1 1 140px", minWidth:140 }}>
               <div style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>Print cost</div>
               <div style={{ fontFamily:FONT_HEADING, fontSize:32, fontWeight:600, color:T.textSubtle, margin:"4px 0" }}>
-                {canPublish ? "$12.50" : "$ --"}
+                {canPublish ? `$${PRINT_COST.toFixed(2)}` : "$ --"}
               </div>
               <SetupHint>Set by format, size, and materials</SetupHint>
             </div>
-            {(canPublish
-              ? [
-                  { label:"Listing Price", value:"$12.50", hint:"Buyers pay" },
-                  { label:"Profit margin", value:"20%", hint:"Percent you earn" },
-                  { label:"Profit", value:"$2.50", hint:"What you earn" },
-                ]
-              : [
-                  { label:"Listing Price", value:"$ --", hint:"Buyers pay" },
-                  { label:"Profit margin", value:"-- %", hint:"Percent you earn" },
-                  { label:"Profit", value:"$ --", hint:"What you earn" },
-                ]
-            ).map(f => (
-              <div key={f.label} style={{ flex:"1 1 140px", minWidth:140, display:"flex", flexDirection:"column", gap:8 }}>
-                <div style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>{f.label}</div>
-                <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, fontFamily:FONT_SANS,
-                  fontSize:16, color:T.textBold }}>{f.value}</div>
-                <SetupHint>{f.hint}</SetupHint>
-              </div>
-            ))}
+            {canPublish ? (
+              <>
+                <PriceField label="Listing Price" hint="Buyers pay" prefix="$" value={listingPrice} onChange={updatePriceFromPrice}
+                  error={invalidPriceField === "price" ? "Enter a valid price." : null}
+                  disabled={invalidPriceField && invalidPriceField !== "price"} />
+                <PriceField label="Profit margin" hint="Percent you earn" suffix="%" value={profitMargin} onChange={updatePriceFromMargin}
+                  error={invalidPriceField === "margin" ? "Enter a valid percentage." : null}
+                  disabled={invalidPriceField && invalidPriceField !== "margin"} />
+                <PriceField label="Profit" hint="What you earn" prefix="$" value={profit} onChange={updatePriceFromProfit}
+                  error={invalidPriceField === "profit" ? "Enter a valid amount." : null}
+                  disabled={invalidPriceField && invalidPriceField !== "profit"} />
+              </>
+            ) : (
+              [
+                { label:"Listing Price", value:"$ --", hint:"Buyers pay" },
+                { label:"Profit margin", value:"-- %", hint:"Percent you earn" },
+                { label:"Profit", value:"$ --", hint:"What you earn" },
+              ].map(f => (
+                <div key={f.label} style={{ flex:"1 1 140px", minWidth:140, display:"flex", flexDirection:"column", gap:8 }}>
+                  <div style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>{f.label}</div>
+                  <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, fontFamily:FONT_SANS,
+                    fontSize:16, color:T.textBold }}>{f.value}</div>
+                  <SetupHint>{f.hint}</SetupHint>
+                </div>
+              ))
+            )}
           </div>
-          <SetupHint>Editing one updates the others automatically.</SetupHint>
+          {!invalidPriceField && <SetupHint>Editing one updates the others automatically.</SetupHint>}
           <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:18, color:T.textBold }}>
             Shipping isn't included here. It's added at checkout based on buyer location.
           </p>
