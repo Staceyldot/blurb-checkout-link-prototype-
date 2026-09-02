@@ -1102,14 +1102,14 @@ const EXPRESS_STYLES = {
   row:    "All wallets",
 };
 
-function ExpressBuySection({ wallets, format, style = "single", onPress, note = true }) {
+function ExpressBuySection({ wallets, format, style = "single", onPress, note = true, showMore = true }) {
   const [expanded, setExpanded] = useState(false);
   if (!wallets.length) return null;
 
   const multi     = wallets.length > 1;
   const showAll   = style === "row" || expanded;
   const compact   = showAll && multi;
-  const canReveal = style === "single" && multi;
+  const canReveal = showMore && style === "single" && multi;
 
   /* Spacing is on the children rather than a column `gap`, because a collapsed
      child would still be holding its gap and the row would shift by 8px the
@@ -1230,18 +1230,6 @@ function ProductPage({ variant, format, setFormat, expressStyle, onAddToCart, on
 
             <div style={{ borderTop:`1px solid ${T.borderSubtle}`, paddingTop:24 }}>
               <p style={{ fontFamily:FONT_HEADING, fontSize:32, fontWeight:500, lineHeight:1.2, color:T.textBold }}>{money(FORMATS[format].price)} USD</p>
-              {/* Single-format link: state the format as product information, not as a
-                  control. A one-option selector reads as broken, but the buyer still
-                  has to know whether a printed book is coming — and with no selector
-                  here, this is the only route to the format details. */}
-              {!chooseFormat && (
-                <p style={{ display:"flex", alignItems:"center", gap:6, marginTop:8, fontSize:15, color:T.textSubtle, flexWrap:"wrap" }}>
-                  <Ms name={hasPrint(format) ? "menu_book" : "picture_as_pdf"} size={20} color={T.brand} />
-                  <span><strong style={{ color:T.textBold, fontWeight:600 }}>{FORMATS[format].label}</strong> · {FORMATS[format].blurb}</span>
-                  <a href="#" onClick={e => { e.preventDefault(); setDetailsModal(true); }}
-                    style={{ fontSize:15, fontWeight:600, color:T.textLink, textDecoration:"underline" }}>Details</a>
-                </p>
-              )}
               {format === "digital" && (
                 <p style={{ fontSize:13, color:T.textSubtle, marginTop:6 }}>Digital download only — no printed book is shipped.</p>
               )}
@@ -1265,17 +1253,20 @@ function ProductPage({ variant, format, setFormat, expressStyle, onAddToCart, on
             </div>
 
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-              <button onClick={() => onAddToCart(hasPrint(format) ? qty : 1)}
-                style={{ width:"100%", height:BTN_H, background:T.brand, color:"#fff", border:"none",
-                  borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
-                  display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}
-                onMouseEnter={e => e.currentTarget.style.opacity=".85"}
-                onMouseLeave={e => e.currentTarget.style.opacity="1"}>
-                <Ms name="shopping_cart" size={20} color="#fff" /> Add to cart
-              </button>
-              {/* Sits in the same stack as Add to cart, same height, no "or" divider */}
-              <ExpressBuySection wallets={wallets} format={format} style={expressStyle}
-                onPress={w => onExpressBuy(hasPrint(format) ? qty : 1, w)} />
+              <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+                {/* Sits in the same stack as Add to cart, same height, no "or" divider */}
+                <ExpressBuySection wallets={wallets} format={format} style={expressStyle} note={false} showMore={false}
+                  onPress={w => onExpressBuy(hasPrint(format) ? qty : 1, w)} />
+                <button onClick={() => onAddToCart(hasPrint(format) ? qty : 1)}
+                  style={{ width:"100%", height:BTN_H, background:T.surface, color:T.brand, border:`1px solid ${T.brand}`,
+                    borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
+                    display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}
+                  onMouseEnter={e => e.currentTarget.style.opacity=".85"}
+                  onMouseLeave={e => e.currentTarget.style.opacity="1"}>
+                  <Ms name="shopping_cart" size={20} color={T.brand} /> Add to cart
+                </button>
+              </div>
+              <WeAcceptRow />
             </div>
 
             {/* Book details */}
@@ -1912,6 +1903,35 @@ function PayMark({ id }) {
   );
   const src = { apple:APPLE_PAY, gpay:GPAY, paypal:PAYPAL_IMG }[id];
   return <img src={src} alt="" style={{ height:24, width:"auto", objectFit:"contain", display:"block", flexShrink:0 }} />;
+}
+
+/* Wallet marks each carry their own brand-mandated pill, unlike the card
+   brands' shared white box (CardBrandIcon) — same idea, different shape. */
+function WalletBadge({ src, bg, border }) {
+  return (
+    <span style={{ height:30, padding:"0 12px", borderRadius:15, background:bg,
+      border: border ? `1px solid ${border}` : "none",
+      display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+      <img src={src} alt="" style={{ height:16, width:"auto", objectFit:"contain", display:"block" }} />
+    </span>
+  );
+}
+
+/* Passive "We accept" trust row — informational only, not a payment picker
+   (that's ExpressBuySection/Payment). Matches the Figma PDP (node 3709:17913). */
+function WeAcceptRow() {
+  return (
+    <div style={{ display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
+      <span style={{ fontSize:16, color:T.textSubtle }}>We accept</span>
+      <WalletBadge src={APPLE_PAY_W} bg="#000000" />
+      <WalletBadge src={GPAY} bg="#ffffff" border={T.border} />
+      <CardBrandIcon src={PAYPAL_W} blue />
+      <CardBrandIcon src={VISA} />
+      <CardBrandIcon src={MASTERCARD} />
+      <CardBrandIcon src={AMEX} blue />
+      <CardBrandIcon src={DISCOVER} />
+    </div>
+  );
 }
 
 function Payment({ open, onToggle, disabled, completed, onComplete, requireBilling, billing:billingProp, setBilling:setBillingProp }) {
