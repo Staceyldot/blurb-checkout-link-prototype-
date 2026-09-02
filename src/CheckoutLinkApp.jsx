@@ -665,7 +665,7 @@ function PreviewPage({ n }) {
 
 /* Two-page book spread with a CSS 3D page-turn (animation reference only —
    Blurb's live flipbook). Matches Figma 4401:3307's static look. */
-function Flipbook({ maxWidth = 900 }) {
+function Flipbook({ maxWidth = 900, pageBadge = false }) {
   const LAST = 7;   // slot 0: (blank, page 1) · slots 1-7: spreads [2,3] … [14,15] — stops at page 15
   const [spread, setSpread] = useState(0);
   const [flip, setFlip]     = useState(null);  // "next" | "prev"
@@ -739,7 +739,11 @@ function Flipbook({ maxWidth = 900 }) {
         <button onClick={() => start("prev")} disabled={spread <= 0} aria-label="Previous pages" style={circle(spread <= 0)}>
           <Ms name="chevron_left" size={22} color={T.textBold} />
         </button>
-        <span style={{ fontSize:14, color:T.textBold }}>Page {rightNum > PREVIEW_LAST_PAGE ? leftNum : rightNum} of {PREVIEW_LAST_PAGE}</span>
+        <span style={pageBadge
+          ? { background:"#FFFFFF", borderRadius:4, padding:"4px 8px", fontSize:14, fontWeight:600, color:T.textBold }
+          : { fontSize:14, color:T.textBold }}>
+          Page {rightNum > PREVIEW_LAST_PAGE ? leftNum : rightNum} of {PREVIEW_LAST_PAGE}
+        </span>
         <button onClick={() => start("next")} disabled={spread >= LAST} aria-label="Next pages" style={circle(spread >= LAST)}>
           <Ms name="chevron_right" size={22} color={T.textBold} />
         </button>
@@ -777,16 +781,26 @@ function BookPreview() {
       </div>
       <Flipbook />
 
+      {/* True viewport takeover (Figma node 3709:18023) — white background,
+          no scrim, since there's nothing behind it to dim. Real title/page
+          count/flipbook content, not the Figma mock's placeholder book. */}
       {fullscreen && (
-        <div onClick={() => setFullscreen(false)}
-          style={{ position:"fixed", inset:0, background:"rgba(20,20,20,.92)", zIndex:300,
-            display:"flex", alignItems:"center", justifyContent:"center", padding:"64px 24px" }}>
-          <button onClick={() => setFullscreen(false)} aria-label="Close fullscreen"
-            style={{ position:"absolute", top:20, right:24, background:"none", border:"none", cursor:"pointer", display:"flex" }}>
-            <Ms name="close" size={32} color="#fff" />
-          </button>
-          <div onClick={e => e.stopPropagation()} style={{ width:"100%", maxWidth:1200 }}>
-            <Flipbook maxWidth={1200} />
+        <div style={{ position:"fixed", inset:0, background:T.surface, zIndex:300, overflowY:"auto" }}>
+          <div style={{ maxWidth:1536, margin:"0 auto", width:"100%", boxSizing:"border-box",
+            padding: isMobile ? "24px 20px" : "80px", display:"flex", flexDirection:"column", gap:24 }}>
+            <div style={{ display:"flex", alignItems: isMobile ? "flex-start" : "center", justifyContent:"space-between",
+              gap:16, flexWrap:"wrap", borderBottom:"1px solid #dcdcdc", paddingBottom:12 }}>
+              <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+                <span style={{ fontFamily:FONT_HEADING, fontSize:24, fontWeight:500, lineHeight:1.2, color:T.textSubtle }}>{PRODUCT.title}</span>
+                <span style={{ fontSize:18, color:T.textSubtle, lineHeight:1.4 }}>First {PREVIEW_LAST_PAGE} pages</span>
+              </div>
+              <button onClick={() => setFullscreen(false)}
+                style={{ display:"flex", alignItems:"center", gap:8, background:"#fff", border:`1px solid ${T.textBold}`,
+                borderRadius:4, padding:"8px 24px", cursor:"pointer", fontSize:16, fontWeight:600, color:T.textBold }}>
+                <Ms name="fullscreen_exit" size={24} color={T.textBold} /> Exit fullscreen
+              </button>
+            </div>
+            <Flipbook maxWidth={900} pageBadge />
           </div>
         </div>
       )}
