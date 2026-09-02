@@ -3279,14 +3279,16 @@ const AUTHOR_SOCIALS = [
 /* The AI panel's own CTA style — outlined rather than the app's solid-fill
    primary Btn, so it reads as a distinct "AI action" affordance: white with a
    purple border when enabled, gray with a gray outline when disabled. */
-function AiOutlineButton({ children, onClick, disabled }) {
+function AiOutlineButton({ children, onClick, disabled, icon }) {
   return (
     <button onClick={disabled ? undefined : onClick} disabled={disabled}
       style={{ width:"100%", padding:"10px 24px", borderRadius:T.radius, fontSize:15, fontWeight:600,
         cursor: disabled ? "not-allowed" : "pointer",
+        display:"flex", alignItems:"center", justifyContent:"center", gap:8,
         background: disabled ? T.disabled : T.surface,
         color: disabled ? T.textDisabled : T.textBold,
         border: `1px solid ${disabled ? T.border : "#7a3dc4"}` }}>
+      {icon && <Ms name={icon} size={20} color={disabled ? T.textDisabled : "#7a3dc4"} />}
       {children}
     </button>
   );
@@ -3417,7 +3419,7 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
           {phase === "prompt" ? (
             <>
               <span style={{ fontSize:12, color:T.textSubtle }}>3 of 5 uses left today</span>
-              <AiOutlineButton onClick={onStartDraft} disabled={!input.trim()}>Draft content</AiOutlineButton>
+              <AiOutlineButton onClick={onStartDraft} disabled={!input.trim()} icon="auto_awesome">Draft content</AiOutlineButton>
             </>
           ) : (
             <AiOutlineButton onClick={onApply} disabled={phase !== "results"}>Apply selected</AiOutlineButton>
