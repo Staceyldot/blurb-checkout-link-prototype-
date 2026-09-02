@@ -3082,8 +3082,8 @@ function SetupHint({ children }) {
 function SetupTextField({ placeholder, hint, height, value, onChange, maxLen }) {
   const controlled = onChange !== undefined;
   const fieldStyle = { border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
-    background:T.surface, height, width:"100%", fontFamily:FONT_SANS, fontSize:16, color:T.textBold,
-    resize:"none" };
+    background:T.surface, height, minHeight:height, width:"100%", fontFamily:FONT_SANS, fontSize:16, color:T.textBold,
+    resize: height ? "vertical" : "none" };
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
       {controlled ? (
@@ -3277,18 +3277,20 @@ const AUTHOR_SOCIALS = [
    keyword chips). Fixed content, not templated from the prompt/tone — this
    demos the review-and-apply interaction, not a real model. */
 /* The AI panel's own CTA style — outlined rather than the app's solid-fill
-   primary Btn, so it reads as a distinct "AI action" affordance: white with a
-   purple border when enabled, gray with a gray outline when disabled. */
-function AiOutlineButton({ children, onClick, disabled, icon }) {
+   primary Btn, so it reads as a distinct affordance: white with a colored
+   border when enabled, gray with a gray outline when disabled. Defaults to
+   the "AI action" purple (Draft content); Apply selected passes the app's
+   standard brand blue instead, since applying isn't itself an AI action. */
+function AiOutlineButton({ children, onClick, disabled, icon, color = "#7a3dc4", textColor }) {
   return (
     <button onClick={disabled ? undefined : onClick} disabled={disabled}
       style={{ width:"100%", padding:"10px 24px", borderRadius:T.radius, fontSize:15, fontWeight:600,
         cursor: disabled ? "not-allowed" : "pointer",
         display:"flex", alignItems:"center", justifyContent:"center", gap:8,
         background: disabled ? T.disabled : T.surface,
-        color: disabled ? T.textDisabled : T.textBold,
-        border: `1px solid ${disabled ? T.border : "#7a3dc4"}` }}>
-      {icon && <Ms name={icon} size={20} color={disabled ? T.textDisabled : "#7a3dc4"} />}
+        color: disabled ? T.textDisabled : (textColor || T.textBold),
+        border: `1px solid ${disabled ? T.border : color}` }}>
+      {icon && <Ms name={icon} size={20} color={disabled ? T.textDisabled : color} />}
       {children}
     </button>
   );
@@ -3341,8 +3343,8 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
               </div>
               <textarea value={input} onChange={e => setInput(e.target.value)}
                 placeholder="e.g. It's a modern rom-com retelling of Pride and Prejudice. Witty, a little chaotic, second-chance romance vibes."
-                style={{ width:"100%", height:193, border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
-                  fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface, resize:"none" }} />
+                style={{ width:"100%", height:193, minHeight:193, border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
+                  fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface, resize:"vertical" }} />
               <div>
                 <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:8 }}>
                   <span style={{ fontSize:12, color:T.textSubtle }}>Tone (optional)</span>
@@ -3422,7 +3424,7 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
               <AiOutlineButton onClick={onStartDraft} disabled={!input.trim()} icon="auto_awesome">Draft content</AiOutlineButton>
             </>
           ) : (
-            <AiOutlineButton onClick={onApply} disabled={phase !== "results"}>Apply selected</AiOutlineButton>
+            <AiOutlineButton onClick={onApply} disabled={phase !== "results"} color={T.brand} textColor={T.brand}>Apply selected</AiOutlineButton>
           )}
           <p style={{ margin:0, fontSize:12, color:T.textSubtle }}>
             {phase === "prompt"
