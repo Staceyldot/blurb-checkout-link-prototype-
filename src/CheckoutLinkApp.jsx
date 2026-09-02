@@ -3328,7 +3328,7 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
     <div style={{ position:"sticky", top:0, height:"100vh", flexShrink:0,
       width: open ? 400 : 0, maxWidth: open ? "92vw" : 0, overflow:"hidden", transition:"width .3s ease" }}>
       <div style={{ width:400, maxWidth:"92vw", height:"100%",
-        background:"#f3f0fd", display:"flex", flexDirection:"column", fontFamily:FONT_SANS }}>
+        background:"#FFFFFF", display:"flex", flexDirection:"column", fontFamily:FONT_SANS }}>
         <div style={{ display:"flex", justifyContent:"flex-end", padding:24, flexShrink:0 }}>
           <button onClick={onClose} aria-label="Close" style={{ background:"none", border:"none", cursor:"pointer", display:"flex" }}>
             <Ms name="close" size={24} color={T.textBold} />
