@@ -3328,7 +3328,7 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
     <div style={{ position:"sticky", top:0, height:"100vh", flexShrink:0,
       width: open ? 400 : 0, maxWidth: open ? "92vw" : 0, overflow:"hidden", transition:"width .3s ease",
       boxShadow: open ? "0px 4px 12px 1px rgba(0,0,0,0.1)" : "none" }}>
-      <div style={{ width:400, maxWidth:"92vw", height:"100%",
+      <div style={{ width:400, maxWidth:"92vw", height:"100%", borderLeft:"1px solid #DCDCDC",
         background:"#FFFFFF", display:"flex", flexDirection:"column", fontFamily:FONT_SANS }}>
         <div style={{ display:"flex", justifyContent:"flex-end", padding:24, flexShrink:0 }}>
           <button onClick={onClose} aria-label="Close" style={{ background:"none", border:"none", cursor:"pointer", display:"flex" }}>
