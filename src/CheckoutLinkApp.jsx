@@ -4079,9 +4079,6 @@ function LinkSetupPage({ onContinue }) {
           </p>
           <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:24,
             display:"flex", flexDirection:"column", gap:24 }}>
-            <h3 style={{ margin:0, fontFamily:FONT_HEADING, fontSize:44, fontWeight:500, lineHeight:1.2, color:T.textBold }}>
-              More from Kim Newton Arispe
-            </h3>
             <div style={{ display:"flex", gap:24, alignItems:"flex-start" }}>
               {CROSS_SELL_BOOKS.map(b => <ProductCarouselCard key={b.title} {...b} />)}
             </div>
