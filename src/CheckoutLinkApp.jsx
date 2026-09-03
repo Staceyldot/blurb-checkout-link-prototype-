@@ -64,6 +64,18 @@ const BOOK_SENSE    = "/assets/book-sense.png";
 const BOOK_GARDNERS = "/assets/book-gardners.png";
 const PUBLISH_CELEBRATION = "/assets/publish-celebration.png";
 
+/* Other titles on the seller's Instant Store — the "Other books preview"
+   carousel on Setup (Figma 5203:102590) shows what a buyer sees below this
+   listing. */
+const CROSS_SELL_BOOKS = [
+  { title:"Sense and Sentimentality", author:"Kim Newton Arispe",
+    blurb:"Two sisters. Two very different ideas of love. One summer that changes everything.",
+    price:28.00, img:BOOK_SENSE },
+  { title:"The Gardner's Dilemma", author:"Kim Newton Arispe, Sam Okafor",
+    blurb:"When the land you've tended for decades is suddenly worth more than you ever imagined, what do you sacrifice to keep it?",
+    price:24.00, img:BOOK_GARDNERS },
+];
+
 /* Setup page Materials swatches (Figma node 4806:45519, "Unpublished / Filled"
    state) — downsized to 200px max edge (from multi-MB Figma exports) since they
    only ever render at 88px. */
@@ -3324,6 +3336,25 @@ function PreviewCard({ icon, title, sub, selected, onSelect, showLink }) {
   );
 }
 
+/* One tile in the "Other books preview" carousel (Figma 5203:102590, "Card - Product"). */
+function ProductCarouselCard({ title, author, blurb, price, img }) {
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:16, width:410.67, flexShrink:0 }}>
+      <div style={{ width:"100%", aspectRatio:"1 / 1", borderRadius:8, overflow:"hidden", opacity:.8 }}>
+        <img src={img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+      </div>
+      <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+        <span style={{ fontFamily:FONT_SANS, fontSize:14, color:T.textSubtle }}>{author}</span>
+        <span style={{ fontFamily:FONT_HEADING, fontSize:24, fontWeight:500, color:T.textBold }}>{title}</span>
+        <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, color:T.textSubtle, lineHeight:1.4 }}>{blurb}</p>
+        <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:700, color:T.textSubtle }}>
+          Starting at ${price.toFixed(2)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function MaterialsRow({ title, first, open, onToggle, children }) {
   return (
     <div style={{ borderTop: first ? "none" : `1px solid ${T.border}` }}>
@@ -3645,6 +3676,7 @@ function LinkSetupPage({ onContinue }) {
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackChoice, setFeedbackChoice] = useState(null);
   const [authorVisible, setAuthorVisible] = useState(true);
+  const [sectionPreviewVisible, setSectionPreviewVisible] = useState(true);
 
   // Listing content fields — plain state so the AI draft panel has something to write into.
   const [listingTitle, setListingTitle] = useState("");
@@ -4030,6 +4062,32 @@ function LinkSetupPage({ onContinue }) {
         </div>
       </SetupSection>
 
+      {/* Other books preview — the buyer-facing cross-sell carousel shown below
+          the listing (Figma 5203:102590). Sellers can hide it with the same
+          toggle pattern as Author profile above. */}
+      <SetupSection title="Other books preview" action={
+        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <SwitchToggle on={sectionPreviewVisible} onToggle={() => setSectionPreviewVisible(v => !v)} />
+          <span style={{ fontFamily:FONT_SANS, fontSize:18, fontWeight:700, color:T.textBold }}>
+            {sectionPreviewVisible ? "Visible to buyers" : "Hidden from buyers"}
+          </span>
+        </div>
+      }>
+        <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
+          <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:18, fontWeight:600, color:T.textSubtle }}>
+            Shown on your checkout page unless you turn this off.
+          </p>
+          <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:24,
+            display:"flex", flexDirection:"column", gap:24 }}>
+            <h3 style={{ margin:0, fontFamily:FONT_HEADING, fontSize:44, fontWeight:500, lineHeight:1.2, color:T.textBold }}>
+              More from Kim Newton Arispe
+            </h3>
+            <div style={{ display:"flex", gap:24, alignItems:"flex-start" }}>
+              {CROSS_SELL_BOOKS.map(b => <ProductCarouselCard key={b.title} {...b} />)}
+            </div>
+          </div>
+        </div>
+      </SetupSection>
 
       {/* Payment and tax info — required nudge, hidden once the page is filled in
           (matches Figma's Unpublished/Filled state, node 4782:41534/41542, where
