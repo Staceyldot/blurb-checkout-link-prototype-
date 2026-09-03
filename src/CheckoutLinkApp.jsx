@@ -113,7 +113,7 @@ const PRODUCT = {
   format: "Hardcover, ImageWrap",
   paper:  "Premium Paper, matte finish",
   options:"Standard Landscape, 10×8 in (25×20 cm)",
-  pages:  "20 pages",
+  pages:  "160 pages",
   price:  35.0,
   img:    BOOK_COVER,
 };
@@ -815,8 +815,8 @@ function BookPreview() {
    values (and drop TbcValue) once signed off. */
 const FORMAT_DETAIL_ROWS = [
   { label:"What you get",
-    print:  "Hardcover with ImageWrap cover, premium matte paper, 10×8 in (25×20 cm), 20 pages",
-    digital:`A single PDF file · ${PDF_FILE.size} · 20 pages` },
+    print:  "Hardcover with ImageWrap cover, premium matte paper, 10×8 in (25×20 cm), 160 pages",
+    digital:`A single PDF file · ${PDF_FILE.size} · 160 pages` },
   { label:"How it reaches you",
     print:  "Printed to order, then shipped — 5–7 days",
     digital:"Downloads straight after payment, and stays on your order page" },
@@ -1197,9 +1197,9 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
     { icon:"/assets/social/link.svg",      label:"Substack" },
   ];
   const detail = [
-    ...(hasPrint(format) ? ["Hardcover, ImageWrap", "10x8 in, 25x20 cm"] : []),
+    ...(hasPrint(format) ? ["10x8 in, 25x20 cm"] : []),
     ...(hasDigital(format) ? [`PDF, ${PDF_FILE.size}`] : []),
-    "20 pages", "Language: English", "Published October 2022", "ISBN 9798211886148",
+    "160 pages", "Language: English", "Published November 2019", "ISBN 9781733372800",
   ];
   const chooseFormat = variant === "both";
 
@@ -1464,10 +1464,10 @@ function CartDrawer({ open, empty, qty, setQty, variant, format, setFormat, expr
                       <div><strong style={{ color:T.textBold }}>Format:</strong> {item.kind}</div>
                       {item.fulfil === "ship"
                         ? <><div><strong style={{ color:T.textBold }}>Project options:</strong> {PRODUCT.options}</div>
-                            <div><strong style={{ color:T.textBold }}># of pages:</strong> 20</div>
+                            <div><strong style={{ color:T.textBold }}># of pages:</strong> 160</div>
                             <div style={{ color:T.textBold, fontWeight:700, marginTop:4 }}>{PRODUCT.format}</div>
                             <div>{PRODUCT.paper}</div></>
-                        : <><div><strong style={{ color:T.textBold }}># of pages:</strong> 20</div>
+                        : <><div><strong style={{ color:T.textBold }}># of pages:</strong> 160</div>
                             <div>{PDF_FILE.size} · {PDF_FILE.name}</div></>}
                     </div>
                   </div>
@@ -3273,7 +3273,7 @@ function PriceField({ label, hint, prefix, suffix, value, onChange, error, disab
 
 function BookDetailsRow() {
   const { isMobile } = useViewport();
-  const bits = [PRODUCT.format, PRODUCT.options, PRODUCT.pages, "Language English", "Published October 2022"];
+  const bits = [PRODUCT.format, PRODUCT.options, PRODUCT.pages, "Language English", "Published November 2019"];
   return (
     <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:8, rowGap:6,
       fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textSubtle }}>
@@ -3285,7 +3285,7 @@ function BookDetailsRow() {
       ))}
       <SetupDot />
       <span style={{ display:"flex", alignItems:"center", gap:4 }}>
-        ISBN 9798211886148 <Ms name="content_copy" size={16} color={T.textSubtle} />
+        ISBN 9781733372800 <Ms name="content_copy" size={16} color={T.textSubtle} />
       </span>
       {!isMobile && <SetupDot />}
       <a href="#" onClick={e => e.preventDefault()}
