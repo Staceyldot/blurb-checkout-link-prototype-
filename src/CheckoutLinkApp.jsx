@@ -3774,7 +3774,7 @@ function LinkSetupPage({ onContinue }) {
   };
 
   const slug = PRODUCT.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-  const linkUrl = `blurb.com/hub/482910-${slug}`;
+  const linkUrl = `blurb.com/hub/482910/${slug}`;
   const copyLink = () => {
     if (navigator.clipboard) navigator.clipboard.writeText(`https://${linkUrl}`).catch(() => {});
     setCopied(true);
@@ -3818,31 +3818,28 @@ function LinkSetupPage({ onContinue }) {
 
       {/* Header: breadcrumb, title, and the auto-generated link field */}
       <div style={{ background:T.surface, padding: isMobile ? "16px 20px 24px" : "32px 80px 24px" }}>
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
-          <div style={{ fontFamily:FONT_SANS, fontSize:14, display:"flex", alignItems:"center", gap:4 }}>
-            <a href="#" onClick={e => e.preventDefault()} style={{ color:T.textLink }}>Instant Store</a>
-            <Ms name="chevron_right" size={16} color={T.textSubtle} />
-            <span style={{ color:T.textSubtle }}>{PRODUCT.title}</span>
-          </div>
-          <button onClick={e => e.preventDefault()} style={{ width:40, height:40, border:`1px solid ${T.border}`,
-            borderRadius:T.radius, background:T.surface, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
-            <Ms name="more_vert" />
-          </button>
+        <div style={{ display:"flex", alignItems:"center", gap:4, fontFamily:FONT_SANS, fontSize:14, marginBottom:16 }}>
+          <a href="#" onClick={e => e.preventDefault()} style={{ color:T.textLink }}>Instant Stores</a>
+          <Ms name="chevron_right" size={16} color={T.textSubtle} />
+          <span style={{ color:T.textSubtle }}>{PRODUCT.title}</span>
         </div>
         <h1 style={{ fontFamily:FONT_HEADING, fontSize: isMobile ? 26 : 32, fontWeight:500, color:T.textBold, margin:"0 0 16px" }}>
           {PRODUCT.title}
         </h1>
-        <div style={{ maxWidth:560 }}>
-          <button onClick={copyLink} style={{ width:"100%", display:"flex", alignItems:"center", gap:8,
-            border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface, cursor:"pointer" }}>
-            <span style={{ flex:1, textAlign:"left", fontFamily:FONT_SANS, fontSize:16, minWidth:0, overflow:"hidden",
-              textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
-              <span style={{ color:T.textDisabled }}>blurb.com/hub/482910-</span>
-              <span style={{ color:T.textBold }}>{slug}</span>
+        <div style={{ maxWidth:672 }}>
+          {/* Static domain/ID prefix sits outside the field (Figma 4403:45381) —
+              only the slug itself reads as editable. */}
+          <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+            <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textDisabled, whiteSpace:"nowrap", flexShrink:0 }}>
+              blurb.com/hub/482910/
             </span>
-            <Ms name={copied ? "check" : "content_copy"} color={copied ? T.success : T.textBold} />
-          </button>
-          <SetupHint>{copied ? "Copied!" : "Auto-generated from your book title. Edit it anytime."}</SetupHint>
+            <button onClick={copyLink} style={{ flex:1, minWidth:0, display:"flex", alignItems:"center", gap:8,
+              border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface, cursor:"pointer" }}>
+              <span style={{ flex:1, textAlign:"left", fontFamily:FONT_SANS, fontSize:16, color:T.textBold, minWidth:0,
+                overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{slug}</span>
+              <Ms name={copied ? "check" : "content_copy"} color={copied ? T.success : T.textBold} />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -4114,6 +4111,24 @@ function LinkSetupPage({ onContinue }) {
           </div>
         </SetupSection>
       )}
+
+      {/* Delete Instant Store — last section on the page (Figma 5572:75042).
+          Bordered on top rather than wrapped in SetupSection, since this block
+          has no title row to divide from. */}
+      <div style={{ background:T.surface, width:"100%", padding: isMobile ? "24px 20px" : "32px 80px",
+        borderTop:`1px solid ${T.borderSubtle}` }}>
+        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+          <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, color:T.textBold, lineHeight:1.4 }}>
+            Buyers will no longer be able to purchase through this link.
+          </p>
+          <button onClick={e => e.preventDefault()} style={{ alignSelf:"flex-start", background:"none", border:"none",
+            cursor:"pointer", padding:"8px 24px 8px 0", display:"flex", alignItems:"center", gap:8 }}>
+            <Ms name="delete" size={24} color={T.textError} />
+            <span style={{ fontSize:16, fontWeight:600, color:T.textError, lineHeight:"24px",
+              borderBottom:`1px solid ${T.textError}`, paddingBottom:2 }}>Delete Instant Store</span>
+          </button>
+        </div>
+      </div>
 
       {/* Spacer so the last section isn't hidden behind the fixed sticky bar below */}
       <div style={{ height:72 }} />
