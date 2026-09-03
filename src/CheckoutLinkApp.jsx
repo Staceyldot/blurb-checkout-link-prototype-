@@ -1274,7 +1274,14 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
               <span style={{ fontSize:16, fontWeight:600, lineHeight:"24px", color:T.textBold }}>Quantity</span>
               {/* Quantity applies to printed copies only — a PDF is one file per order. */}
               {hasPrint(format)
-                ? <QuantityStepper qty={qty} setQty={setQty} />
+                ? <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                    <QuantityStepper qty={qty} setQty={setQty} />
+                    {qty > 1 && (
+                      <span style={{ fontSize:16, color:T.textSubtle }}>
+                        ({money(FORMATS.print.price)} x {qty})
+                      </span>
+                    )}
+                  </div>
                 : <span style={{ alignSelf:"flex-start", display:"flex", alignItems:"center", gap:6, height:BTN_H,
                     padding:"0 12px", border:`1px solid ${T.border}`, borderRadius:T.radius, fontSize:14, color:T.textSubtle }}>
                     <Ms name="download" size={18} color={T.textSubtle} /> One file
