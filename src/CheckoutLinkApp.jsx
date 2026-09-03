@@ -1179,8 +1179,7 @@ function ExpressBuySection({ wallets, format, style = "single", onPress, note = 
   );
 }
 
-function ProductPage({ variant, format, setFormat, expressStyle, onAddToCart, onExpressBuy, onCartClick, cartCount, onCheckout }) {
-  const wallets = useWallets();
+function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, cartCount, onCheckout }) {
   const { isDesktop } = useViewport();
   const [qty, setQty] = useState(1);
   const [detailsOpen, setDetailsOpen] = useState(false);   // "Book details" accordion
@@ -1287,9 +1286,16 @@ function ProductPage({ variant, format, setFormat, expressStyle, onAddToCart, on
 
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-                {/* Sits in the same stack as Add to cart, same height, no "or" divider */}
-                <ExpressBuySection wallets={wallets} format={format} style={expressStyle} note={false} showMore={false}
-                  onPress={w => onExpressBuy(hasPrint(format) ? qty : 1, w)} />
+                {/* Filled "Buy now" leads, outlined "Add to cart" follows — same
+                    stack, same height, no "or" divider (Figma 3709:17913). */}
+                <button onClick={() => { onAddToCart(hasPrint(format) ? qty : 1); onCheckout(); }}
+                  style={{ width:"100%", height:BTN_H, background:T.brand, color:"#fff", border:"none",
+                    borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
+                    display:"flex", alignItems:"center", justifyContent:"center" }}
+                  onMouseEnter={e => e.currentTarget.style.opacity=".85"}
+                  onMouseLeave={e => e.currentTarget.style.opacity="1"}>
+                  Buy now
+                </button>
                 <button onClick={() => onAddToCart(hasPrint(format) ? qty : 1)}
                   style={{ width:"100%", height:BTN_H, background:T.surface, color:T.brand, border:`1px solid ${T.brand}`,
                     borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
@@ -4286,8 +4292,7 @@ function CheckoutLinkApp({ onSwitchFlow }) {
         <>
           <ProductPage variant={variant} format={format} setFormat={setFormat}
             cartCount={inCart ? (hasPrint(format) ? qty : 0) + (hasDigital(format) ? 1 : 0) : 0}
-            expressStyle={expressStyle}
-            onAddToCart={addToCart} onExpressBuy={expressBuy}
+            onAddToCart={addToCart}
             onCartClick={() => setCartOpen(true)} onCheckout={goCheckout} />
           <CartDrawer open={cartOpen} empty={!inCart} qty={qty} setQty={setQty}
             variant={variant} format={format} setFormat={setFormat} onExpressBuy={expressBuy}
