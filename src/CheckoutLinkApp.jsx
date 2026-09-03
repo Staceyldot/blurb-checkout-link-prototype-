@@ -1273,7 +1273,9 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
             )}
 
             <div style={{ borderTop:`1px solid ${T.borderSubtle}`, paddingTop:24 }}>
-              <p style={{ fontFamily:FONT_HEADING, fontSize:32, fontWeight:500, lineHeight:1.2, color:T.textBold }}>{money(FORMATS[format].price)} USD</p>
+              <p style={{ fontFamily:FONT_HEADING, fontSize:32, fontWeight:500, lineHeight:1.2, color:T.textBold }}>
+                {money(subtotalOf(format, hasPrint(format) ? qty : 1) - savingOf(format))} USD
+              </p>
               {format === "digital" && (
                 <p style={{ fontSize:13, color:T.textSubtle, marginTop:6 }}>Digital download only — no printed book is shipped.</p>
               )}
