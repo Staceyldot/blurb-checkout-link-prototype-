@@ -1535,12 +1535,15 @@ function CartDrawer({ open, empty, qty, setQty, variant, format, setFormat, expr
                   : <>Tax is calculated at Checkout from your billing location. There's nothing to ship — your download is ready as soon as you pay. </>}
                 You may also enter a promotional code at checkout. Please note that volume discounts cannot be combined with promotional codes.
               </p>
-              <Btn onClick={onCheckout} fullWidth>Checkout</Btn>
-              {/* Wallets sit right by the Checkout button so an impulse buy never has
-                  to enter the checkout at all. No card link here — the Checkout
-                  button above already is that route. */}
-              <ExpressBuySection wallets={wallets} format={format} note={false}
-                style={expressStyle} onPress={w => onExpressBuy(qty, w)} />
+              {/* Wallets lead, Checkout follows filled beneath — same stack order
+                  as the PDP's express buy + Add to cart (Figma 3709:17913), but
+                  filled since Checkout is this panel's primary action. Own gap so
+                  the button pair sits tighter than the parent's 14px rhythm. */}
+              <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+                <ExpressBuySection wallets={wallets} format={format} note={false} showMore={false}
+                  style={expressStyle} onPress={w => onExpressBuy(qty, w)} />
+                <Btn onClick={onCheckout} fullWidth>Checkout</Btn>
+              </div>
               <button onClick={onClose} style={{ background:"none", border:"none", cursor:"pointer",
                 color:T.textLink, fontWeight:600, fontSize:14, textDecoration:"underline" }}>Continue shopping</button>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, fontSize:12, color:T.textSubtle }}>
