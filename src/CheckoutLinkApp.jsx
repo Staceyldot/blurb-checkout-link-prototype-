@@ -60,20 +60,20 @@ const BOOK_COVER  = "/assets/book-liberal-libations.png";
 const BLURB_MARK  = "/assets/blurb-mark.svg";
 const AUTHOR_PHOTO = "/assets/author-kim.png";
 const BLURB_LOGO_EMAIL = "/assets/blurb-logo-email.png";  // full-color logo for the email header
-const BOOK_SENSE    = "/assets/book-sense.png";
-const BOOK_GARDNERS = "/assets/book-gardners.png";
+const BOOK_STIRRED_OBSESSION = "/assets/book-stirred-obsession.jpg";
+const BOOK_SPIRIT_SMOKE_SALT = "/assets/book-spirit-smoke-salt.jpg";
 const PUBLISH_CELEBRATION = "/assets/publish-celebration.png";
 
 /* Other titles on the seller's Instant Store — the "Other books preview"
    carousel on Setup (Figma 5203:102590) shows what a buyer sees below this
-   listing. */
+   listing. Copy and covers match the PDP's own carousel (Figma 3709:18021). */
 const CROSS_SELL_BOOKS = [
-  { title:"Sense and Sentimentality", author:"Kim Newton Arispe",
-    blurb:"Two sisters. Two very different ideas of love. One summer that changes everything.",
-    price:28.00, img:BOOK_SENSE },
-  { title:"The Gardner's Dilemma", author:"Kim Newton Arispe, Sam Okafor",
-    blurb:"When the land you've tended for decades is suddenly worth more than you ever imagined, what do you sacrifice to keep it?",
-    price:24.00, img:BOOK_GARDNERS },
+  { title:"The Stirred Obsession: A Minimalist's Guide to the Modern Martini", author:"Kim Newton Arispe",
+    blurb:"The timeless elegance of the world's most iconic cocktail takes center stage in The Stirred Obsession: A Minimalist's Guide to the Modern Martini.",
+    price:28.00, img:BOOK_STIRRED_OBSESSION },
+  { title:"Spirit, Smoke & Salt", author:"Kim Newton Arispe",
+    blurb:"Rooted in centuries of craftsmanship, agave spirits possess a depth, minerality, and complexity that rival the finest whiskies and brandies in the world. This volume bridges ancient distillation traditions with modern cocktail architecture, showing you how to turn primitive, earth-bound flavors into sleek, high-end drinks.",
+    price:40.00, img:BOOK_SPIRIT_SMOKE_SALT },
 ];
 
 /* Setup page Materials swatches (Figma node 4806:45519, "Unpublished / Filled"
@@ -1385,8 +1385,8 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
         <div style={{ marginTop:0, paddingTop:80, paddingBottom:80, display:"flex", flexDirection:"column", gap:48 }}>
           <h2 style={{ fontFamily:FONT_HEADING, fontSize: isDesktop ? 44 : 32, fontWeight:500, lineHeight:1.2, color:T.textBold }}>More from {PRODUCT.author}</h2>
           <div style={{ display:"flex", flexWrap:"wrap", gap:24 }}>
-            {[["Sense and Sentimentality","Two sisters. Two very different ideas of love. One summer that changes everything.","$28.00",BOOK_SENSE],
-              ["The Gardner's Dilemma","When the land you've tended for decades is suddenly worth more than you ever imagined, what do you sacrifice to keep it?","$24.00",BOOK_GARDNERS]].map(([t,d,p,img]) => (
+            {[["The Stirred Obsession: A Minimalist's Guide to the Modern Martini","The timeless elegance of the world's most iconic cocktail takes center stage in The Stirred Obsession: A Minimalist's Guide to the Modern Martini.","$28.00",BOOK_STIRRED_OBSESSION],
+              ["Spirit, Smoke & Salt","Rooted in centuries of craftsmanship, agave spirits possess a depth, minerality, and complexity that rival the finest whiskies and brandies in the world. This volume bridges ancient distillation traditions with modern cocktail architecture, showing you how to turn primitive, earth-bound flavors into sleek, high-end drinks.","$40.00",BOOK_SPIRIT_SMOKE_SALT]].map(([t,d,p,img]) => (
               <div key={t} style={{ width:340, maxWidth:"100%", display:"flex", flexDirection:"column", gap:16 }}>
                 {/* Square frame (Figma 410.667²); absolutely-positioned img so aspect-ratio
                     controls the height and the portrait cover is contained (gaps on the sides) */}
@@ -1395,7 +1395,8 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
                 </div>
                 <div style={{ display:"flex", flexDirection:"column", gap:8, padding:"0 12px" }}>
                   <p style={{ fontFamily:FONT_HEADING, fontSize:24, fontWeight:500, lineHeight:1.2, color:T.textBold }}>{t}</p>
-                  <p style={{ fontSize:16, color:T.textSubtle, lineHeight:1.4 }}>{d}</p>
+                  <p style={{ fontSize:16, color:T.textSubtle, lineHeight:1.4,
+                    display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{d}</p>
                   <p style={{ fontSize:16, fontWeight:700, color:T.textSubtle, lineHeight:1.4 }}>Starting at {p}</p>
                   <button style={{ background:"none", border:"none", cursor:"pointer", padding:"8px 24px 8px 0",
                     display:"flex", alignItems:"center", gap:8 }}>
@@ -3346,7 +3347,8 @@ function ProductCarouselCard({ title, author, blurb, price, img }) {
       <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
         <span style={{ fontFamily:FONT_SANS, fontSize:14, color:T.textSubtle }}>{author}</span>
         <span style={{ fontFamily:FONT_HEADING, fontSize:24, fontWeight:500, color:T.textBold }}>{title}</span>
-        <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, color:T.textSubtle, lineHeight:1.4 }}>{blurb}</p>
+        <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, color:T.textSubtle, lineHeight:1.4,
+          display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{blurb}</p>
         <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:700, color:T.textSubtle }}>
           Starting at ${price.toFixed(2)}
         </span>
