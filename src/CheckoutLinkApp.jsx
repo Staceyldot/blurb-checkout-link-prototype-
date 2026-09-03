@@ -3280,7 +3280,7 @@ function PriceField({ label, hint, prefix, suffix, value, onChange, error, disab
 
 function BookDetailsRow() {
   const { isMobile } = useViewport();
-  const bits = [PRODUCT.format, PRODUCT.options, PRODUCT.pages, "Language English", "Published November 2019"];
+  const bits = ["10×8 in, 25×20 cm", PRODUCT.pages, "Language: English", "Published November 2019"];
   return (
     <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:8, rowGap:6,
       fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textSubtle }}>
