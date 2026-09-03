@@ -574,7 +574,7 @@ function PdpFooter() {
       <div style={{ background:"#292929", display:"flex", alignItems:"center", gap:40, padding:`16px ${padX}px`, width:"100%" }}>
         <div style={{ display:"flex", alignItems:"center", gap:24, flexWrap: isMobile ? "wrap" : "nowrap",
           fontSize:12, color:"#ffffff", lineHeight:1.4, whiteSpace:"nowrap" }}>
-          <span>2026 RPI Print, Inc.</span>
+          <span>©2026 RPI Print, Inc.</span>
           {legalLinks.map(l => (
             <a key={l} href="#" style={{ color:"#ffffff", textDecoration:"none" }}
               onMouseEnter={e => e.currentTarget.style.textDecoration="underline"}
