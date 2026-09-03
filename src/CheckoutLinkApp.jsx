@@ -3338,14 +3338,13 @@ function PreviewCard({ icon, title, sub, selected, onSelect, showLink }) {
 }
 
 /* One tile in the "Other books preview" carousel (Figma 5203:102590, "Card - Product"). */
-function ProductCarouselCard({ title, author, blurb, price, img }) {
+function ProductCarouselCard({ title, blurb, price, img }) {
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:16, width:410.67, flexShrink:0 }}>
+    <div style={{ display:"flex", flexDirection:"column", gap:16, width:328.54, flexShrink:0 }}>
       <div style={{ width:"100%", aspectRatio:"1 / 1", borderRadius:8, overflow:"hidden", opacity:.8 }}>
         <img src={img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
       </div>
       <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-        <span style={{ fontFamily:FONT_SANS, fontSize:14, color:T.textSubtle }}>{author}</span>
         <span style={{ fontFamily:FONT_HEADING, fontSize:24, fontWeight:500, color:T.textBold }}>{title}</span>
         <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, color:T.textSubtle, lineHeight:1.4,
           display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{blurb}</p>
