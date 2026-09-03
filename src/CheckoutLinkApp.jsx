@@ -632,9 +632,14 @@ function QuantityStepper({ qty, setQty, size=40, onBelowMin }) {
     display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" };
   // At quantity 1, decrementing removes the item (when onBelowMin is provided).
   const dec = () => { if (qty <= 1) { onBelowMin ? onBelowMin() : setQty(1); } else setQty(qty - 1); };
+  // Without onBelowMin, "-" at 1 is already a no-op — disable it rather than
+  // leave a dead click. Where onBelowMin removes the item instead, keep it live.
+  const decDisabled = qty <= 1 && !onBelowMin;
   return (
     <div style={{ display:"flex", height:size }}>
-      <button style={{ ...btn, borderRadius:"4px 0 0 4px", marginRight:-1 }} onClick={dec} aria-label="Decrease quantity"><Ms name="remove" size={20} /></button>
+      <button style={{ ...btn, borderRadius:"4px 0 0 4px", marginRight:-1,
+        ...(decDisabled && { cursor:"not-allowed", color:T.textDisabled, background:T.disabled }) }}
+        onClick={dec} disabled={decDisabled} aria-label="Decrease quantity"><Ms name="remove" size={20} /></button>
       <div style={{ ...btn, width:48, cursor:"default", fontSize:18, color:T.textBold, marginRight:-1 }}>{qty}</div>
       <button style={{ ...btn, borderRadius:"0 4px 4px 0" }} onClick={() => setQty(qty+1)} aria-label="Increase quantity"><Ms name="add" size={20} /></button>
     </div>
