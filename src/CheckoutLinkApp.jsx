@@ -60,6 +60,7 @@ const BOOK_COVER  = "/assets/book-liberal-libations.png";
 const BLURB_MARK  = "/assets/blurb-mark.svg";
 const AUTHOR_PHOTO = "/assets/author-kim.png";
 const BLURB_LOGO_EMAIL = "/assets/blurb-logo-email.png";  // full-color logo for the email header
+const US_FLAG = "/assets/us-flag.png";  // Codex dashboard nav region flag (node 4248:8889) — flat icon, not the emoji glyph
 const BOOK_STIRRED_OBSESSION = "/assets/book-stirred-obsession.jpg";
 const BOOK_SPIRIT_SMOKE_SALT = "/assets/book-spirit-smoke-salt.jpg";
 const PUBLISH_CELEBRATION = "/assets/publish-celebration.png";
@@ -3645,6 +3646,52 @@ function SideNavSection({ section, open, onToggle }) {
   );
 }
 
+const navMenuItem = { display:"flex", alignItems:"center", gap:10, padding:"10px 12px", borderRadius:T.radius,
+  fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold, textDecoration:"none", cursor:"pointer" };
+
+/* Collapsed-nav menu — the cart/flag/Log out/Help row that the desktop layout
+   shows inline, opened from the dark hamburger button on Tablet/Mobile. Codex's
+   spec (4141:5458, 4141:5560) shows the closed button only; the menu contents
+   and behavior here are this prototype's own, not a documented Figma state. */
+function HamburgerMenu() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = e => { if (!ref.current?.contains(e.target)) setOpen(false); };
+    const onKey = e => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("mousedown", onDown); document.removeEventListener("keydown", onKey); };
+  }, [open]);
+
+  return (
+    <span ref={ref} style={{ position:"relative", display:"inline-flex" }}>
+      <button onClick={() => setOpen(o => !o)} aria-expanded={open} aria-label="Menu" style={{ width:40, height:40,
+        borderRadius:T.radius, background:T.textBold, border:"none", cursor:"pointer",
+        display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+        <Ms name={open ? "close" : "menu"} size={24} color="#fff" />
+      </button>
+      {open && (
+        <div style={{ position:"absolute", top:"calc(100% + 8px)", right:0, zIndex:110, width:200,
+          background:T.surface, border:`1px solid ${T.borderSubtle}`, borderRadius:T.radius,
+          boxShadow:"0 4px 14px rgba(20,20,20,.18)", padding:8, display:"flex", flexDirection:"column", gap:2 }}>
+          <a href="#" onClick={e => e.preventDefault()} style={navMenuItem}>
+            <Ms name="shopping_cart" size={20} color={T.textSubtle} /> Cart
+          </a>
+          <a href="#" onClick={e => e.preventDefault()} style={navMenuItem}>
+            <img src={US_FLAG} alt="United States" style={{ width:25, height:18, display:"block" }} /> English (US)
+          </a>
+          <div style={{ height:1, background:T.borderSubtle, margin:"4px 0" }} />
+          <a href="#" onClick={e => e.preventDefault()} style={navMenuItem}>Log out</a>
+          <a href="#" onClick={e => e.preventDefault()} style={navMenuItem}>Help</a>
+        </div>
+      )}
+    </span>
+  );
+}
+
 /* Dashboard top nav (Codex Foundation, node 4140:5390) — Setup-only chrome, since
    Setup is the seller's dashboard rather than the buyer-facing checkout flow the
    other stages share. Responsive per Codex's Tablet (4141:5458) and Mobile
@@ -3659,15 +3706,11 @@ function DashboardTopNav() {
       alignItems:"center", justifyContent:"space-between", padding:`0 ${padX}px`, height:60, flexShrink:0 }}>
       <img src={BLURB_LOGO} alt="Blurb" style={{ height:48.39, width:"auto", display:"block" }} />
       {collapsed ? (
-        <button onClick={e => e.preventDefault()} aria-label="Menu" style={{ width:40, height:40,
-          borderRadius:T.radius, background:T.textBold, border:"none", cursor:"pointer",
-          display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-          <Ms name="menu" size={24} color="#fff" />
-        </button>
+        <HamburgerMenu />
       ) : (
         <div style={{ display:"flex", alignItems:"center", gap:24 }}>
           <Ms name="shopping_cart" size={24} color={T.textBold} />
-          <span style={{ fontSize:20, lineHeight:1 }} role="img" aria-label="United States">🇺🇸</span>
+          <img src={US_FLAG} alt="United States" style={{ width:25, height:18, display:"block" }} />
           <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:16,
             fontWeight:600, color:T.textBold, textDecoration:"none" }}>Log out</a>
           <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:16,
