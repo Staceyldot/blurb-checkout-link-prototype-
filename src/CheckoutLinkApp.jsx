@@ -4087,7 +4087,8 @@ const ONLINE_EDITOR_PROJECTS = [
    the same way Manage Instant Store does elsewhere on the Dashboard. */
 const INSTANT_STORES = [
   { title:"Liberal Libations", sub:"Trade book · 10×8", link:"blurb.com/1/ppq8w", price:"$35.00", status:"live", orders:14 },
-  { title:"Coastal Light — Volume II", sub:"Photo book · 10×10", link:"blurb.com/1/c1t2k", price:"$49.00", status:"live", orders:3 },
+  { title:"The Stirred Obsession: A Minimalist's Guide to the Modern Martini", sub:"Photo book · 10×10", link:"blurb.com/1/c1t2k", price:"$28.00", status:"live", orders:3 },
+  { title:"Spirit, Smoke & Salt", sub:"Trade book · 8×10", link:"blurb.com/1/sm5kt", price:"$40.00", status:"live", orders:7 },
   { title:"Field Notes: Patagonia", sub:"Magazine · 8.5×11", link:null, price:"Not set", status:"draft", orders:null },
 ];
 
@@ -4106,9 +4107,10 @@ function InstantStoresTable({ onManageInstantStore }) {
         <tbody>
           {INSTANT_STORES.map(s => (
             <tr key={s.title}>
-              <td style={cell}>
+              <td style={{ ...cell, maxWidth:220 }}>
                 <a href="#" onClick={e => { e.preventDefault(); onManageInstantStore?.(); }}
-                  style={{ display:"block", fontWeight:600, color:WF.body, textDecoration:"none" }}>{s.title}</a>
+                  style={{ display:"block", fontWeight:600, color:WF.body, textDecoration:"none",
+                    whiteSpace:"normal", wordBreak:"break-word" }}>{s.title}</a>
                 <span style={{ display:"block", fontSize:12, color:"#6b6b6b", marginTop:2 }}>{s.sub}</span>
               </td>
               <td style={cell}>
