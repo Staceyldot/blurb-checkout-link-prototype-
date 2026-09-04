@@ -1394,7 +1394,7 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
           <div style={{ display:"flex", flexWrap:"wrap", gap:24 }}>
             {[["The Stirred Obsession: A Minimalist's Guide to the Modern Martini","The timeless elegance of the world's most iconic cocktail takes center stage in The Stirred Obsession: A Minimalist's Guide to the Modern Martini.","$28.00",BOOK_STIRRED_OBSESSION],
               ["Spirit, Smoke & Salt","Rooted in centuries of craftsmanship, agave spirits possess a depth, minerality, and complexity that rival the finest whiskies and brandies in the world. This volume bridges ancient distillation traditions with modern cocktail architecture, showing you how to turn primitive, earth-bound flavors into sleek, high-end drinks.","$40.00",BOOK_SPIRIT_SMOKE_SALT]].map(([t,d,p,img]) => (
-              <div key={t} style={{ width:340, maxWidth:"100%", display:"flex", flexDirection:"column", gap:16 }}>
+              <div key={t} style={{ width:410.67, maxWidth:"100%", display:"flex", flexDirection:"column", gap:16 }}>
                 {/* Square frame (Figma 410.667²); absolutely-positioned img so aspect-ratio
                     controls the height and the portrait cover is contained (gaps on the sides) */}
                 <div style={{ position:"relative", width:"100%", aspectRatio:"1 / 1", borderRadius:8, overflow:"hidden" }}>
@@ -3347,7 +3347,7 @@ function PreviewCard({ icon, title, sub, selected, onSelect, showLink }) {
 /* One tile in the "Other books preview" carousel (Figma 5203:102590, "Card - Product"). */
 function ProductCarouselCard({ title, blurb, price, img }) {
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:16, width:328.54, flexShrink:0 }}>
+    <div style={{ display:"flex", flexDirection:"column", gap:16, width:410.67, flexShrink:0 }}>
       <div style={{ width:"100%", aspectRatio:"1 / 1", borderRadius:8, overflow:"hidden", opacity:.8 }}>
         <img src={img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
       </div>
@@ -4082,9 +4082,9 @@ function LinkSetupPage({ onContinue }) {
           <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:18, fontWeight:600, color:T.textSubtle }}>
             Shown on your checkout page unless you turn this off.
           </p>
-          <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:24,
-            display:"flex", flexDirection:"column", gap:24 }}>
-            <div style={{ display:"flex", gap:24, alignItems:"flex-start" }}>
+          <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:"24px 24px 8px",
+            display:"flex", flexDirection:"column", gap:24, overflow:"hidden" }}>
+            <div className="other-books-scroll" style={{ display:"flex", gap:24, alignItems:"flex-start", overflowX:"auto", overflowY:"hidden", paddingBottom:24 }}>
               {CROSS_SELL_BOOKS.map(b => <ProductCarouselCard key={b.title} {...b} />)}
             </div>
           </div>
