@@ -3931,8 +3931,8 @@ function WireframeProjectRow({ project, onManageInstantStore }) {
    today + "why order a proof", and one non-book product). */
 const ALL_PROJECTS = [
   { cover:PRODUCT.img, badge:"Selling", title:"Liberal Libations",
-    desc:"Liberal Libations empowers the cocktail enthusiast to craft bar-quality cocktails for a large crowd or for an intimate gathering.",
-    meta:[["Project type","Trade Book"],["Project option","8×10 in, 20×25 cm"],["# of pages","176"],["ISBN","9798211886148"],["Created with","BookWright"],["Created","Mar 14, 2024"]],
+    desc:"Liberal Libations empowers the cocktail enthusiast to craft bar-quality cocktails for a large crowd or for an intimate gathering. Make-ahead batch recipes mean less time mixing drinks and more time enjoying each sip with friends. Over 85 recipes",
+    meta:[["Project type","Trade Book"],["Project option","10×8 in, 25×20 cm"],["# of pages","160"],["ISBN","9781733372800"],["Created with","BookWright"],["Created","March 14, 2019"]],
     actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"download", label:"Download PDF" }],
     share:true },
   { badge:"Selling", title:"Xylophone, glockenspiel & bells for beginner adults",
@@ -4023,7 +4023,8 @@ function AllProjectsRow({ project, onManageInstantStore }) {
         <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:WF.font, fontSize:18, fontWeight:700,
           color:WF.body, textDecoration:"none", marginBottom:6 }}>{project.title}</a>
         {project.desc && (
-          <p style={{ margin:"0 0 12px", fontFamily:WF.font, fontSize:13.5, color:"#3d3d3d", lineHeight:1.4 }}>{project.desc}</p>
+          <p style={{ margin:"0 0 12px", fontFamily:WF.font, fontSize:13.5, color:"#3d3d3d", lineHeight:1.4,
+            display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{project.desc}</p>
         )}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(2, minmax(180px, max-content))", gap:"2px 28px", marginBottom: project.share ? 10 : 0 }}>
           {project.meta.map(([label, value]) => (
