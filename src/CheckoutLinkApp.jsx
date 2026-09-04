@@ -3647,20 +3647,33 @@ function SideNavSection({ section, open, onToggle }) {
 
 /* Dashboard top nav (Codex Foundation, node 4140:5390) — Setup-only chrome, since
    Setup is the seller's dashboard rather than the buyer-facing checkout flow the
-   other stages share. */
+   other stages share. Responsive per Codex's Tablet (4141:5458) and Mobile
+   (4141:5560) variants: cart/flag/Log out/Help collapse into a single dark
+   hamburger button below desktop. */
 function DashboardTopNav() {
+  const { isMobile, isTablet } = useViewport();
+  const collapsed = isMobile || isTablet;
+  const padX = isMobile ? 20 : isTablet ? 40 : 80;
   return (
     <div style={{ background:T.surface, borderBottom:`1px solid ${T.borderSubtle}`, display:"flex",
-      alignItems:"center", justifyContent:"space-between", padding:"0 80px", height:60, flexShrink:0 }}>
-      <img src={BLURB_LOGO} alt="Blurb" style={{ height:32, width:"auto", display:"block" }} />
-      <div style={{ display:"flex", alignItems:"center", gap:24 }}>
-        <Ms name="shopping_cart" size={24} color={T.textBold} />
-        <span style={{ fontSize:20, lineHeight:1 }} role="img" aria-label="United States">🇺🇸</span>
-        <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:16,
-          fontWeight:600, color:T.textBold, textDecoration:"none" }}>Log out</a>
-        <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:16,
-          fontWeight:600, color:T.textBold, textDecoration:"none" }}>Help</a>
-      </div>
+      alignItems:"center", justifyContent:"space-between", padding:`0 ${padX}px`, height:60, flexShrink:0 }}>
+      <img src={BLURB_LOGO} alt="Blurb" style={{ height:48.39, width:"auto", display:"block" }} />
+      {collapsed ? (
+        <button onClick={e => e.preventDefault()} aria-label="Menu" style={{ width:40, height:40,
+          borderRadius:T.radius, background:T.textBold, border:"none", cursor:"pointer",
+          display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+          <Ms name="menu" size={24} color="#fff" />
+        </button>
+      ) : (
+        <div style={{ display:"flex", alignItems:"center", gap:24 }}>
+          <Ms name="shopping_cart" size={24} color={T.textBold} />
+          <span style={{ fontSize:20, lineHeight:1 }} role="img" aria-label="United States">🇺🇸</span>
+          <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:16,
+            fontWeight:600, color:T.textBold, textDecoration:"none" }}>Log out</a>
+          <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:16,
+            fontWeight:600, color:T.textBold, textDecoration:"none" }}>Help</a>
+        </div>
+      )}
     </div>
   );
 }
