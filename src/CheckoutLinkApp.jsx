@@ -3755,6 +3755,7 @@ const WF = {
   sellBg: "#e9f7ee", sellBorder: "#b6e3c4", sellText: "#1e7b34", sellDot: "#1e9e42",
   expiryBg: "#fdecea", expiryBorder: "#f1b0a8", expiryText: "#c0392b",
   proofBg: "#eaf6fb", proofBorder: "#a9d4e5", proofText: "#2c6e88",
+  draftBorder: "#d9d9d9", draftText: "#6b6b6b",
 };
 
 const WF_SIDE_SECTIONS = [
@@ -4079,6 +4080,65 @@ const ONLINE_EDITOR_PROJECTS = [
     actions:[{ icon:"launch", label:"Open" }, { icon:"library_add", label:"Duplicate" }] },
 ];
 
+/* Instant Stores — copied from the reference's sell-checkout-links.html. The
+   most relevant of the wireframe pages to this app (it's the same "Instant
+   Store" this whole prototype is about), so its live rows link into Setup
+   the same way Manage Instant Store does elsewhere on the Dashboard. */
+const INSTANT_STORES = [
+  { title:"Liberal Libations", sub:"Trade book · 10×8", link:"blurb.com/1/ppq8w", price:"$24.99", status:"live", orders:14 },
+  { title:"Coastal Light — Volume II", sub:"Photo book · 10×10", link:"blurb.com/1/c1t2k", price:"$49.00", status:"live", orders:3 },
+  { title:"Field Notes: Patagonia", sub:"Magazine · 8.5×11", link:null, price:"Not set", status:"draft", orders:null },
+];
+
+function InstantStoresTable({ onManageInstantStore }) {
+  const cell = { padding:"13px 14px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:WF.font, fontSize:13.5, color:WF.body };
+  const th = { padding:"10px 14px", borderBottom:`1px solid #d9d9d9`, fontFamily:WF.font, fontSize:11, fontWeight:700,
+    color:"#6b6b6b", textAlign:"left", textTransform:"uppercase", letterSpacing:".44px" };
+  return (
+    <div style={{ overflowX:"auto" }}>
+      <table style={{ width:"100%", borderCollapse:"collapse", minWidth:640 }}>
+        <thead>
+          <tr>
+            {["Project", "Link", "Price", "Status", "Orders"].map(h => <th key={h} style={th}>{h}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {INSTANT_STORES.map(s => (
+            <tr key={s.title}>
+              <td style={cell}>
+                <a href="#" onClick={e => { e.preventDefault(); onManageInstantStore?.(); }}
+                  style={{ display:"block", fontWeight:600, color:WF.body, textDecoration:"none" }}>{s.title}</a>
+                <span style={{ display:"block", fontSize:12, color:"#6b6b6b", marginTop:2 }}>{s.sub}</span>
+              </td>
+              <td style={cell}>
+                {s.link ? (
+                  <span style={{ display:"inline-flex", alignItems:"center", gap:6, color:WF.text }}>
+                    {s.link} <Ms name="content_copy" size={14} color="#6b6b6b" />
+                  </span>
+                ) : (
+                  <span style={{ display:"inline-flex", alignItems:"center", gap:6, color:"#b3b3b3" }}>
+                    — <Ms name="content_copy" size={14} color="#d9d9d9" />
+                  </span>
+                )}
+              </td>
+              <td style={cell}>{s.price}</td>
+              <td style={cell}>
+                <span style={{ display:"inline-block", borderRadius:20, padding:"3px 9px", fontSize:11.5, fontWeight:600,
+                  ...(s.status === "live"
+                    ? { color:WF.sellText, background:WF.sellBg, border:`1px solid ${WF.sellBorder}` }
+                    : { color:WF.draftText, background:"transparent", border:`1px solid ${WF.draftBorder}` }) }}>
+                  {s.status === "live" ? "Live" : "Draft"}
+                </span>
+              </td>
+              <td style={cell}>{s.orders ?? "—"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 /* Seller dashboard Home — the demo's stop before Setup, so the story starts at
    the seller's home screen rather than dropping straight into Instant Store
    setup. Content and styling copied as closely as possible from the legacy
@@ -4093,8 +4153,8 @@ function DashboardHomePage({ onContinue }) {
      footer), so it's a sub-view rather than its own top-level stepper stop. */
   const [subPage, setSubPage] = useState("home");
   const goAllProjects = e => { e?.preventDefault(); setSubPage("all-projects"); };
-  const SIDE_NAV_TARGETS = { "All projects":"all-projects", "Online editor projects":"online-editor" };
-  const ACTIVE_ITEM_FOR = { "all-projects":"All projects", "online-editor":"Online editor projects" };
+  const SIDE_NAV_TARGETS = { "All projects":"all-projects", "Online editor projects":"online-editor", "Instant Stores":"instant-stores" };
+  const ACTIVE_ITEM_FOR = { "all-projects":"All projects", "online-editor":"Online editor projects", "instant-stores":"Instant Stores" };
 
   return (
     <>
@@ -4228,7 +4288,7 @@ function DashboardHomePage({ onContinue }) {
                 ))}
               </div>
             </>
-          ) : (
+          ) : subPage === "online-editor" ? (
             <>
               <span style={{ display:"block", fontFamily:WF.font, fontSize:22, fontWeight:700, color:WF.text }}>Online editor projects</span>
 
@@ -4255,6 +4315,24 @@ function DashboardHomePage({ onContinue }) {
               {ONLINE_EDITOR_PROJECTS.map(p => (
                 <AllProjectsRow key={p.title} project={p} onManageInstantStore={onContinue} />
               ))}
+            </>
+          ) : (
+            <>
+              <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
+                <div>
+                  <span style={{ display:"block", fontFamily:WF.font, fontSize:22, fontWeight:700, color:WF.text }}>Instant Stores</span>
+                  <p style={{ margin:"4px 0 0", fontFamily:WF.font, fontSize:13, color:"#6d6d6d" }}>
+                    Shareable links that let customers buy directly from you
+                  </p>
+                </div>
+                <a href="#" onClick={e => e.preventDefault()} style={{ background:"#555", color:"#fff", border:"1px solid #333",
+                  borderRadius:4, padding:"6px 13px", fontFamily:WF.font, fontSize:12.5, fontWeight:600,
+                  textDecoration:"none", whiteSpace:"nowrap" }}>+ Create Instant Store</a>
+              </div>
+
+              <div style={{ border:`1px solid ${WF.border}`, borderRadius:8, overflow:"hidden" }}>
+                <InstantStoresTable onManageInstantStore={onContinue} />
+              </div>
             </>
           )}
         </div>
