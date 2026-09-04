@@ -3094,17 +3094,18 @@ function DemoBar({ view, onJump, onSwitchFlow, variant, onVariantChange, express
    the product. The stage keys are the stepper's own, so the URL and the demo bar
    can't disagree about what the stages are.
 
-   Default (and fallback for an unrecognised value) is Setup — a shopper clicking
-   a real checkout link lands on the PDP, but this demo build opens on Setup so it
-   tells the whole story, seller side first, without needing ?stage=setup typed
-   in. A mistyped demo URL should still open on something rather than throw.
+   Default (and fallback for an unrecognised value) is Dashboard — a shopper
+   clicking a real checkout link lands on the PDP, but this demo build opens
+   on the seller's Dashboard so it tells the whole story from the very start,
+   without needing ?stage=dashboard typed in. A mistyped demo URL should still
+   open on something rather than throw.
    Like the regular flow's params this seeds the first render only — using the
    stepper afterwards doesn't rewrite the URL. */
 const STAGE_KEYS = STAGES.map(s => s.key);
 const initialStage = () => {
-  if (typeof window === "undefined") return "setup";
+  if (typeof window === "undefined") return "dashboard";
   const s = (new URLSearchParams(window.location.search).get("stage") || "").trim().toLowerCase();
-  return STAGE_KEYS.includes(s) ? s : "setup";
+  return STAGE_KEYS.includes(s) ? s : "dashboard";
 };
 
 /* ═══════════════════════════ LINK SETUP (seller-side) ═══════════════════════════
