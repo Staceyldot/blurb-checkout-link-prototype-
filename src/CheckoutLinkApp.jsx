@@ -3738,92 +3738,287 @@ function SideNav() {
   );
 }
 
-/* Seller dashboard — the demo's stop before Setup, so the story starts at the
-   seller's home screen rather than dropping straight into Instant Store setup.
-   Deliberately a lightweight placeholder (no Figma spec for this screen), just
-   enough to give the new stepper stop somewhere to land. */
-/* Content/IA ported from the legacy phase-2-checkout-links/home.html wireframe
-   (Current orders table, Most recent projects list), rebuilt with this app's
-   own Codex-based tokens rather than that kit's pre-Codex `--bk-*` styling.
-   Trimmed to the one book this demo actually has, using the same order
-   constants the confirmation/email screens use so the numbers line up. */
-function DashboardHomePage({ onContinue }) {
-  const cell = { padding:"10px 8px", fontSize:14, color:T.textBold, borderBottom:`1px solid ${T.borderSubtle}`, textAlign:"left" };
+/* ═══════════ Dashboard Home — deliberately NOT Codex ═══════════
+   The seller Home screen is legacy, pre-Codex UI (the phase-2-checkout-links
+   wireframe kit, predates the design system this app's other screens follow).
+   Copied as closely as possible from the live reference
+   (dashboard-eight-smoky-11.vercel.app/phase-2-checkout-links/home) — its own
+   flat grey/white palette and plain sans type, not this app's `T` tokens,
+   FONT_HEADING, or the Codex-sourced DashboardTopNav/SideNav used elsewhere.
+   Colors, borders and sizes below are copied from that page's computed
+   styles rather than approximated. */
+const WF = {
+  text: "#1a1a1a", body: "#333333", subtle: "#444444", faint: "#606060",
+  border: "#c4c4c4", borderLight: "#e0e0e0", divider: "#e0e0e0",
+  panel: "#f4f4f4", head: "#f2f2f2", theadBg: "#fafafa", cover: "#d0d0d0",
+};
+
+function WireframeTopNav() {
   return (
-    <>
-    <DashboardTopNav />
-    <div style={{ display:"flex", alignItems:"flex-start" }}>
-    <SideNav />
-    <div style={{ flex:1, minWidth:0, minHeight:"100vh", background:T.bg, fontFamily:FONT_SANS }}>
-      <div style={{ padding:"48px 80px", display:"flex", flexDirection:"column", gap:48, maxWidth:900 }}>
-        <h1 style={{ fontFamily:FONT_HEADING, fontSize:32, fontWeight:500, color:T.textBold, margin:0 }}>Home</h1>
-
-        {/* Current orders */}
-        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <h2 style={{ fontFamily:FONT_HEADING, fontSize:22, fontWeight:500, color:T.textBold, margin:0 }}>Current orders</h2>
-            <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:14,
-              fontWeight:600, color:T.textLink, textDecoration:"none" }}>View all</a>
-          </div>
-          <table style={{ width:"100%", borderCollapse:"collapse" }}>
-            <thead>
-              <tr>
-                {["Order", "Status", "Shipping details", "Tracking details"].map(h => (
-                  <th key={h} style={{ ...cell, fontWeight:700, color:T.textSubtle }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style={cell}>
-                  <a href="#" onClick={e => e.preventDefault()} style={{ color:T.textLink, fontWeight:700, textDecoration:"none" }}>{ORDER_NUMBER}</a>
-                </td>
-                <td style={cell}>Shipped</td>
-                <td style={cell}>Delivered {ORDER_DATE}</td>
-                <td style={cell}>
-                  <a href="#" onClick={e => e.preventDefault()} style={{ color:T.textLink, textDecoration:"none" }}>{UPS_TRACKING}</a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        {/* Most recent projects */}
-        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <h2 style={{ fontFamily:FONT_HEADING, fontSize:22, fontWeight:500, color:T.textBold, margin:0 }}>Most recent projects</h2>
-            <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:14,
-              fontWeight:600, color:T.textLink, textDecoration:"none" }}>See all projects</a>
-          </div>
-          <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:20, background:T.surface,
-            display:"flex", gap:20, alignItems:"flex-start", flexWrap:"wrap" }}>
-            <img src={PRODUCT.img} alt="" style={{ width:96, height:96, borderRadius:8, objectFit:"cover", flexShrink:0 }} />
-            <div style={{ flex:"1 1 200px", minWidth:0, display:"flex", flexDirection:"column", gap:8 }}>
-              <span style={{ alignSelf:"flex-start", fontFamily:FONT_SANS, fontSize:12, fontWeight:700,
-                color:T.brand, background:T.panel, borderRadius:999, padding:"2px 10px" }}>Instant Store · Live</span>
-              <span style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:500, color:T.textBold }}>{PRODUCT.title}</span>
-              <span style={{ fontFamily:FONT_SANS, fontSize:14, color:T.textSubtle }}>
-                {PRODUCT.format} · {PRODUCT.pages} · by {PRODUCT.author}
-              </span>
-            </div>
-            <div style={{ display:"flex", flexDirection:"column", gap:10, flexShrink:0 }}>
-              <a href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:6,
-                fontFamily:FONT_SANS, fontSize:14, fontWeight:600, color:T.textBold, textDecoration:"none" }}>
-                <Ms name="shopping_cart" size={18} color={T.textSubtle} /> Order more
-              </a>
-              <a href="#" onClick={e => { e.preventDefault(); onContinue(); }} style={{ display:"flex", alignItems:"center", gap:6,
-                fontFamily:FONT_SANS, fontSize:14, fontWeight:600, color:T.textBold, textDecoration:"none" }}>
-                <Ms name="settings" size={18} color={T.textSubtle} /> Manage Instant Store
-              </a>
-              <a href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:6,
-                fontFamily:FONT_SANS, fontSize:14, fontWeight:600, color:T.textError, textDecoration:"none" }}>
-                <Ms name="delete" size={18} color={T.textError} /> Delete
-              </a>
-            </div>
-          </div>
-        </div>
+    <div style={{ background:"#fff", borderBottom:`1px solid ${WF.borderLight}`, display:"flex",
+      alignItems:"center", justifyContent:"space-between", padding:"16px 20px", flexShrink:0 }}>
+      <img src={BLURB_LOGO} alt="Blurb" style={{ height:40, width:"auto", display:"block" }} />
+      <div style={{ display:"flex", alignItems:"center", gap:20 }}>
+        <a href="#" onClick={e => e.preventDefault()} aria-label="Cart" style={{ color:WF.body, display:"flex" }}>
+          <Ms name="shopping_cart" size={20} color={WF.body} />
+        </a>
+        <span style={{ fontSize:20, lineHeight:1 }} role="img" aria-label="United States">🇺🇸</span>
+        <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:13,
+          fontWeight:400, color:WF.body, textDecoration:"none" }}>Help</a>
+        <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:13,
+          fontWeight:400, color:WF.body, textDecoration:"none" }}>Log Out</a>
       </div>
     </div>
+  );
+}
+
+const WF_SIDE_SECTIONS = [
+  { label:"Projects", items:["All projects", "Online editor projects"] },
+  { label:"Sell", items:["Instant Stores", "Earnings", "Monthly profit reports", "Payment settings"], badge:"Instant Stores" },
+  { label:"Account", items:["My orders", "Account settings", "Address book", "My profile"] },
+];
+
+function WireframeSideNav() {
+  return (
+    <div style={{ width:280, flexShrink:0, background:"#fff", padding:"32px 24px", display:"flex",
+      flexDirection:"column", gap:28 }}>
+      {WF_SIDE_SECTIONS.map(section => (
+        <div key={section.label} style={{ display:"flex", flexDirection:"column", gap:6 }}>
+          <div style={{ fontFamily:FONT_SANS, fontSize:13, fontWeight:700, color:WF.text, marginBottom:4 }}>{section.label}</div>
+          {section.items.map(item => (
+            <a key={item} href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:8,
+              fontFamily:FONT_SANS, fontSize:13.5, color:WF.body, textDecoration:"none", padding:"3px 0" }}>
+              {item}
+              {item === section.badge && (
+                <span style={{ fontFamily:FONT_SANS, fontSize:10, fontWeight:700, color:"#fff",
+                  background:"#262626", borderRadius:999, padding:"2px 8px" }}>New</span>
+              )}
+            </a>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* Big multi-column global footer (Codex's PdpFooter is a different, smaller
+   "Built with Blurb" trust bar — this page uses the older site-wide one). */
+const WF_FOOTER_COLUMNS = [
+  { title:"Self-Publishing", links:["Self-Publishing", "Creation & Layout Tools", "Sell & Self-Publish", "Sell on Blurb's Bookstore"] },
+  { title:"Photo Books", links:["Photo Books", "Wedding Photo Books", "Family Photo Books"] },
+  { title:"Get Inspired", links:["Blog", "Bookstore"] },
+  { title:"Help", links:["Help Center", "Pricing", "Shipping"] },
+  { title:"Company", links:["About Blurb", "Work at Blurb"] },
+];
+function WireframeFooter() {
+  const { isMobile } = useViewport();
+  return (
+    <div style={{ background:"#fff", borderTop:`1px solid ${WF.borderLight}` }}>
+      <div style={{ padding: isMobile ? "32px 20px" : "40px 80px", display:"flex", flexWrap:"wrap", gap:32 }}>
+        {WF_FOOTER_COLUMNS.map(col => (
+          <div key={col.title} style={{ display:"flex", flexDirection:"column", gap:10, minWidth:160 }}>
+            <div style={{ fontFamily:FONT_SANS, fontSize:13, fontWeight:700, color:WF.text, letterSpacing:".04em", textTransform:"uppercase" }}>{col.title}</div>
+            {col.links.map(l => (
+              <a key={l} href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:13, color:WF.body, textDecoration:"none" }}>{l}</a>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div style={{ background:"#dde3e8", padding:"14px 20px", display:"flex", flexWrap:"wrap",
+        alignItems:"center", justifyContent:"center", gap:20, fontSize:12, color:"#555" }}>
+        <span>© 2016 - 2026 RPI Print, Inc.</span>
+        <a href="#" onClick={e => e.preventDefault()} style={{ color:"#555", textDecoration:"none" }}>Company</a>
+        <a href="#" onClick={e => e.preventDefault()} style={{ color:"#555", textDecoration:"none" }}>Privacy Policy</a>
+        <a href="#" onClick={e => e.preventDefault()} style={{ color:"#555", textDecoration:"none" }}>Support</a>
+      </div>
+    </div>
+  );
+}
+
+/* Current orders — same three demo orders shown on the reference page (not
+   this app's own ORDER_NUMBER/ORDER_DATE/UPS_TRACKING; a faithful copy of the
+   reference's content, not this app's checkout-link order). */
+const WF_ORDERS = [
+  { id:"20481187", status:"In production", shipping:"Delivery by 2026-08-03", tracking:"—" },
+  { id:"20481163", status:"Shipped", shipping:"Delivered Jul 15, 2026", tracking:"1Z999AA10123456784" },
+  { id:"20475311", status:"Shipped", shipping:"Delivered Jul 6, 2026", tracking:"1Z999AA10123456721" },
+];
+
+/* Most recent projects — copied 1:1 from the reference page's five example
+   rows (an online-editor project, a live PDF, two orderable PDFs, and one
+   still in preflight), so every action/state variant shows up. */
+const WF_PROJECTS = [
+  { badge:"Online editor", title:"Pride and Preconceptions",
+    desc:"A witty modern retelling of a beloved classic, reimagined for today's readers.",
+    meta:[["Project type","Trade Book"],["Project option","6×9 in"],["# of pages","240"],["Created","Mar 14, 2024"]],
+    actions:[{ icon:"launch", label:"Open" }, { icon:"library_add", label:"Duplicate" }] },
+  { badge:"PDF", title:"Field Notes: Patagonia",
+    desc:"A traveler's illustrated journal from six weeks trekking through southern Patagonia.",
+    meta:[["Project type","Magazine"],["Project option","8.5×11 in"],["# of pages","56"],["Created","Oct 2, 2025"]],
+    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }] },
+  { badge:"PDF", title:"PDF-1536774", expiry:"Expires in 4 days — order now before it's gone.",
+    desc:"Preflight check complete — your book is ready to be ordered.",
+    meta:[["Status","Preflight check complete"],["# of pages","32"],["Uploaded","Jul 22, 2026"]],
+    orderNote:"Order a copy to unlock selling options.", actions:[{ icon:"add_link", label:"Create Instant Store" }] },
+  { badge:"PDF", title:"PDF-1538042", expiry:"Expires in 12 days — order now before it's gone.",
+    desc:"Preflight check complete — your book is ready to be ordered.",
+    meta:[["Status","Preflight check complete"],["# of pages","48"],["Uploaded","Jul 30, 2026"]],
+    orderNote:"Order a copy to unlock selling options.", actions:[{ icon:"add_link", label:"Create Instant Store" }] },
+  { badge:"PDF", title:"PDF-1537918", expiry:"Expires in 14 days — order now before it's gone.",
+    desc:"Preflight check in progress — we're checking your file…",
+    meta:[["Status","Preflight check in progress"],["# of pages","—"],["Uploaded","Aug 1, 2026"]],
+    checkingNote:"We're checking your file — actions unlock once preflight finishes." },
+];
+
+function WfActionLink({ icon, label, danger, onClick }) {
+  return (
+    <a href="#" onClick={e => { e.preventDefault(); onClick?.(); }} style={{ display:"flex", alignItems:"center", gap:6,
+      fontFamily:FONT_SANS, fontSize:13, color: danger ? "#bd1818" : WF.subtle, textDecoration:"none" }}>
+      <Ms name={icon} size={16} color={danger ? "#bd1818" : WF.subtle} /> {label}
+    </a>
+  );
+}
+
+function WireframeProjectRow({ project, onManageInstantStore }) {
+  const { isMobile } = useViewport();
+  return (
+    <div style={{ display:"flex", flexDirection: isMobile ? "column" : "row", gap:20,
+      padding:"22px 0", borderBottom:`1px solid ${WF.border}` }}>
+      <div style={{ position:"relative", width:116, height:148, background:WF.cover, border:`1px solid ${WF.borderLight}`,
+        borderRadius:4, flexShrink:0 }}>
+        <span style={{ position:"absolute", left:0, right:0, bottom:0, background:"rgba(255,255,255,.75)",
+          color:WF.subtle, fontSize:12, fontWeight:700, padding:5, textAlign:"center" }}>Preview</span>
+      </div>
+      <div style={{ flex:"1 1 300px", minWidth:0, display:"flex", flexDirection:"column" }}>
+        <span style={{ alignSelf:"flex-start", fontFamily:FONT_SANS, fontSize:11, fontWeight:600, color:WF.faint,
+          background:"#e8e8e8", border:"1px solid #c0c0c0", borderRadius:999, padding:"2px 9px", marginBottom:8 }}>
+          {project.badge}
+        </span>
+        <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:18, fontWeight:700,
+          color:WF.body, textDecoration:"none", marginBottom:6 }}>{project.title}</a>
+        {project.expiry && (
+          <span style={{ alignSelf:"flex-start", display:"inline-flex", alignItems:"center", gap:6, fontFamily:FONT_SANS,
+            fontSize:12.5, color:WF.subtle, background:WF.panel, border:"1px solid #ccc", borderRadius:4,
+            padding:"6px 10px", margin:"0 0 8px" }}>
+            <Ms name="schedule" size={14} color={WF.subtle} />{project.expiry}
+          </span>
+        )}
+        <p style={{ margin:"0 0 12px", fontFamily:FONT_SANS, fontSize:13.5, color:"#3d3d3d", lineHeight:1.4 }}>{project.desc}</p>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(2, minmax(140px, max-content))", gap:"2px 28px", marginBottom:0 }}>
+          {project.meta.map(([label, value]) => (
+            <span key={label} style={{ fontFamily:FONT_SANS, fontSize:13, color:"#3d3d3d" }}><b>{label}:</b> {value}</span>
+          ))}
+        </div>
+      </div>
+      <div style={{ display:"flex", flexDirection:"column", gap:16, flexShrink:0, paddingLeft: isMobile ? 0 : 14 }}>
+        {project.orderNote && (
+          <div>
+            <WfActionLink icon="shopping_cart" label="Order" />
+            <p style={{ margin:"10px 0 0", fontFamily:FONT_SANS, fontSize:12.5, fontStyle:"italic", color:WF.faint }}>
+              {project.orderNote}
+            </p>
+          </div>
+        )}
+        {project.actions?.map(a => (
+          <WfActionLink key={a.label} icon={a.icon} label={a.label}
+            onClick={a.label === "Manage Instant Store" ? onManageInstantStore : undefined} />
+        ))}
+        {project.checkingNote && (
+          <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:12.5, fontStyle:"italic", color:WF.faint }}>{project.checkingNote}</p>
+        )}
+        <div style={{ height:1, background:WF.divider }} />
+        <WfActionLink icon="delete" label="Delete" danger />
+      </div>
+    </div>
+  );
+}
+
+/* Seller dashboard Home — the demo's stop before Setup, so the story starts at
+   the seller's home screen rather than dropping straight into Instant Store
+   setup. Content and styling copied as closely as possible from the legacy
+   phase-2-checkout-links/home.html wireframe (see WF/Wireframe* above) —
+   deliberately not this app's Codex design system. */
+function DashboardHomePage({ onContinue }) {
+  const { isMobile } = useViewport();
+  const [bannerOpen, setBannerOpen] = useState(true);
+  return (
+    <>
+    <WireframeTopNav />
+    <div style={{ display:"flex", alignItems:"flex-start", background:"#fff" }}>
+      {!isMobile && <WireframeSideNav />}
+      <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column" }}>
+        <div style={{ padding: isMobile ? "20px" : "32px 40px", display:"flex", flexDirection:"column", gap:24 }}>
+          {bannerOpen && (
+            <div style={{ background:WF.panel, border:`1px solid ${WF.border}`, borderRadius:8, padding:16,
+              display:"flex", alignItems:"flex-start", gap:12 }}>
+              <Ms name="campaign" size={20} color={WF.subtle} style={{ flexShrink:0, marginTop:2 }} />
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ fontFamily:FONT_SANS, fontSize:14, fontWeight:700, color:WF.text }}>We're retiring BookWright Online.</div>
+                <div style={{ fontFamily:FONT_SANS, fontSize:13, color:WF.subtle, marginTop:2 }}>
+                  Your existing projects are right where you left them. <b>What's changing and why</b>
+                </div>
+              </div>
+              <button onClick={e => e.preventDefault()} style={{ background:"#fff", color:WF.body, border:"1px solid #ccc",
+                borderRadius:4, padding:"8px 16px", fontFamily:FONT_SANS, fontSize:13, fontWeight:600, cursor:"pointer",
+                whiteSpace:"nowrap", flexShrink:0 }}>Open BookWright Online</button>
+              <button onClick={() => setBannerOpen(false)} aria-label="Dismiss" style={{ background:"none", border:"none",
+                cursor:"pointer", color:WF.subtle, flexShrink:0, display:"flex" }}>
+                <Ms name="close" size={18} color={WF.subtle} />
+              </button>
+            </div>
+          )}
+
+          {/* Current orders */}
+          <div style={{ border:`1px solid ${WF.border}`, borderRadius:8, overflow:"hidden" }}>
+            <div style={{ background:WF.head, borderBottom:`1px solid ${WF.border}`, padding:"14px 18px",
+              display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+              <span style={{ fontFamily:FONT_SANS, fontSize:17, fontWeight:700, color:WF.text }}>Current orders</span>
+              <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:13, color:WF.body, textDecoration:"none" }}>View all</a>
+            </div>
+            <div style={{ overflowX:"auto" }}>
+              <table style={{ width:"100%", borderCollapse:"collapse", minWidth:520 }}>
+                <thead>
+                  <tr>
+                    {["Order", "Status", "Shipping details", "Tracking details"].map(h => (
+                      <th key={h} style={{ background:WF.theadBg, borderBottom:`1px solid ${WF.border}`, padding:"10px 16px",
+                        fontFamily:FONT_SANS, fontSize:13, fontWeight:600, color:"#555555", textAlign:"left" }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {WF_ORDERS.map(o => (
+                    <tr key={o.id}>
+                      <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:FONT_SANS, fontSize:13, color:"#3d3d3d" }}>{o.id}</td>
+                      <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:FONT_SANS, fontSize:13, color:"#3d3d3d" }}>{o.status}</td>
+                      <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:FONT_SANS, fontSize:13, color:"#3d3d3d" }}>{o.shipping}</td>
+                      <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:FONT_SANS, fontSize:13, color:"#3d3d3d" }}>{o.tracking}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Most recent projects */}
+          <div>
+            <div style={{ display:"flex", alignItems:"baseline", justifyContent:"space-between", marginBottom:2 }}>
+              <span style={{ fontFamily:FONT_SANS, fontSize:15, fontWeight:700, color:WF.text }}>Most recent projects</span>
+              <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:14, fontWeight:600, color:WF.body, textDecoration:"none" }}>See all projects →</a>
+            </div>
+            {WF_PROJECTS.map(p => (
+              <WireframeProjectRow key={p.title} project={p} onManageInstantStore={onContinue} />
+            ))}
+            <div style={{ display:"flex", justifyContent:"center", marginTop:20 }}>
+              <a href="#" onClick={e => e.preventDefault()} style={{ border:"1px solid #aaa", borderRadius:4, background:"#e4e4e4",
+                color:WF.text, padding:"10px 22px", fontFamily:FONT_SANS, fontSize:13.5, fontWeight:600, textDecoration:"none" }}>
+                See all projects →
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <WireframeFooter />
+      </div>
     </div>
     </>
   );
