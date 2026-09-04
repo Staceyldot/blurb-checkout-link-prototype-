@@ -3628,21 +3628,19 @@ function SideNavItem({ label, active, badge }) {
   );
 }
 
-function SideNavSection({ section, open, onToggle }) {
+/* Section headers are static labels, not accordion triggers — the submenu
+   is always shown, so there's nothing to collapse or click. */
+function SideNavSection({ section }) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-      <button onClick={onToggle} style={{ display:"flex", alignItems:"center", gap:8, height:48,
-        padding:"0 12px", background:"none", border:"none", cursor:"pointer", width:"100%", textAlign:"left" }}>
-        <span style={{ flex:1, fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textSubtle }}>{section.label}</span>
-        <Ms name={open ? "expand_less" : "expand_more"} color={T.textSubtle} />
-      </button>
-      <Collapse open={open}>
-        <div style={{ display:"flex", flexDirection:"column", gap:8, paddingLeft:8 }}>
-          {section.items.map(item => (
-            <SideNavItem key={item} label={item} active={item === section.active} badge={item === section.active} />
-          ))}
-        </div>
-      </Collapse>
+      <div style={{ display:"flex", alignItems:"center", height:48, padding:"0 12px" }}>
+        <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textSubtle }}>{section.label}</span>
+      </div>
+      <div style={{ display:"flex", flexDirection:"column", gap:8, paddingLeft:8 }}>
+        {section.items.map(item => (
+          <SideNavItem key={item} label={item} active={item === section.active} badge={item === section.active} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -3723,15 +3721,12 @@ function DashboardTopNav() {
 }
 
 function SideNav() {
-  const [open, setOpen] = useState({ projects: false, sell: true, account: false });
   return (
     <div style={{ position:"sticky", top:0, height:"100vh", width:280, flexShrink:0, overflowY:"auto",
       background:T.surface, borderRight:`1px solid ${T.borderSubtle}`, padding:"24px 16px" }}>
       <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-        <SideNavItem label="Home" />
         {SIDE_NAV_SECTIONS.map(section => (
-          <SideNavSection key={section.key} section={section} open={open[section.key]}
-            onToggle={() => setOpen(o => ({ ...o, [section.key]: !o[section.key] }))} />
+          <SideNavSection key={section.key} section={section} />
         ))}
       </div>
     </div>
