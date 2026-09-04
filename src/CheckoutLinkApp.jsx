@@ -3614,9 +3614,9 @@ const SIDE_NAV_SECTIONS = [
   { key: "account", label: "Account", items: ["My orders", "Account settings", "Address book", "My profile"] },
 ];
 
-function SideNavItem({ label, active, badge }) {
+function SideNavItem({ label, active, badge, onClick }) {
   return (
-    <a href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:8,
+    <a href="#" onClick={e => { e.preventDefault(); onClick?.(); }} style={{ display:"flex", alignItems:"center", gap:8,
       height:48, padding:"0 12px", borderRadius:T.radius, textDecoration:"none",
       background: active ? "#f1f9fe" : "transparent" }}>
       <span style={{ flex:1, fontFamily:FONT_SANS, fontSize:16, fontWeight:600,
@@ -3630,8 +3630,11 @@ function SideNavItem({ label, active, badge }) {
 }
 
 /* Section headers are static labels, not accordion triggers — the submenu
-   is always shown, so there's nothing to collapse or click. */
-function SideNavSection({ section }) {
+   is always shown, so there's nothing to collapse or click. `onNavigate`
+   fires for whichever item was clicked; only "All projects" does anything
+   (jumps to the Dashboard's All projects sub-page) — the rest are decorative,
+   matching the rest of this page's non-functional controls. */
+function SideNavSection({ section, onNavigate }) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
       <div style={{ display:"flex", alignItems:"center", height:48, padding:"0 12px" }}>
@@ -3639,7 +3642,8 @@ function SideNavSection({ section }) {
       </div>
       <div style={{ display:"flex", flexDirection:"column", gap:8, paddingLeft:8 }}>
         {section.items.map(item => (
-          <SideNavItem key={item} label={item} active={item === section.active} badge={item === section.active} />
+          <SideNavItem key={item} label={item} active={item === section.active} badge={item === section.active}
+            onClick={() => onNavigate?.(item)} />
         ))}
       </div>
     </div>
@@ -3721,13 +3725,14 @@ function DashboardTopNav() {
   );
 }
 
-function SideNav() {
+function SideNav({ onSelectAllProjects }) {
   return (
     <div style={{ position:"sticky", top:0, height:"100vh", width:280, flexShrink:0, overflowY:"auto",
       background:T.surface, borderRight:`1px solid ${T.borderSubtle}`, padding:"24px 16px" }}>
       <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
         {SIDE_NAV_SECTIONS.map(section => (
-          <SideNavSection key={section.key} section={section} />
+          <SideNavSection key={section.key} section={section}
+            onNavigate={item => { if (item === "All projects") onSelectAllProjects?.(); }} />
         ))}
       </div>
     </div>
@@ -4146,15 +4151,18 @@ function InstantStoresTable({ onManageInstantStore }) {
    the seller's home screen rather than dropping straight into Instant Store
    setup. Content and styling copied as closely as possible from the legacy
    phase-2-checkout-links/home.html wireframe (see WF/Wireframe* above) —
-   deliberately not this app's Codex design system. */
-function DashboardHomePage({ onContinue }) {
+   deliberately not this app's Codex design system.
+
+   `subPage`/`setSubPage` pick which sub-screen shows — Home, All projects,
+   Online editor projects, or Instant Stores, per the reference kit's
+   home.html/manage.html/create.html/sell-checkout-links.html. All four share
+   this same shell (top nav, side nav, banner, footer), so it's a sub-view
+   rather than its own top-level stepper stop. Owned by CheckoutLinkApp, not
+   local state, so Setup's "All projects" sidebar link can land here already
+   on that page. */
+function DashboardHomePage({ onContinue, subPage, setSubPage }) {
   const { isMobile } = useViewport();
   const [bannerOpen, setBannerOpen] = useState(true);
-  /* Which sub-screen of the Dashboard is showing — Home, All projects, or
-     Online editor projects, per the reference kit's home.html/manage.html/
-     create.html. All three share this same shell (top nav, side nav, banner,
-     footer), so it's a sub-view rather than its own top-level stepper stop. */
-  const [subPage, setSubPage] = useState("home");
   const goAllProjects = e => { e?.preventDefault(); setSubPage("all-projects"); };
   const SIDE_NAV_TARGETS = { "All projects":"all-projects", "Online editor projects":"online-editor", "Instant Stores":"instant-stores" };
   const ACTIVE_ITEM_FOR = { "all-projects":"All projects", "online-editor":"Online editor projects", "instant-stores":"Instant Stores" };
@@ -4347,7 +4355,7 @@ function DashboardHomePage({ onContinue }) {
   );
 }
 
-function LinkSetupPage({ onContinue }) {
+function LinkSetupPage({ onContinue, onGoAllProjects }) {
   const { isMobile } = useViewport();
   const [copied, setCopied] = useState(false);
   const [preview, setPreview] = useState("sample");
@@ -4471,7 +4479,7 @@ function LinkSetupPage({ onContinue }) {
     <>
     <DashboardTopNav />
     <div style={{ display:"flex", alignItems:"flex-start" }}>
-    <SideNav />
+    <SideNav onSelectAllProjects={onGoAllProjects} />
     <div style={{ flex:1, minWidth:0, minHeight:"100vh", background:T.bg, fontFamily:FONT_SANS }}>
       {/* Order-a-copy nudge — sellers can't buy their own link, so this is the way to
           get a proof copy before going live. Switches to a warning once the link is
@@ -4926,6 +4934,11 @@ function CheckoutLinkApp({ onSwitchFlow }) {
   const [view, setView] = useState(initialStage);  // pdp | checkout | confirm | email
   const [cartOpen, setCartOpen] = useState(false);
   const [inCart, setInCart] = useState(false);
+  /* Which sub-screen of the Dashboard stage is showing — see DashboardHomePage.
+     Lifted up here (rather than local state on that component) so Setup's
+     "All projects" sidebar link can jump to the Dashboard already on that
+     sub-page instead of always landing on Home. */
+  const [dashboardSubPage, setDashboardSubPage] = useState("home");
 
   /* What the seller put on the link (print | digital | both) and what the buyer
      ended up with. Single-format links pin `format` to the only choice. */
@@ -5061,11 +5074,13 @@ function CheckoutLinkApp({ onSwitchFlow }) {
         skippedStages={checkoutSkipped ? ["checkout"] : []} />
 
       {view === "dashboard" && (
-        <DashboardHomePage onContinue={() => jump("setup")} />
+        <DashboardHomePage onContinue={() => jump("setup")}
+          subPage={dashboardSubPage} setSubPage={setDashboardSubPage} />
       )}
 
       {view === "setup" && (
-        <LinkSetupPage onContinue={() => jump("pdp")} />
+        <LinkSetupPage onContinue={() => jump("pdp")}
+          onGoAllProjects={() => { setDashboardSubPage("all-projects"); jump("dashboard"); }} />
       )}
 
       {view === "pdp" && (
