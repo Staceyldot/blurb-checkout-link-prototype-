@@ -3750,15 +3750,22 @@ const WF = {
   border: "#c4c4c4", borderLight: "#e0e0e0", divider: "#e0e0e0",
   panel: "#f4f4f4", head: "#f2f2f2", theadBg: "#fafafa", cover: "#d0d0d0",
   font: "Arial, Helvetica, sans-serif",
+  /* "Selling" badge, "expires today" and "why order a proof" pills — All
+     projects page only (Most recent projects on Home has its own greys). */
+  sellBg: "#e9f7ee", sellBorder: "#b6e3c4", sellText: "#1e7b34", sellDot: "#1e9e42",
+  expiryBg: "#fdecea", expiryBorder: "#f1b0a8", expiryText: "#c0392b",
+  proofBg: "#eaf6fb", proofBorder: "#a9d4e5", proofText: "#2c6e88",
 };
 
 const WF_SIDE_SECTIONS = [
-  { label:"Projects", items:["All projects", "Online editor projects"], active:"All projects" },
+  { label:"Projects", items:["All projects", "Online editor projects"] },
   { label:"Sell", items:["Instant Stores", "Earnings", "Monthly profit reports", "Payment settings"], badge:"Instant Stores" },
   { label:"Account", items:["My orders", "Account settings", "Address book", "My profile"] },
 ];
 
-function WireframeSideNav() {
+/* `activeItem` bolds whichever sidebar item matches the sub-page actually
+   showing (Home vs All projects) — nothing bolds until that page exists. */
+function WireframeSideNav({ activeItem, onNavigate }) {
   return (
     <div style={{ width:280, flexShrink:0, background:"#fff", padding:"32px 24px", display:"flex",
       flexDirection:"column", gap:28 }}>
@@ -3766,8 +3773,10 @@ function WireframeSideNav() {
         <div key={section.label} style={{ display:"flex", flexDirection:"column", gap:6 }}>
           <div style={{ fontFamily:WF.font, fontSize:11.5, fontWeight:700, color:WF.text, marginBottom:4 }}>{section.label}</div>
           {section.items.map(item => (
-            <a key={item} href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:8,
-              fontFamily:WF.font, fontSize:13.5, fontWeight: item === section.active ? 700 : 400,
+            <a key={item} href="#"
+              onClick={e => { e.preventDefault(); onNavigate?.(item); }}
+              style={{ display:"flex", alignItems:"center", gap:8,
+              fontFamily:WF.font, fontSize:13.5, fontWeight: item === activeItem ? 700 : 400,
               color:WF.body, textDecoration:"none", padding:"3px 0" }}>
               {item}
               {item === section.badge && (
@@ -3914,6 +3923,162 @@ function WireframeProjectRow({ project, onManageInstantStore }) {
   );
 }
 
+/* All projects — copied from the reference's manage.html the same way Home was
+   copied from home.html: content and structure as close as possible, this
+   app's WF tokens instead of the kit's own CSS. 11 of its ~98 demo projects,
+   covering every row variant the reference shows (selling, plain, expiring
+   today + "why order a proof", and one non-book product). */
+const ALL_PROJECTS = [
+  { cover:PRODUCT.img, badge:"Selling", title:"Liberal Libations",
+    desc:"Liberal Libations empowers the cocktail enthusiast to craft bar-quality cocktails for a large crowd or for an intimate gathering.",
+    meta:[["Project type","Trade Book"],["Project option","8×10 in, 20×25 cm"],["# of pages","176"],["ISBN","9798211886148"],["Created with","BookWright"],["Created","Mar 14, 2024"]],
+    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"download", label:"Download PDF" }],
+    share:true },
+  { badge:"Selling", title:"Xylophone, glockenspiel & bells for beginner adults",
+    desc:"The songs in this book have been adapted and can be played on all models of popular wooden xylophones…",
+    meta:[["Project type","Trade Book"],["Project option","8×10 in, 20×25 cm"],["# of pages","50"],["Created with","BookWright"],["Created","Dec 25, 2023"]],
+    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"download", label:"Download PDF" }],
+    share:true },
+  { badge:"Selling", title:"Pride and Preconceptions",
+    desc:"A witty modern retelling of a beloved classic, reimagined for today's readers.",
+    meta:[["Project type","Trade Book"],["Project option","6×9 in"],["ISBN","2 ISBNs"],["Created with","InDesign"],["Created","Mar 14, 2024"]],
+    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"storefront", label:"Manage bookstore listing" }],
+    share:true },
+  { title:"Midnight Harvest",
+    desc:"A slow-burn mystery set across three harvest seasons in a small vineyard town.",
+    meta:[["Project type","Trade Book"],["Project option","6×9 in"],["# of pages","224"],["Created with","BookWright"],["Created","May 2, 2026"]],
+    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }, { icon:"local_shipping", label:"Set up retail distribution" }],
+    share:true },
+  { title:"Late Bloomers: a garden through the seasons",
+    desc:"A year of photos following one backyard garden from first frost to last harvest.",
+    meta:[["Project type","Photo Book"],["Project option","10×8 in"],["# of pages","72"],["Created with","Online editor"],["Created","Jun 11, 2026"]],
+    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }, { icon:"local_shipping", label:"Set up retail distribution" }],
+    share:true },
+  { title:"Wildflower Table",
+    desc:"A seasonal collection of pressed-flower table settings and simple centerpiece ideas.",
+    meta:[["Project type","Photo Book"],["Project option","10×8 in"],["# of pages","96"],["Created with","InDesign"],["Created","Apr 20, 2026"]],
+    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }, { icon:"local_shipping", label:"Set up retail distribution" }],
+    share:true },
+  { title:"Watercolor basics: a field guide for outdoor painters",
+    expiryToday:"This project expires today unless ordered.", proof:true,
+    desc:"A practical guide to watercolor painting outdoors, from gear selection to handling light and weather…",
+    meta:[["Project type","Photo Book"],["Project option","7×7 in, 18×18 cm"],["# of pages","84"],["Created with","InDesign"],["Created","Aug 14, 2023"]],
+    actions:[{ icon:"shopping_cart", label:"Order" }, { icon:"add_link", label:"Create Instant Store" }],
+    share:true },
+  { title:"Hand lettering for beginners: modern calligraphy at home",
+    expiryToday:"This project expires today unless ordered.", proof:true,
+    desc:"A step-by-step guide to modern calligraphy, brush pen lettering, and decorative layouts…",
+    meta:[["Project type","Trade Book"],["Project option","6×9 in, 15×23 cm"],["# of pages","128"],["Created with","BookWright"],["Created","Jan 18, 2023"]],
+    actions:[{ icon:"shopping_cart", label:"Order" }, { icon:"add_link", label:"Create Instant Store" }],
+    share:true },
+  { title:"The backyard beekeeper: a seasonal guide",
+    expiryToday:"This project expires today unless ordered.", proof:true,
+    desc:"A month-by-month guide to keeping bees in a suburban garden — from first hive to first harvest.",
+    meta:[["Project type","Trade Book"],["Project option","7×9 in, 18×23 cm"],["# of pages","156"],["Created with","InDesign"],["Created","Oct 4, 2022"]],
+    actions:[{ icon:"shopping_cart", label:"Order" }, { icon:"add_link", label:"Create Instant Store" }],
+    share:true },
+  { title:"PDF-12537555", proof:true,
+    desc:"Preflight check complete — your book is ready to be ordered.",
+    meta:[["Status","Preflight check complete"],["# of pages","48"],["Uploaded","Jul 28, 2026"],["Expires in","15 days"]],
+    actions:[{ icon:"shopping_cart", label:"Order" }, { icon:"add_link", label:"Create Instant Store" }],
+    share:false },
+  { title:"BW - Wall art",
+    meta:[["Project type","Acrylic Print"],["Project option","Portrait, 16×20 in, 40.6×50.8 cm"],["Created with","BookWright"],["Creation date","Jul 31, 2026, 3:46 AM PDT"]],
+    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }],
+    share:false },
+];
+
+function AllProjectsRow({ project, onManageInstantStore }) {
+  const { isMobile } = useViewport();
+  return (
+    <div style={{ display:"flex", flexDirection: isMobile ? "column" : "row", gap:20,
+      padding:"22px 0", borderBottom:`1px solid ${WF.border}` }}>
+      <div style={{ flexShrink:0, width:130 }}>
+        {project.cover ? (
+          <img src={project.cover} alt="" style={{ width:130, height:168, objectFit:"cover", boxShadow:"2px 4px 10px rgba(0,0,0,.16)" }} />
+        ) : (
+          <div style={{ width:130, height:168, background:WF.cover, border:`1px solid ${WF.borderLight}` }} />
+        )}
+        <a href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:4, marginTop:8,
+          fontFamily:WF.font, fontSize:12, color:WF.body, textDecoration:"none" }}>
+          Preview <Ms name="open_in_new" size={13} color={WF.body} />
+        </a>
+      </div>
+      <div style={{ flex:"1 1 300px", minWidth:0, display:"flex", flexDirection:"column" }}>
+        {project.badge && (
+          <span style={{ alignSelf:"flex-start", display:"flex", alignItems:"center", gap:6, fontFamily:WF.font,
+            fontSize:11, fontWeight:600, color:WF.sellText, background:WF.sellBg, border:`1px solid ${WF.sellBorder}`,
+            borderRadius:999, padding:"3px 10px", marginBottom:8 }}>
+            <span style={{ width:6, height:6, borderRadius:"50%", background:WF.sellDot }} /> {project.badge}
+          </span>
+        )}
+        {project.expiryToday && (
+          <span style={{ alignSelf:"flex-start", display:"inline-flex", alignItems:"center", gap:6, fontFamily:WF.font,
+            fontSize:12.5, color:WF.expiryText, background:WF.expiryBg, border:`1px solid ${WF.expiryBorder}`,
+            borderRadius:6, padding:"6px 12px", marginBottom:8 }}>
+            <Ms name="schedule" size={14} color={WF.expiryText} />{project.expiryToday}
+          </span>
+        )}
+        <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:WF.font, fontSize:18, fontWeight:700,
+          color:WF.body, textDecoration:"none", marginBottom:6 }}>{project.title}</a>
+        {project.desc && (
+          <p style={{ margin:"0 0 12px", fontFamily:WF.font, fontSize:13.5, color:"#3d3d3d", lineHeight:1.4 }}>{project.desc}</p>
+        )}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(2, minmax(180px, max-content))", gap:"2px 28px", marginBottom: project.share ? 10 : 0 }}>
+          {project.meta.map(([label, value]) => (
+            <span key={label} style={{ fontFamily:WF.font, fontSize:13, color:"#3d3d3d" }}><b>{label}:</b> {value}</span>
+          ))}
+        </div>
+        {project.share && (
+          <a href="#" onClick={e => e.preventDefault()} style={{ display:"inline-flex", alignItems:"center", gap:4,
+            alignSelf:"flex-start", fontFamily:WF.font, fontSize:13, color:WF.subtle, textDecoration:"none" }}>
+            <Ms name="ios_share" size={14} color={WF.subtle} /> Share private link
+          </a>
+        )}
+      </div>
+      <div style={{ display:"flex", flexDirection:"column", gap:16, flexShrink:0, paddingLeft: isMobile ? 0 : 14 }}>
+        {project.proof && (
+          <span style={{ display:"inline-flex", alignItems:"center", gap:6, fontFamily:WF.font, fontSize:12.5,
+            color:WF.proofText, background:WF.proofBg, border:`1px solid ${WF.proofBorder}`, borderRadius:6, padding:"6px 12px" }}>
+            <Ms name="info" size={14} color={WF.proofText} /> Why order a proof? — print or digital.
+          </span>
+        )}
+        {project.actions.map(a => (
+          <WfActionLink key={a.label} icon={a.icon} label={a.label}
+            onClick={a.label === "Manage Instant Store" ? onManageInstantStore : undefined} />
+        ))}
+        <div style={{ height:1, background:WF.divider }} />
+        <WfActionLink icon="delete" label="Delete" danger />
+      </div>
+    </div>
+  );
+}
+
+/* Online editor projects — copied from the reference's own "Projects — Online
+   editor projects" screen. Simpler than All projects: no badges, no ISBN/share
+   link, just Open/Duplicate/Delete and an occasional expiry pill. Reuses
+   AllProjectsRow, which already treats badge/desc/share/proof as optional. */
+const ONLINE_EDITOR_PROJECTS = [
+  { title:"Xylophone, glockenspiel & bells for beginner adults", expiryToday:"Expires in 3 days unless you order it.",
+    meta:[["Project type","Trade Book"],["Project option","8×10 in, 20×25 cm"],["# of pages","50"],["Last edited","Jun 18, 2026"]],
+    actions:[{ icon:"launch", label:"Open" }, { icon:"library_add", label:"Duplicate" }] },
+  { title:"Watercolor basics: a field guide for outdoor painters",
+    meta:[["Project type","Photo Book"],["Project option","7×7 in, 18×18 cm"],["# of pages","84"],["Last edited","May 30, 2026"]],
+    actions:[{ icon:"launch", label:"Open" }, { icon:"library_add", label:"Duplicate" }] },
+  { title:"52 hikes: a year on the trail in the Pacific Northwest",
+    meta:[["Project type","Trade Book"],["Project option","8×10 in, 20×25 cm"],["# of pages","120"],["Last edited","Apr 12, 2026"]],
+    actions:[{ icon:"launch", label:"Open" }, { icon:"library_add", label:"Duplicate" }] },
+  { title:"Hand lettering for beginners: modern calligraphy at home",
+    meta:[["Project type","Trade Book"],["Project option","6×9 in, 15×23 cm"],["# of pages","64"],["Last edited","Feb 2, 2026"]],
+    actions:[{ icon:"launch", label:"Open" }, { icon:"library_add", label:"Duplicate" }] },
+  { title:"Harbor Lines: a sketchbook of coastal towns", expiryToday:"Expires in 5 days unless you order it.",
+    meta:[["Project type","Trade Book"],["Project option","8×10 in, 20×25 cm"],["# of pages","72"],["Last edited","Jul 9, 2026"]],
+    actions:[{ icon:"launch", label:"Open" }, { icon:"library_add", label:"Duplicate" }] },
+  { title:"Homegrown: a kitchen garden journal",
+    meta:[["Project type","Photo Book"],["Project option","8×8 in, 20×20 cm"],["# of pages","60"],["Last edited","May 27, 2026"]],
+    actions:[{ icon:"launch", label:"Open" }, { icon:"library_add", label:"Duplicate" }] },
+];
+
 /* Seller dashboard Home — the demo's stop before Setup, so the story starts at
    the seller's home screen rather than dropping straight into Instant Store
    setup. Content and styling copied as closely as possible from the legacy
@@ -3922,11 +4087,23 @@ function WireframeProjectRow({ project, onManageInstantStore }) {
 function DashboardHomePage({ onContinue }) {
   const { isMobile } = useViewport();
   const [bannerOpen, setBannerOpen] = useState(true);
+  /* Which sub-screen of the Dashboard is showing — Home, All projects, or
+     Online editor projects, per the reference kit's home.html/manage.html/
+     create.html. All three share this same shell (top nav, side nav, banner,
+     footer), so it's a sub-view rather than its own top-level stepper stop. */
+  const [subPage, setSubPage] = useState("home");
+  const goAllProjects = e => { e?.preventDefault(); setSubPage("all-projects"); };
+  const SIDE_NAV_TARGETS = { "All projects":"all-projects", "Online editor projects":"online-editor" };
+  const ACTIVE_ITEM_FOR = { "all-projects":"All projects", "online-editor":"Online editor projects" };
+
   return (
     <>
     <DashboardTopNav />
     <div style={{ display:"flex", alignItems:"flex-start", background:"#fff" }}>
-      {!isMobile && <WireframeSideNav />}
+      {!isMobile && (
+        <WireframeSideNav activeItem={ACTIVE_ITEM_FOR[subPage]}
+          onNavigate={item => { if (SIDE_NAV_TARGETS[item]) setSubPage(SIDE_NAV_TARGETS[item]); }} />
+      )}
       <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column" }}>
         <div style={{ padding: isMobile ? "20px" : "32px 40px", display:"flex", flexDirection:"column", gap:24, maxWidth:934, width:"100%" }}>
           {bannerOpen && (
@@ -3949,53 +4126,137 @@ function DashboardHomePage({ onContinue }) {
             </div>
           )}
 
-          {/* Current orders */}
-          <div style={{ border:`1px solid ${WF.border}`, borderRadius:8, overflow:"hidden" }}>
-            <div style={{ background:WF.head, borderBottom:`1px solid ${WF.border}`, padding:"14px 18px",
-              display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-              <span style={{ fontFamily:WF.font, fontSize:17, fontWeight:700, color:WF.text }}>Current orders</span>
-              <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:WF.font, fontSize:13, color:WF.body, textDecoration:"none" }}>View all</a>
-            </div>
-            <div style={{ overflowX:"auto" }}>
-              <table style={{ width:"100%", borderCollapse:"collapse", minWidth:520 }}>
-                <thead>
-                  <tr>
-                    {["Order", "Status", "Shipping details", "Tracking details"].map(h => (
-                      <th key={h} style={{ background:WF.theadBg, borderBottom:`1px solid ${WF.border}`, padding:"10px 16px",
-                        fontFamily:WF.font, fontSize:13, fontWeight:600, color:"#555555", textAlign:"left" }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {WF_ORDERS.map(o => (
-                    <tr key={o.id}>
-                      <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:WF.font, fontSize:13, color:"#3d3d3d" }}>{o.id}</td>
-                      <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:WF.font, fontSize:13, color:"#3d3d3d" }}>{o.status}</td>
-                      <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:WF.font, fontSize:13, color:"#3d3d3d" }}>{o.shipping}</td>
-                      <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:WF.font, fontSize:13, color:"#3d3d3d" }}>{o.tracking}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          {subPage === "home" ? (
+            <>
+              {/* Current orders */}
+              <div style={{ border:`1px solid ${WF.border}`, borderRadius:8, overflow:"hidden" }}>
+                <div style={{ background:WF.head, borderBottom:`1px solid ${WF.border}`, padding:"14px 18px",
+                  display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                  <span style={{ fontFamily:WF.font, fontSize:17, fontWeight:700, color:WF.text }}>Current orders</span>
+                  <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:WF.font, fontSize:13, color:WF.body, textDecoration:"none" }}>View all</a>
+                </div>
+                <div style={{ overflowX:"auto" }}>
+                  <table style={{ width:"100%", borderCollapse:"collapse", minWidth:520 }}>
+                    <thead>
+                      <tr>
+                        {["Order", "Status", "Shipping details", "Tracking details"].map(h => (
+                          <th key={h} style={{ background:WF.theadBg, borderBottom:`1px solid ${WF.border}`, padding:"10px 16px",
+                            fontFamily:WF.font, fontSize:13, fontWeight:600, color:"#555555", textAlign:"left" }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {WF_ORDERS.map(o => (
+                        <tr key={o.id}>
+                          <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:WF.font, fontSize:13, color:"#3d3d3d" }}>{o.id}</td>
+                          <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:WF.font, fontSize:13, color:"#3d3d3d" }}>{o.status}</td>
+                          <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:WF.font, fontSize:13, color:"#3d3d3d" }}>{o.shipping}</td>
+                          <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:WF.font, fontSize:13, color:"#3d3d3d" }}>{o.tracking}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
-          {/* Most recent projects */}
-          <div>
-            <div style={{ display:"flex", alignItems:"baseline", justifyContent:"space-between", marginBottom:2 }}>
-              <span style={{ fontFamily:WF.font, fontSize:15, fontWeight:700, color:WF.text }}>Most recent projects</span>
-              <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:WF.font, fontSize:14, fontWeight:600, color:WF.body, textDecoration:"none" }}>See all projects →</a>
-            </div>
-            {WF_PROJECTS.map(p => (
-              <WireframeProjectRow key={p.title} project={p} onManageInstantStore={onContinue} />
-            ))}
-            <div style={{ display:"flex", justifyContent:"center", marginTop:20 }}>
-              <a href="#" onClick={e => e.preventDefault()} style={{ border:"1px solid #aaa", borderRadius:4, background:"#e4e4e4",
-                color:WF.text, padding:"10px 22px", fontFamily:WF.font, fontSize:13.5, fontWeight:600, textDecoration:"none" }}>
-                See all projects →
-              </a>
-            </div>
-          </div>
+              {/* Most recent projects */}
+              <div>
+                <div style={{ display:"flex", alignItems:"baseline", justifyContent:"space-between", marginBottom:2 }}>
+                  <span style={{ fontFamily:WF.font, fontSize:15, fontWeight:700, color:WF.text }}>Most recent projects</span>
+                  <a href="#" onClick={goAllProjects} style={{ fontFamily:WF.font, fontSize:14, fontWeight:600, color:WF.body, textDecoration:"none" }}>See all projects →</a>
+                </div>
+                {WF_PROJECTS.map(p => (
+                  <WireframeProjectRow key={p.title} project={p} onManageInstantStore={onContinue} />
+                ))}
+                <div style={{ display:"flex", justifyContent:"center", marginTop:20 }}>
+                  <a href="#" onClick={goAllProjects} style={{ border:"1px solid #aaa", borderRadius:4, background:"#e4e4e4",
+                    color:WF.text, padding:"10px 22px", fontFamily:WF.font, fontSize:13.5, fontWeight:600, textDecoration:"none" }}>
+                    See all projects →
+                  </a>
+                </div>
+              </div>
+            </>
+          ) : subPage === "all-projects" ? (
+            <>
+              <div>
+                <span style={{ display:"block", fontFamily:WF.font, fontSize:22, fontWeight:700, color:WF.text }}>All projects</span>
+                <p style={{ margin:"4px 0 0", fontFamily:WF.font, fontSize:13.5, color:"#3d3d3d" }}>
+                  Order, share, and distribute your finished projects and PDF uploads.
+                </p>
+              </div>
+
+              {/* Toolbar — Sort by/Show are static in this demo, matching the
+                  rest of the app's decorative-only controls */}
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
+                <span style={{ fontFamily:WF.font, fontSize:17, fontWeight:700, color:WF.body }}>
+                  Projects <span style={{ fontWeight:400, color:"#6b6b6b", fontSize:13 }}>{ALL_PROJECTS.length} of 98 projects</span>
+                </span>
+                <div style={{ display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
+                  <label style={{ display:"flex", alignItems:"center", gap:8, fontFamily:WF.font, fontSize:13, fontWeight:600, color:"#6b6b6b" }}>
+                    Sort by
+                    <span style={{ display:"inline-flex", alignItems:"center", gap:10, background:"#fff",
+                      border:"1px solid #b3b3b3", borderRadius:6, padding:"8px 14px", fontFamily:WF.font,
+                      fontSize:13.5, fontWeight:700, color:WF.body }}>
+                      Date <Ms name="expand_more" size={16} color={WF.body} />
+                    </span>
+                  </label>
+                  <label style={{ display:"flex", alignItems:"center", gap:8, fontFamily:WF.font, fontSize:13, fontWeight:600, color:"#6b6b6b" }}>
+                    Show
+                    <span style={{ display:"inline-flex", alignItems:"center", gap:10, background:"#fff",
+                      border:"1px solid #b3b3b3", borderRadius:6, padding:"8px 14px", fontFamily:WF.font,
+                      fontSize:13.5, fontWeight:700, color:WF.body }}>
+                      All my projects <Ms name="expand_more" size={16} color={WF.body} />
+                    </span>
+                  </label>
+                  <a href="#" onClick={e => e.preventDefault()} style={{ background:"#555", color:"#fff", border:"1px solid #333",
+                    borderRadius:4, padding:"9px 18px", fontFamily:WF.font, fontSize:14, fontWeight:600,
+                    textDecoration:"none", whiteSpace:"nowrap" }}>+ Start a project</a>
+                </div>
+              </div>
+
+              {ALL_PROJECTS.map(p => (
+                <AllProjectsRow key={p.title} project={p} onManageInstantStore={onContinue} />
+              ))}
+
+              <div style={{ display:"flex", justifyContent:"center", gap:8, marginTop:8,
+                fontFamily:WF.font, fontSize:13, color:WF.body }}>
+                {["First", "‹ Prev", "Next ›", "Last"].map((label, i) => (
+                  <React.Fragment key={label}>
+                    {i > 0 && <span style={{ color:"#ccc" }}>|</span>}
+                    <a href="#" onClick={e => e.preventDefault()} style={{ color:WF.body, textDecoration:"none" }}>{label}</a>
+                  </React.Fragment>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <span style={{ display:"block", fontFamily:WF.font, fontSize:22, fontWeight:700, color:WF.text }}>Online editor projects</span>
+
+              {/* Toolbar — just Sort by here, no Show filter, matching the reference */}
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
+                <span style={{ fontFamily:WF.font, fontSize:17, fontWeight:700, color:WF.body }}>
+                  Projects <span style={{ fontWeight:400, color:"#6b6b6b", fontSize:13 }}>{ONLINE_EDITOR_PROJECTS.length} projects</span>
+                </span>
+                <div style={{ display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
+                  <label style={{ display:"flex", alignItems:"center", gap:8, fontFamily:WF.font, fontSize:13, fontWeight:600, color:"#6b6b6b" }}>
+                    Sort by
+                    <span style={{ display:"inline-flex", alignItems:"center", gap:10, background:"#fff",
+                      border:"1px solid #b3b3b3", borderRadius:6, padding:"8px 14px", fontFamily:WF.font,
+                      fontSize:13.5, fontWeight:700, color:WF.body }}>
+                      Date <Ms name="expand_more" size={16} color={WF.body} />
+                    </span>
+                  </label>
+                  <a href="#" onClick={e => e.preventDefault()} style={{ background:"#555", color:"#fff", border:"1px solid #333",
+                    borderRadius:4, padding:"9px 18px", fontFamily:WF.font, fontSize:14, fontWeight:600,
+                    textDecoration:"none", whiteSpace:"nowrap" }}>+ Start a project</a>
+                </div>
+              </div>
+
+              {ONLINE_EDITOR_PROJECTS.map(p => (
+                <AllProjectsRow key={p.title} project={p} onManageInstantStore={onContinue} />
+              ))}
+            </>
+          )}
         </div>
 
         <WireframeFooter />
