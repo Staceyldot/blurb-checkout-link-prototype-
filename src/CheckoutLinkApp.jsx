@@ -4086,7 +4086,7 @@ const ONLINE_EDITOR_PROJECTS = [
    Store" this whole prototype is about), so its live rows link into Setup
    the same way Manage Instant Store does elsewhere on the Dashboard. */
 const INSTANT_STORES = [
-  { title:"Liberal Libations", sub:"Trade book · 10×8", link:"blurb.com/1/ppq8w", price:"$24.99", status:"live", orders:14 },
+  { title:"Liberal Libations", sub:"Trade book · 10×8", link:"blurb.com/1/ppq8w", price:"$35.00", status:"live", orders:14 },
   { title:"Coastal Light — Volume II", sub:"Photo book · 10×10", link:"blurb.com/1/c1t2k", price:"$49.00", status:"live", orders:3 },
   { title:"Field Notes: Patagonia", sub:"Magazine · 8.5×11", link:null, price:"Not set", status:"draft", orders:null },
 ];
