@@ -3348,8 +3348,8 @@ function PreviewCard({ icon, title, sub, selected, onSelect, showLink }) {
 function ProductCarouselCard({ title, blurb, price, img }) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:16, width:410.67, flexShrink:0 }}>
-      <div style={{ width:"100%", aspectRatio:"1 / 1", borderRadius:8, overflow:"hidden", opacity:.8 }}>
-        <img src={img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+      <div style={{ position:"relative", width:"100%", aspectRatio:"1 / 1", borderRadius:8, overflow:"hidden", opacity:.8 }}>
+        <img src={img} alt="" style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"contain", display:"block" }} />
       </div>
       <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
         <span style={{ fontFamily:FONT_HEADING, fontSize:24, fontWeight:500, color:T.textBold }}>{title}</span>
@@ -3645,6 +3645,26 @@ function SideNavSection({ section, open, onToggle }) {
   );
 }
 
+/* Dashboard top nav (Codex Foundation, node 4140:5390) — Setup-only chrome, since
+   Setup is the seller's dashboard rather than the buyer-facing checkout flow the
+   other stages share. */
+function DashboardTopNav() {
+  return (
+    <div style={{ background:T.surface, borderBottom:`1px solid ${T.borderSubtle}`, display:"flex",
+      alignItems:"center", justifyContent:"space-between", padding:"0 80px", height:60, flexShrink:0 }}>
+      <img src={BLURB_LOGO} alt="Blurb" style={{ height:32, width:"auto", display:"block" }} />
+      <div style={{ display:"flex", alignItems:"center", gap:24 }}>
+        <Ms name="shopping_cart" size={24} color={T.textBold} />
+        <span style={{ fontSize:20, lineHeight:1 }} role="img" aria-label="United States">🇺🇸</span>
+        <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:16,
+          fontWeight:600, color:T.textBold, textDecoration:"none" }}>Log out</a>
+        <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:16,
+          fontWeight:600, color:T.textBold, textDecoration:"none" }}>Help</a>
+      </div>
+    </div>
+  );
+}
+
 function SideNav() {
   const [open, setOpen] = useState({ projects: false, sell: true, account: false });
   return (
@@ -3783,6 +3803,7 @@ function LinkSetupPage({ onContinue }) {
 
   return (
     <>
+    <DashboardTopNav />
     <div style={{ display:"flex", alignItems:"flex-start" }}>
     <SideNav />
     <div style={{ flex:1, minWidth:0, minHeight:"100vh", background:T.bg, fontFamily:FONT_SANS }}>
@@ -4074,20 +4095,24 @@ function LinkSetupPage({ onContinue }) {
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           <SwitchToggle on={sectionPreviewVisible} onToggle={() => setSectionPreviewVisible(v => !v)} />
           <span style={{ fontFamily:FONT_SANS, fontSize:18, fontWeight:700, color:T.textBold }}>
-            {sectionPreviewVisible ? "Visible to buyers" : "Hidden from buyers"}
+            {sectionPreviewVisible ? "Visible to buyers" : "Hidden to buyers"}
           </span>
         </div>
       }>
         <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
           <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:18, fontWeight:600, color:T.textSubtle }}>
-            Shown on your checkout page unless you turn this off.
+            {sectionPreviewVisible
+              ? "Shown on your checkout page unless you turn this off."
+              : "This section won't show on your checkout page."}
           </p>
-          <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:"24px 24px 8px",
-            display:"flex", flexDirection:"column", gap:24, overflow:"hidden" }}>
-            <div className="other-books-scroll" style={{ display:"flex", gap:24, alignItems:"flex-start", overflowX:"auto", overflowY:"hidden", paddingBottom:24 }}>
-              {CROSS_SELL_BOOKS.map(b => <ProductCarouselCard key={b.title} {...b} />)}
+          {sectionPreviewVisible && (
+            <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:"24px 24px 8px",
+              display:"flex", flexDirection:"column", gap:24, overflow:"hidden" }}>
+              <div className="other-books-scroll" style={{ display:"flex", gap:24, alignItems:"flex-start", overflowX:"auto", overflowY:"hidden", paddingBottom:24 }}>
+                {CROSS_SELL_BOOKS.map(b => <ProductCarouselCard key={b.title} {...b} />)}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </SetupSection>
 
