@@ -3748,10 +3748,11 @@ const WF = {
   text: "#1a1a1a", body: "#333333", subtle: "#444444", faint: "#606060",
   border: "#c4c4c4", borderLight: "#e0e0e0", divider: "#e0e0e0",
   panel: "#f4f4f4", head: "#f2f2f2", theadBg: "#fafafa", cover: "#d0d0d0",
+  font: "Arial, Helvetica, sans-serif",
 };
 
 const WF_SIDE_SECTIONS = [
-  { label:"Projects", items:["All projects", "Online editor projects"] },
+  { label:"Projects", items:["All projects", "Online editor projects"], active:"All projects" },
   { label:"Sell", items:["Instant Stores", "Earnings", "Monthly profit reports", "Payment settings"], badge:"Instant Stores" },
   { label:"Account", items:["My orders", "Account settings", "Address book", "My profile"] },
 ];
@@ -3762,13 +3763,14 @@ function WireframeSideNav() {
       flexDirection:"column", gap:28 }}>
       {WF_SIDE_SECTIONS.map(section => (
         <div key={section.label} style={{ display:"flex", flexDirection:"column", gap:6 }}>
-          <div style={{ fontFamily:FONT_SANS, fontSize:13, fontWeight:700, color:WF.text, marginBottom:4 }}>{section.label}</div>
+          <div style={{ fontFamily:WF.font, fontSize:11.5, fontWeight:700, color:WF.text, marginBottom:4 }}>{section.label}</div>
           {section.items.map(item => (
             <a key={item} href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:8,
-              fontFamily:FONT_SANS, fontSize:13.5, color:WF.body, textDecoration:"none", padding:"3px 0" }}>
+              fontFamily:WF.font, fontSize:13.5, fontWeight: item === section.active ? 700 : 400,
+              color:WF.body, textDecoration:"none", padding:"3px 0" }}>
               {item}
               {item === section.badge && (
-                <span style={{ fontFamily:FONT_SANS, fontSize:10, fontWeight:700, color:"#fff",
+                <span style={{ fontFamily:WF.font, fontSize:10, fontWeight:700, color:"#fff",
                   background:"#262626", borderRadius:999, padding:"2px 8px" }}>New</span>
               )}
             </a>
@@ -3795,9 +3797,9 @@ function WireframeFooter() {
       <div style={{ padding: isMobile ? "32px 20px" : "40px 80px", display:"flex", flexWrap:"wrap", gap:32 }}>
         {WF_FOOTER_COLUMNS.map(col => (
           <div key={col.title} style={{ display:"flex", flexDirection:"column", gap:10, minWidth:160 }}>
-            <div style={{ fontFamily:FONT_SANS, fontSize:13, fontWeight:700, color:WF.text, letterSpacing:".04em", textTransform:"uppercase" }}>{col.title}</div>
+            <div style={{ fontFamily:WF.font, fontSize:13, fontWeight:700, color:WF.text, letterSpacing:".04em", textTransform:"uppercase" }}>{col.title}</div>
             {col.links.map(l => (
-              <a key={l} href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:13, color:WF.body, textDecoration:"none" }}>{l}</a>
+              <a key={l} href="#" onClick={e => e.preventDefault()} style={{ fontFamily:WF.font, fontSize:13, color:WF.body, textDecoration:"none" }}>{l}</a>
             ))}
           </div>
         ))}
@@ -3851,7 +3853,7 @@ const WF_PROJECTS = [
 function WfActionLink({ icon, label, danger, onClick }) {
   return (
     <a href="#" onClick={e => { e.preventDefault(); onClick?.(); }} style={{ display:"flex", alignItems:"center", gap:6,
-      fontFamily:FONT_SANS, fontSize:13, color: danger ? "#bd1818" : WF.subtle, textDecoration:"none" }}>
+      fontFamily:WF.font, fontSize:13, color: danger ? "#bd1818" : WF.subtle, textDecoration:"none" }}>
       <Ms name={icon} size={16} color={danger ? "#bd1818" : WF.subtle} /> {label}
     </a>
   );
@@ -3868,23 +3870,23 @@ function WireframeProjectRow({ project, onManageInstantStore }) {
           color:WF.subtle, fontSize:12, fontWeight:700, padding:5, textAlign:"center" }}>Preview</span>
       </div>
       <div style={{ flex:"1 1 300px", minWidth:0, display:"flex", flexDirection:"column" }}>
-        <span style={{ alignSelf:"flex-start", fontFamily:FONT_SANS, fontSize:11, fontWeight:600, color:WF.faint,
+        <span style={{ alignSelf:"flex-start", fontFamily:WF.font, fontSize:11, fontWeight:600, color:WF.faint,
           background:"#e8e8e8", border:"1px solid #c0c0c0", borderRadius:999, padding:"2px 9px", marginBottom:8 }}>
           {project.badge}
         </span>
-        <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:18, fontWeight:700,
+        <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:WF.font, fontSize:18, fontWeight:700,
           color:WF.body, textDecoration:"none", marginBottom:6 }}>{project.title}</a>
         {project.expiry && (
-          <span style={{ alignSelf:"flex-start", display:"inline-flex", alignItems:"center", gap:6, fontFamily:FONT_SANS,
+          <span style={{ alignSelf:"flex-start", display:"inline-flex", alignItems:"center", gap:6, fontFamily:WF.font,
             fontSize:12.5, color:WF.subtle, background:WF.panel, border:"1px solid #ccc", borderRadius:4,
             padding:"6px 10px", margin:"0 0 8px" }}>
             <Ms name="schedule" size={14} color={WF.subtle} />{project.expiry}
           </span>
         )}
-        <p style={{ margin:"0 0 12px", fontFamily:FONT_SANS, fontSize:13.5, color:"#3d3d3d", lineHeight:1.4 }}>{project.desc}</p>
+        <p style={{ margin:"0 0 12px", fontFamily:WF.font, fontSize:13.5, color:"#3d3d3d", lineHeight:1.4 }}>{project.desc}</p>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(2, minmax(140px, max-content))", gap:"2px 28px", marginBottom:0 }}>
           {project.meta.map(([label, value]) => (
-            <span key={label} style={{ fontFamily:FONT_SANS, fontSize:13, color:"#3d3d3d" }}><b>{label}:</b> {value}</span>
+            <span key={label} style={{ fontFamily:WF.font, fontSize:13, color:"#3d3d3d" }}><b>{label}:</b> {value}</span>
           ))}
         </div>
       </div>
@@ -3892,7 +3894,7 @@ function WireframeProjectRow({ project, onManageInstantStore }) {
         {project.orderNote && (
           <div>
             <WfActionLink icon="shopping_cart" label="Order" />
-            <p style={{ margin:"10px 0 0", fontFamily:FONT_SANS, fontSize:12.5, fontStyle:"italic", color:WF.faint }}>
+            <p style={{ margin:"10px 0 0", fontFamily:WF.font, fontSize:12.5, fontStyle:"italic", color:WF.faint }}>
               {project.orderNote}
             </p>
           </div>
@@ -3902,7 +3904,7 @@ function WireframeProjectRow({ project, onManageInstantStore }) {
             onClick={a.label === "Manage Instant Store" ? onManageInstantStore : undefined} />
         ))}
         {project.checkingNote && (
-          <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:12.5, fontStyle:"italic", color:WF.faint }}>{project.checkingNote}</p>
+          <p style={{ margin:0, fontFamily:WF.font, fontSize:12.5, fontStyle:"italic", color:WF.faint }}>{project.checkingNote}</p>
         )}
         <div style={{ height:1, background:WF.divider }} />
         <WfActionLink icon="delete" label="Delete" danger />
@@ -3931,13 +3933,13 @@ function DashboardHomePage({ onContinue }) {
               display:"flex", alignItems:"flex-start", gap:12 }}>
               <Ms name="campaign" size={20} color={WF.subtle} style={{ flexShrink:0, marginTop:2 }} />
               <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ fontFamily:FONT_SANS, fontSize:14, fontWeight:700, color:WF.text }}>We're retiring BookWright Online.</div>
-                <div style={{ fontFamily:FONT_SANS, fontSize:13, color:WF.subtle, marginTop:2 }}>
+                <div style={{ fontFamily:WF.font, fontSize:14, fontWeight:700, color:WF.text }}>We're retiring BookWright Online.</div>
+                <div style={{ fontFamily:WF.font, fontSize:13, color:WF.subtle, marginTop:2 }}>
                   Your existing projects are right where you left them. <b>What's changing and why</b>
                 </div>
               </div>
               <button onClick={e => e.preventDefault()} style={{ background:"#fff", color:WF.body, border:"1px solid #ccc",
-                borderRadius:4, padding:"8px 16px", fontFamily:FONT_SANS, fontSize:13, fontWeight:600, cursor:"pointer",
+                borderRadius:4, padding:"8px 16px", fontFamily:WF.font, fontSize:13, fontWeight:600, cursor:"pointer",
                 whiteSpace:"nowrap", flexShrink:0 }}>Open BookWright Online</button>
               <button onClick={() => setBannerOpen(false)} aria-label="Dismiss" style={{ background:"none", border:"none",
                 cursor:"pointer", color:WF.subtle, flexShrink:0, display:"flex" }}>
@@ -3950,8 +3952,8 @@ function DashboardHomePage({ onContinue }) {
           <div style={{ border:`1px solid ${WF.border}`, borderRadius:8, overflow:"hidden" }}>
             <div style={{ background:WF.head, borderBottom:`1px solid ${WF.border}`, padding:"14px 18px",
               display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-              <span style={{ fontFamily:FONT_SANS, fontSize:17, fontWeight:700, color:WF.text }}>Current orders</span>
-              <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:13, color:WF.body, textDecoration:"none" }}>View all</a>
+              <span style={{ fontFamily:WF.font, fontSize:17, fontWeight:700, color:WF.text }}>Current orders</span>
+              <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:WF.font, fontSize:13, color:WF.body, textDecoration:"none" }}>View all</a>
             </div>
             <div style={{ overflowX:"auto" }}>
               <table style={{ width:"100%", borderCollapse:"collapse", minWidth:520 }}>
@@ -3959,17 +3961,17 @@ function DashboardHomePage({ onContinue }) {
                   <tr>
                     {["Order", "Status", "Shipping details", "Tracking details"].map(h => (
                       <th key={h} style={{ background:WF.theadBg, borderBottom:`1px solid ${WF.border}`, padding:"10px 16px",
-                        fontFamily:FONT_SANS, fontSize:13, fontWeight:600, color:"#555555", textAlign:"left" }}>{h}</th>
+                        fontFamily:WF.font, fontSize:13, fontWeight:600, color:"#555555", textAlign:"left" }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {WF_ORDERS.map(o => (
                     <tr key={o.id}>
-                      <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:FONT_SANS, fontSize:13, color:"#3d3d3d" }}>{o.id}</td>
-                      <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:FONT_SANS, fontSize:13, color:"#3d3d3d" }}>{o.status}</td>
-                      <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:FONT_SANS, fontSize:13, color:"#3d3d3d" }}>{o.shipping}</td>
-                      <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:FONT_SANS, fontSize:13, color:"#3d3d3d" }}>{o.tracking}</td>
+                      <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:WF.font, fontSize:13, color:"#3d3d3d" }}>{o.id}</td>
+                      <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:WF.font, fontSize:13, color:"#3d3d3d" }}>{o.status}</td>
+                      <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:WF.font, fontSize:13, color:"#3d3d3d" }}>{o.shipping}</td>
+                      <td style={{ padding:"10px 16px", borderBottom:`1px solid ${WF.borderLight}`, fontFamily:WF.font, fontSize:13, color:"#3d3d3d" }}>{o.tracking}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -3980,15 +3982,15 @@ function DashboardHomePage({ onContinue }) {
           {/* Most recent projects */}
           <div>
             <div style={{ display:"flex", alignItems:"baseline", justifyContent:"space-between", marginBottom:2 }}>
-              <span style={{ fontFamily:FONT_SANS, fontSize:15, fontWeight:700, color:WF.text }}>Most recent projects</span>
-              <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:14, fontWeight:600, color:WF.body, textDecoration:"none" }}>See all projects →</a>
+              <span style={{ fontFamily:WF.font, fontSize:15, fontWeight:700, color:WF.text }}>Most recent projects</span>
+              <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:WF.font, fontSize:14, fontWeight:600, color:WF.body, textDecoration:"none" }}>See all projects →</a>
             </div>
             {WF_PROJECTS.map(p => (
               <WireframeProjectRow key={p.title} project={p} onManageInstantStore={onContinue} />
             ))}
             <div style={{ display:"flex", justifyContent:"center", marginTop:20 }}>
               <a href="#" onClick={e => e.preventDefault()} style={{ border:"1px solid #aaa", borderRadius:4, background:"#e4e4e4",
-                color:WF.text, padding:"10px 22px", fontFamily:FONT_SANS, fontSize:13.5, fontWeight:600, textDecoration:"none" }}>
+                color:WF.text, padding:"10px 22px", fontFamily:WF.font, fontSize:13.5, fontWeight:600, textDecoration:"none" }}>
                 See all projects →
               </a>
             </div>
