@@ -5,3 +5,8 @@ dist-ssr
 .vercel
 .DS_Store
 .env*
+
+# Legacy pre-Codex dashboard wireframes (reference only, missing shared
+# stylesheets, not part of the shippable prototype) — see home.html port
+# into DashboardHomePage in src/CheckoutLinkApp.jsx.
+phase-2-checkout-links/

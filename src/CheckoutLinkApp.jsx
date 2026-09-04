@@ -2792,6 +2792,7 @@ function ConfirmationEmail({ order, onBack }) {
    tooltip and the accessible name. Five full labels can't hold one row on a
    laptop, and a stepper that wraps stops reading as a sequence. */
 const STAGES = [
+  { key:"dashboard", short:"Dashboard", label:"Seller dashboard" },
   { key:"setup",    short:"Setup",    label:"Link setup" },
   { key:"pdp",      short:"PDP",      label:"Product page" },
   { key:"checkout", short:"Checkout", label:"Checkout" },
@@ -3647,7 +3648,7 @@ function SideNavSection({ section, open, onToggle }) {
 }
 
 const navMenuItem = { display:"flex", alignItems:"center", gap:10, padding:"10px 12px", borderRadius:T.radius,
-  fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold, textDecoration:"none", cursor:"pointer" };
+  fontFamily:FONT_SANS, fontSize:16, fontWeight:400, color:T.textBold, textDecoration:"none", cursor:"pointer" };
 
 /* Collapsed-nav menu — the cart/flag/Log out/Help row that the desktop layout
    shows inline, opened from the dark hamburger button on Tablet/Mobile. Codex's
@@ -3712,9 +3713,9 @@ function DashboardTopNav() {
           <Ms name="shopping_cart" size={24} color={T.textBold} />
           <img src={US_FLAG} alt="United States" style={{ width:25, height:18, display:"block" }} />
           <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:16,
-            fontWeight:600, color:T.textBold, textDecoration:"none" }}>Log out</a>
+            fontWeight:400, color:T.textBold, textDecoration:"none" }}>Log out</a>
           <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:16,
-            fontWeight:600, color:T.textBold, textDecoration:"none" }}>Help</a>
+            fontWeight:400, color:T.textBold, textDecoration:"none" }}>Help</a>
         </div>
       )}
     </div>
@@ -3734,6 +3735,97 @@ function SideNav() {
         ))}
       </div>
     </div>
+  );
+}
+
+/* Seller dashboard — the demo's stop before Setup, so the story starts at the
+   seller's home screen rather than dropping straight into Instant Store setup.
+   Deliberately a lightweight placeholder (no Figma spec for this screen), just
+   enough to give the new stepper stop somewhere to land. */
+/* Content/IA ported from the legacy phase-2-checkout-links/home.html wireframe
+   (Current orders table, Most recent projects list), rebuilt with this app's
+   own Codex-based tokens rather than that kit's pre-Codex `--bk-*` styling.
+   Trimmed to the one book this demo actually has, using the same order
+   constants the confirmation/email screens use so the numbers line up. */
+function DashboardHomePage({ onContinue }) {
+  const cell = { padding:"10px 8px", fontSize:14, color:T.textBold, borderBottom:`1px solid ${T.borderSubtle}`, textAlign:"left" };
+  return (
+    <>
+    <DashboardTopNav />
+    <div style={{ display:"flex", alignItems:"flex-start" }}>
+    <SideNav />
+    <div style={{ flex:1, minWidth:0, minHeight:"100vh", background:T.bg, fontFamily:FONT_SANS }}>
+      <div style={{ padding:"48px 80px", display:"flex", flexDirection:"column", gap:48, maxWidth:900 }}>
+        <h1 style={{ fontFamily:FONT_HEADING, fontSize:32, fontWeight:500, color:T.textBold, margin:0 }}>Home</h1>
+
+        {/* Current orders */}
+        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <h2 style={{ fontFamily:FONT_HEADING, fontSize:22, fontWeight:500, color:T.textBold, margin:0 }}>Current orders</h2>
+            <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:14,
+              fontWeight:600, color:T.textLink, textDecoration:"none" }}>View all</a>
+          </div>
+          <table style={{ width:"100%", borderCollapse:"collapse" }}>
+            <thead>
+              <tr>
+                {["Order", "Status", "Shipping details", "Tracking details"].map(h => (
+                  <th key={h} style={{ ...cell, fontWeight:700, color:T.textSubtle }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={cell}>
+                  <a href="#" onClick={e => e.preventDefault()} style={{ color:T.textLink, fontWeight:700, textDecoration:"none" }}>{ORDER_NUMBER}</a>
+                </td>
+                <td style={cell}>Shipped</td>
+                <td style={cell}>Delivered {ORDER_DATE}</td>
+                <td style={cell}>
+                  <a href="#" onClick={e => e.preventDefault()} style={{ color:T.textLink, textDecoration:"none" }}>{UPS_TRACKING}</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Most recent projects */}
+        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <h2 style={{ fontFamily:FONT_HEADING, fontSize:22, fontWeight:500, color:T.textBold, margin:0 }}>Most recent projects</h2>
+            <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:14,
+              fontWeight:600, color:T.textLink, textDecoration:"none" }}>See all projects</a>
+          </div>
+          <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:20, background:T.surface,
+            display:"flex", gap:20, alignItems:"flex-start", flexWrap:"wrap" }}>
+            <img src={PRODUCT.img} alt="" style={{ width:96, height:96, borderRadius:8, objectFit:"cover", flexShrink:0 }} />
+            <div style={{ flex:"1 1 200px", minWidth:0, display:"flex", flexDirection:"column", gap:8 }}>
+              <span style={{ alignSelf:"flex-start", fontFamily:FONT_SANS, fontSize:12, fontWeight:700,
+                color:T.brand, background:T.panel, borderRadius:999, padding:"2px 10px" }}>Instant Store · Live</span>
+              <span style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:500, color:T.textBold }}>{PRODUCT.title}</span>
+              <span style={{ fontFamily:FONT_SANS, fontSize:14, color:T.textSubtle }}>
+                {PRODUCT.format} · {PRODUCT.pages} · by {PRODUCT.author}
+              </span>
+            </div>
+            <div style={{ display:"flex", flexDirection:"column", gap:10, flexShrink:0 }}>
+              <a href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:6,
+                fontFamily:FONT_SANS, fontSize:14, fontWeight:600, color:T.textBold, textDecoration:"none" }}>
+                <Ms name="shopping_cart" size={18} color={T.textSubtle} /> Order more
+              </a>
+              <a href="#" onClick={e => { e.preventDefault(); onContinue(); }} style={{ display:"flex", alignItems:"center", gap:6,
+                fontFamily:FONT_SANS, fontSize:14, fontWeight:600, color:T.textBold, textDecoration:"none" }}>
+                <Ms name="settings" size={18} color={T.textSubtle} /> Manage Instant Store
+              </a>
+              <a href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:6,
+                fontFamily:FONT_SANS, fontSize:14, fontWeight:600, color:T.textError, textDecoration:"none" }}>
+                <Ms name="delete" size={18} color={T.textError} /> Delete
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+    </>
   );
 }
 
@@ -4449,6 +4541,10 @@ function CheckoutLinkApp({ onSwitchFlow }) {
         expressStyle={expressStyle} onExpressStyleChange={setExpressStyle}
         format={format} onFormatChange={changeFormat}
         skippedStages={checkoutSkipped ? ["checkout"] : []} />
+
+      {view === "dashboard" && (
+        <DashboardHomePage onContinue={() => jump("setup")} />
+      )}
 
       {view === "setup" && (
         <LinkSetupPage onContinue={() => jump("pdp")} />
