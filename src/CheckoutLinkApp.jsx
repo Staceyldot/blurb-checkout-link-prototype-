@@ -3738,13 +3738,15 @@ function SideNav() {
   );
 }
 
-/* ═══════════ Dashboard Home — deliberately NOT Codex ═══════════
+/* ═══════════ Dashboard Home — deliberately NOT Codex (except the top nav) ═══════════
    The seller Home screen is legacy, pre-Codex UI (the phase-2-checkout-links
    wireframe kit, predates the design system this app's other screens follow).
    Copied as closely as possible from the live reference
    (dashboard-eight-smoky-11.vercel.app/phase-2-checkout-links/home) — its own
-   flat grey/white palette and plain sans type, not this app's `T` tokens,
-   FONT_HEADING, or the Codex-sourced DashboardTopNav/SideNav used elsewhere.
+   flat grey/white palette and plain sans type, not this app's `T` tokens or
+   FONT_HEADING. The one exception is the top nav: it reuses Setup's Codex
+   DashboardTopNav so the two screens share identical chrome, per request —
+   only the sidebar/content below stay wireframe-styled.
    Colors, borders and sizes below are copied from that page's computed
    styles rather than approximated. */
 const WF = {
@@ -3752,25 +3754,6 @@ const WF = {
   border: "#c4c4c4", borderLight: "#e0e0e0", divider: "#e0e0e0",
   panel: "#f4f4f4", head: "#f2f2f2", theadBg: "#fafafa", cover: "#d0d0d0",
 };
-
-function WireframeTopNav() {
-  return (
-    <div style={{ background:"#fff", borderBottom:`1px solid ${WF.borderLight}`, display:"flex",
-      alignItems:"center", justifyContent:"space-between", padding:"16px 20px", flexShrink:0 }}>
-      <img src={BLURB_LOGO} alt="Blurb" style={{ height:40, width:"auto", display:"block" }} />
-      <div style={{ display:"flex", alignItems:"center", gap:20 }}>
-        <a href="#" onClick={e => e.preventDefault()} aria-label="Cart" style={{ color:WF.body, display:"flex" }}>
-          <Ms name="shopping_cart" size={20} color={WF.body} />
-        </a>
-        <span style={{ fontSize:20, lineHeight:1 }} role="img" aria-label="United States">🇺🇸</span>
-        <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:13,
-          fontWeight:400, color:WF.body, textDecoration:"none" }}>Help</a>
-        <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:13,
-          fontWeight:400, color:WF.body, textDecoration:"none" }}>Log Out</a>
-      </div>
-    </div>
-  );
-}
 
 const WF_SIDE_SECTIONS = [
   { label:"Projects", items:["All projects", "Online editor projects"] },
@@ -3943,11 +3926,11 @@ function DashboardHomePage({ onContinue }) {
   const [bannerOpen, setBannerOpen] = useState(true);
   return (
     <>
-    <WireframeTopNav />
+    <DashboardTopNav />
     <div style={{ display:"flex", alignItems:"flex-start", background:"#fff" }}>
       {!isMobile && <WireframeSideNav />}
       <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column" }}>
-        <div style={{ padding: isMobile ? "20px" : "32px 40px", display:"flex", flexDirection:"column", gap:24 }}>
+        <div style={{ padding: isMobile ? "20px" : "32px 40px", display:"flex", flexDirection:"column", gap:24, maxWidth:934, width:"100%" }}>
           {bannerOpen && (
             <div style={{ background:WF.panel, border:`1px solid ${WF.border}`, borderRadius:8, padding:16,
               display:"flex", alignItems:"flex-start", gap:12 }}>
