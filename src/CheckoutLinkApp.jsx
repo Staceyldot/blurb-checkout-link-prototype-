@@ -3301,25 +3301,33 @@ function PriceField({ label, hint, prefix, suffix, value, onChange, error, disab
   );
 }
 
-function BookDetailsRow() {
-  const { isMobile } = useViewport();
+function BookDetailsRow({ showCover, onViewProject }) {
   const bits = ["10×8 in, 25×20 cm", PRODUCT.pages, "Language: English", "Published November 2019"];
   return (
-    <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:8, rowGap:6,
-      fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textSubtle }}>
-      {bits.map((b, i) => (
-        <React.Fragment key={i}>
-          {i > 0 && <SetupDot />}
-          <span>{b}</span>
-        </React.Fragment>
-      ))}
-      <SetupDot />
-      <span style={{ display:"flex", alignItems:"center", gap:4 }}>
-        ISBN 9781733372800 <Ms name="content_copy" size={16} color={T.textSubtle} />
-      </span>
-      {!isMobile && <SetupDot />}
-      <a href="#" onClick={e => e.preventDefault()}
-        style={{ color:T.textLink, fontWeight:600, textDecoration:"underline" }}>View project</a>
+    <div style={{ display:"flex", gap:16, alignItems:"flex-start" }}>
+      {showCover && (
+        <div style={{ width:64, height:83, flexShrink:0, overflow:"hidden", borderRadius:4,
+          boxShadow:"2px 4px 10px rgba(0,0,0,.16)" }}>
+          <img src={PRODUCT.img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", transform:"scale(1.2)" }} />
+        </div>
+      )}
+      <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+        <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:8, rowGap:6,
+          fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textSubtle }}>
+          {bits.map((b, i) => (
+            <React.Fragment key={i}>
+              {i > 0 && <SetupDot />}
+              <span>{b}</span>
+            </React.Fragment>
+          ))}
+          <SetupDot />
+          <span style={{ display:"flex", alignItems:"center", gap:4 }}>
+            ISBN 9781733372800 <Ms name="content_copy" size={16} color={T.textSubtle} />
+          </span>
+        </div>
+        <a href="#" onClick={e => { e.preventDefault(); onViewProject?.(); }}
+          style={{ color:T.textLink, fontWeight:600, textDecoration:"underline", alignSelf:"flex-start" }}>View project</a>
+      </div>
     </div>
   );
 }
@@ -3728,10 +3736,10 @@ function DashboardTopNav() {
   );
 }
 
-function SideNav({ activeItem, onNavigate }) {
+function SideNav({ activeItem, onNavigate, divider }) {
   return (
     <div style={{ position:"sticky", top:0, height:"100vh", width:280, flexShrink:0, overflowY:"auto",
-      background:"#fff", padding:"32px 24px" }}>
+      background:"#fff", padding:"32px 24px", borderRight: divider ? `1px solid ${WF.borderLight}` : "none" }}>
       <div style={{ display:"flex", flexDirection:"column", gap:28 }}>
         {SIDE_NAV_SECTIONS.map(section => (
           <SideNavSection key={section.key} section={section} activeItem={activeItem} onNavigate={onNavigate} />
@@ -4419,7 +4427,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
     <>
     <DashboardTopNav />
     <div style={{ display:"flex", alignItems:"flex-start" }}>
-    <SideNav activeItem="Instant Stores" onNavigate={item => { if (item === "All projects") onGoAllProjects?.(); }} />
+    <SideNav activeItem="Instant Stores" onNavigate={item => { if (item === "All projects") onGoAllProjects?.(); }} divider />
     <div style={{ flex:1, minWidth:0, minHeight:"100vh", background:T.bg, fontFamily:FONT_SANS }}>
       {/* Order-a-copy nudge — sellers can't buy their own link, so this is the way to
           get a proof copy before going live. Switches to a warning once the link is
@@ -4458,37 +4466,29 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
           <Ms name="chevron_right" size={16} color={T.textSubtle} />
           <span style={{ color:T.textSubtle }}>{PRODUCT.title}</span>
         </div>
-        <div style={{ display:"flex", gap:16, alignItems:"flex-start" }}>
-          <div style={{ width:64, height:83, flexShrink:0, overflow:"hidden", borderRadius:4,
-            boxShadow:"2px 4px 10px rgba(0,0,0,.16)" }}>
-            <img src={PRODUCT.img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", transform:"scale(1.2)" }} />
-          </div>
-          <div style={{ flex:1, minWidth:0 }}>
-            <h1 style={{ fontFamily:FONT_HEADING, fontSize: isMobile ? 26 : 32, fontWeight:500, color:T.textBold, margin:"0 0 16px" }}>
-              {PRODUCT.title}
-            </h1>
-            <div style={{ maxWidth:672 }}>
-              {/* Static domain/ID prefix sits outside the field (Figma 4403:45381) —
-                  only the slug itself reads as editable. */}
-              <div style={{ display:"flex", alignItems:"center", gap:4 }}>
-                <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textDisabled, whiteSpace:"nowrap", flexShrink:0 }}>
-                  blurb.com/hub/482910/
-                </span>
-                <button onClick={copyLink} style={{ flex:1, minWidth:0, display:"flex", alignItems:"center", gap:8,
-                  border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface, cursor:"pointer" }}>
-                  <span style={{ flex:1, textAlign:"left", fontFamily:FONT_SANS, fontSize:16, color:T.textBold, minWidth:0,
-                    overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{slug}</span>
-                  <Ms name={copied ? "check" : "content_copy"} color={copied ? T.success : T.textBold} />
-                </button>
-              </div>
-            </div>
+        <h1 style={{ fontFamily:FONT_HEADING, fontSize: isMobile ? 26 : 32, fontWeight:500, color:T.textBold, margin:"0 0 16px" }}>
+          {PRODUCT.title}
+        </h1>
+        <div style={{ maxWidth:672 }}>
+          {/* Static domain/ID prefix sits outside the field (Figma 4403:45381) —
+              only the slug itself reads as editable. */}
+          <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+            <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textDisabled, whiteSpace:"nowrap", flexShrink:0 }}>
+              blurb.com/hub/482910/
+            </span>
+            <button onClick={copyLink} style={{ flex:1, minWidth:0, display:"flex", alignItems:"center", gap:8,
+              border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface, cursor:"pointer" }}>
+              <span style={{ flex:1, textAlign:"left", fontFamily:FONT_SANS, fontSize:16, color:T.textBold, minWidth:0,
+                overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{slug}</span>
+              <Ms name={copied ? "check" : "content_copy"} color={copied ? T.success : T.textBold} />
+            </button>
           </div>
         </div>
       </div>
 
       {/* Book details */}
       <SetupSection title="Book details">
-        <BookDetailsRow />
+        <BookDetailsRow showCover onViewProject={onGoAllProjects} />
       </SetupSection>
 
       {/* Listing content — empty state */}
@@ -4736,9 +4736,11 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
 
       {/* Delete Instant Store — last section on the page (Figma 5572:75042).
           Bordered on top rather than wrapped in SetupSection, since this block
-          has no title row to divide from. */}
-      <div style={{ background:T.surface, width:"100%", padding: isMobile ? "24px 20px" : "32px 80px",
-        borderTop:`1px solid ${T.borderSubtle}` }}>
+          has no title row to divide from. The divider sits inside the padded
+          content (not on the outer full-bleed div) so it spans the same width
+          as every other section's header divider. */}
+      <div style={{ background:T.surface, width:"100%", padding: isMobile ? "24px 20px" : "32px 80px" }}>
+        <div style={{ borderTop:`1px solid ${T.borderSubtle}`, marginBottom:24 }} />
         <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
           <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, color:T.textBold, lineHeight:1.4 }}>
             Buyers will no longer be able to purchase through this link.
