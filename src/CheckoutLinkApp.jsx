@@ -3781,9 +3781,11 @@ function WireframeSideNav({ activeItem, onNavigate }) {
           {section.items.map(item => (
             <a key={item} href="#"
               onClick={e => { e.preventDefault(); onNavigate?.(item); }}
+              onMouseEnter={e => e.currentTarget.style.background = "#f0f0f0"}
+              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
               style={{ display:"flex", alignItems:"center", gap:8,
               fontFamily:WF.font, fontSize:13.5, fontWeight: item === activeItem ? 700 : 400,
-              color:WF.body, textDecoration:"none", padding:"3px 0" }}>
+              color:WF.body, textDecoration:"none", padding:"5px 8px", margin:"0 -8px", borderRadius:4 }}>
               {item}
               {item === section.badge && (
                 <span style={{ fontFamily:WF.font, fontSize:10, fontWeight:700, color:"#fff",
@@ -4156,6 +4158,123 @@ function InstantStoresTable({ onManageInstantStore }) {
   );
 }
 
+/* Projects with no Instant Store yet — the "Select a project" modal's other
+   list. Type/size copied from their ALL_PROJECTS entries above; none carry a
+   cover there either, so this list is placeholder-thumbnail only, matching
+   the reference modal (only already-selling rows get real covers). */
+const AVAILABLE_TO_SELL = [
+  { title:"Midnight Harvest", sub:"Trade Book · 6×9 in" },
+  { title:"Late Bloomers: a garden through the seasons", sub:"Photo Book · 10×8 in" },
+  { title:"Wildflower Table", sub:"Photo Book · 10×8 in" },
+  { title:"Watercolor basics: a field guide for outdoor painters", sub:"Photo Book · 7×7 in" },
+  { title:"Hand lettering for beginners: modern calligraphy at home", sub:"Trade Book · 6×9 in" },
+  { title:"The backyard beekeeper: a seasonal guide", sub:"Trade Book · 7×9 in" },
+];
+
+/* "Select a project for your Instant Store" — opens from the Instant Stores
+   page's "+ Create Instant Store" button. Picking any existing project (either
+   list) leads into the same Setup flow as "Manage Instant Store" elsewhere on
+   the Dashboard; "Create a new project" is out of scope (link setup/project
+   creation are owned elsewhere per the README) so it's decorative. */
+function CreateInstantStoreModal({ open, onClose, onSelect }) {
+  if (!open) return null;
+  const row = (title, sub, cover) => (
+    <div key={title} role="button" tabIndex={0} onClick={onSelect}
+      onMouseEnter={e => e.currentTarget.style.background = "#f0f0f0"}
+      onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+      style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 20px", cursor:"pointer",
+        borderBottom:`1px solid ${WF.borderLight}` }}>
+      {cover ? (
+        <img src={cover} alt="" style={{ width:40, height:52, objectFit:"cover", borderRadius:2, flexShrink:0 }} />
+      ) : (
+        <div style={{ width:40, height:52, borderRadius:2, background:WF.cover, border:`1px solid ${WF.borderLight}`, flexShrink:0 }} />
+      )}
+      <div style={{ minWidth:0 }}>
+        <div style={{ fontFamily:WF.font, fontSize:14, fontWeight:700, color:WF.text }}>{title}</div>
+        <div style={{ fontFamily:WF.font, fontSize:12.5, color:"#6b6b6b", marginTop:2 }}>{sub}</div>
+      </div>
+    </div>
+  );
+  return (
+    <>
+      <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.45)", zIndex:200 }} />
+      <div style={{ position:"fixed", top:"50%", left:"50%", transform:"translate(-50%,-50%)", zIndex:210,
+        width:560, maxWidth:"92vw", maxHeight:"88vh", background:"#fff", borderRadius:8,
+        boxShadow:"0 8px 32px rgba(0,0,0,.2)", display:"flex", flexDirection:"column", overflow:"hidden" }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"18px 20px",
+          borderBottom:`1px solid ${WF.borderLight}` }}>
+          <span style={{ fontFamily:WF.font, fontSize:17, fontWeight:700, color:WF.text }}>
+            Select a project for your Instant Store
+          </span>
+          <button onClick={onClose} aria-label="Close" style={{ background:"#f0f0f0", border:"none", borderRadius:"50%",
+            width:28, height:28, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>
+            <Ms name="close" size={16} color={WF.subtle} />
+          </button>
+        </div>
+
+        <div style={{ padding:"18px 20px 0", display:"flex", flexDirection:"column", gap:16 }}>
+          <div role="button" tabIndex={0} onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:14,
+            background:"#f0f7fb", border:"1px solid #bfe0ef", borderRadius:6, padding:14, cursor:"pointer" }}>
+            <div style={{ width:32, height:32, borderRadius:"50%", background:"#107eb1",
+              display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+              <Ms name="add" size={20} color="#fff" />
+            </div>
+            <div>
+              <div style={{ fontFamily:WF.font, fontSize:14.5, fontWeight:700, color:"#107eb1" }}>Create a new project</div>
+              <div style={{ fontFamily:WF.font, fontSize:12.5, color:"#5a5a5a", marginTop:2 }}>
+                Pick a format to start with, then choose the design tool that's right for it.
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            <div style={{ flex:1, height:1, background:WF.borderLight }} />
+            <span style={{ fontFamily:WF.font, fontSize:11, fontWeight:700, color:"#8a8a8a", letterSpacing:".4px" }}>
+              OR SELECT AN EXISTING PROJECT
+            </span>
+            <div style={{ flex:1, height:1, background:WF.borderLight }} />
+          </div>
+
+          <div style={{ position:"relative" }}>
+            <Ms name="search" size={18} color="#8a8a8a" style={{ position:"absolute", left:12, top:11 }} />
+            <input placeholder="Search your projects" onFocus={e => e.preventDefault()} readOnly
+              style={{ width:"100%", boxSizing:"border-box", padding:"10px 12px 10px 38px", fontFamily:WF.font, fontSize:14,
+                color:WF.text, border:`1px solid ${WF.border}`, borderRadius:4 }} />
+          </div>
+        </div>
+
+        <div style={{ overflowY:"auto", flex:1, marginTop:12 }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"6px 20px" }}>
+            <span style={{ fontFamily:WF.font, fontSize:11, fontWeight:700, color:"#8a8a8a", letterSpacing:".4px" }}>
+              AVAILABLE TO SELL ({AVAILABLE_TO_SELL.length})
+            </span>
+            <span style={{ fontFamily:WF.font, fontSize:12, color:"#8a8a8a" }}>Sorted by most recent</span>
+          </div>
+          {AVAILABLE_TO_SELL.map(p => row(p.title, p.sub))}
+
+          <div style={{ padding:"14px 20px 6px" }}>
+            <span style={{ fontFamily:WF.font, fontSize:11, fontWeight:700, color:"#8a8a8a", letterSpacing:".4px" }}>
+              ALREADY HAS AN INSTANT STORE
+            </span>
+          </div>
+          {INSTANT_STORES.map(p => row(p.title, `${p.sub} · ${p.status === "live" ? "Live" : "Draft"}`, p.cover))}
+        </div>
+
+        <div style={{ padding:"14px 20px", textAlign:"center", fontFamily:WF.font, fontSize:12.5, color:"#5a5a5a",
+          borderTop:`1px solid ${WF.borderLight}` }}>
+          Not finding your project? <a href="#" onClick={e => e.preventDefault()} style={{ color:"#107eb1", fontWeight:600,
+            textDecoration:"none" }}>Go to your projects page</a> to see your full list.
+        </div>
+
+        <div style={{ display:"flex", justifyContent:"flex-end", padding:"14px 20px", borderTop:`1px solid ${WF.borderLight}` }}>
+          <button onClick={onClose} style={{ background:"#fff", color:WF.body, border:`1px solid ${WF.border}`, borderRadius:4,
+            padding:"9px 18px", fontFamily:WF.font, fontSize:13.5, fontWeight:600, cursor:"pointer" }}>Cancel</button>
+        </div>
+      </div>
+    </>
+  );
+}
+
 /* Seller dashboard Home — the demo's stop before Setup, so the story starts at
    the seller's home screen rather than dropping straight into Instant Store
    setup. Content and styling copied as closely as possible from the legacy
@@ -4172,6 +4291,7 @@ function InstantStoresTable({ onManageInstantStore }) {
 function DashboardHomePage({ onContinue, subPage, setSubPage }) {
   const { isMobile } = useViewport();
   const [bannerOpen, setBannerOpen] = useState(true);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
   const goAllProjects = e => { e?.preventDefault(); setSubPage("all-projects"); };
   const SIDE_NAV_TARGETS = { "All projects":"all-projects", "Online editor projects":"online-editor", "Instant Stores":"instant-stores" };
   const ACTIVE_ITEM_FOR = { "all-projects":"All projects", "online-editor":"Online editor projects", "instant-stores":"Instant Stores" };
@@ -4345,7 +4465,7 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
                     Shareable links that let customers buy directly from you
                   </p>
                 </div>
-                <a href="#" onClick={e => e.preventDefault()} style={{ background:"#555", color:"#fff", border:"1px solid #333",
+                <a href="#" onClick={e => { e.preventDefault(); setCreateModalOpen(true); }} style={{ background:"#555", color:"#fff", border:"1px solid #333",
                   borderRadius:4, padding:"6px 13px", fontFamily:WF.font, fontSize:12.5, fontWeight:600,
                   textDecoration:"none", whiteSpace:"nowrap" }}>+ Create Instant Store</a>
               </div>
@@ -4360,6 +4480,8 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
         <WireframeFooter />
       </div>
     </div>
+    <CreateInstantStoreModal open={createModalOpen} onClose={() => setCreateModalOpen(false)}
+      onSelect={() => { setCreateModalOpen(false); onContinue(); }} />
     </>
   );
 }
