@@ -3942,7 +3942,7 @@ const ALL_PROJECTS = [
     meta:[["Project type","Trade Book"],["Project option","10×8 in, 25×20 cm"],["# of pages","160"],["ISBN","9781733372800"],["Created with","BookWright"],["Created","March 14, 2019"]],
     actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }, { icon:"local_shipping", label:"Set up retail distribution" }],
     share:true },
-  { cover:BOOK_STIRRED_OBSESSION, coverZoom:1, coverPos:"0% center", badge:"Selling", title:"The Stirred Obsession: A Minimalist's Guide to the Modern Martini",
+  { cover:BOOK_STIRRED_OBSESSION, coverAspect:"square", coverZoom:1.12, badge:"Selling", title:"The Stirred Obsession: A Minimalist's Guide to the Modern Martini",
     desc:"The timeless elegance of the world's most iconic cocktail takes center stage in The Stirred Obsession: A Minimalist's Guide to the Modern Martini.",
     meta:[["Project type","Photo Book"],["Project option","10×10 in"],["# of pages","96"],["Created with","BookWright"],["Created","Jan 9, 2025"]],
     actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"download", label:"Download PDF" }],
@@ -4003,7 +4003,7 @@ function AllProjectsRow({ project, onManageInstantStore }) {
       padding:"22px 0", borderBottom:`1px solid ${WF.border}` }}>
       <div style={{ flexShrink:0, width:130 }}>
         {project.cover ? (
-          <div style={{ width:130, height:168, overflow:"hidden", boxShadow:"2px 4px 10px rgba(0,0,0,.16)" }}>
+          <div style={{ width:130, height:project.coverAspect === "square" ? 130 : 168, overflow:"hidden", boxShadow:"2px 4px 10px rgba(0,0,0,.16)" }}>
             <img src={project.cover} alt="" style={{ width:"100%", height:"100%", objectFit:"cover",
               objectPosition:project.coverPos || "center", transform:`scale(${project.coverZoom ?? 1.2})` }} />
           </div>
@@ -4097,7 +4097,7 @@ const ONLINE_EDITOR_PROJECTS = [
    Store" this whole prototype is about), so its live rows link into Setup
    the same way Manage Instant Store does elsewhere on the Dashboard. */
 const INSTANT_STORES = [
-  { title:"The Stirred Obsession: A Minimalist's Guide to the Modern Martini", sub:"Photo book · 10×10", link:"blurb.com/1/c1t2k", price:"$28.00", status:"live", orders:3, cover:BOOK_STIRRED_OBSESSION, coverZoom:1, coverPos:"0% center" },
+  { title:"The Stirred Obsession: A Minimalist's Guide to the Modern Martini", sub:"Photo book · 10×10", link:"blurb.com/1/c1t2k", price:"$28.00", status:"live", orders:3, cover:BOOK_STIRRED_OBSESSION, coverAspect:"square", coverZoom:1.12 },
   { title:"Spirit, Smoke & Salt", sub:"Trade book · 8×10", link:"blurb.com/1/sm5kt", price:"$40.00", status:"live", orders:7, cover:BOOK_SPIRIT_SMOKE_SALT },
   { title:"Field Notes: Patagonia", sub:"Magazine · 8.5×11", link:null, price:"Not set", status:"draft", orders:null, cover:null },
 ];
@@ -4120,7 +4120,7 @@ function InstantStoresTable({ onManageInstantStore }) {
               <td style={{ ...cell, maxWidth:220 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:12 }}>
                   {s.cover ? (
-                    <div style={{ width:40, height:52, borderRadius:2, overflow:"hidden", flexShrink:0 }}>
+                    <div style={{ width:40, height:s.coverAspect === "square" ? 40 : 52, borderRadius:2, overflow:"hidden", flexShrink:0 }}>
                       <img src={s.cover} alt="" style={{ width:"100%", height:"100%", objectFit:"cover",
                         objectPosition:s.coverPos || "center", transform:`scale(${s.coverZoom ?? 1.2})` }} />
                     </div>
@@ -4184,14 +4184,14 @@ const AVAILABLE_TO_SELL = [
    creation are owned elsewhere per the README) so it's decorative. */
 function CreateInstantStoreModal({ open, onClose, onSelect }) {
   if (!open) return null;
-  const row = (title, sub, cover, coverZoom, coverPos) => (
+  const row = (title, sub, cover, coverZoom, coverPos, coverAspect) => (
     <div key={title} role="button" tabIndex={0} onClick={onSelect}
       onMouseEnter={e => e.currentTarget.style.background = "#f0f0f0"}
       onMouseLeave={e => e.currentTarget.style.background = "transparent"}
       style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 20px", cursor:"pointer",
         borderBottom:`1px solid ${WF.borderLight}` }}>
       {cover ? (
-        <div style={{ width:40, height:52, borderRadius:2, overflow:"hidden", flexShrink:0 }}>
+        <div style={{ width:40, height:coverAspect === "square" ? 40 : 52, borderRadius:2, overflow:"hidden", flexShrink:0 }}>
           <img src={cover} alt="" style={{ width:"100%", height:"100%", objectFit:"cover",
             objectPosition:coverPos || "center", transform:`scale(${coverZoom ?? 1.2})` }} />
         </div>
@@ -4266,7 +4266,7 @@ function CreateInstantStoreModal({ open, onClose, onSelect }) {
               ALREADY HAS AN INSTANT STORE
             </span>
           </div>
-          {INSTANT_STORES.map(p => row(p.title, `${p.sub} · ${p.status === "live" ? "Live" : "Draft"}`, p.cover, p.coverZoom, p.coverPos))}
+          {INSTANT_STORES.map(p => row(p.title, `${p.sub} · ${p.status === "live" ? "Live" : "Draft"}`, p.cover, p.coverZoom, p.coverPos, p.coverAspect))}
         </div>
 
         <div style={{ padding:"14px 20px", textAlign:"center", fontFamily:WF.font, fontSize:12.5, color:"#5a5a5a",
@@ -4658,22 +4658,30 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
           <Ms name="chevron_right" size={16} color={T.textSubtle} />
           <span style={{ color:T.textSubtle }}>{PRODUCT.title}</span>
         </div>
-        <h1 style={{ fontFamily:FONT_HEADING, fontSize: isMobile ? 26 : 32, fontWeight:500, color:T.textBold, margin:"0 0 16px" }}>
-          {PRODUCT.title}
-        </h1>
-        <div style={{ maxWidth:672 }}>
-          {/* Static domain/ID prefix sits outside the field (Figma 4403:45381) —
-              only the slug itself reads as editable. */}
-          <div style={{ display:"flex", alignItems:"center", gap:4 }}>
-            <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textDisabled, whiteSpace:"nowrap", flexShrink:0 }}>
-              blurb.com/hub/482910/
-            </span>
-            <button onClick={copyLink} style={{ flex:1, minWidth:0, display:"flex", alignItems:"center", gap:8,
-              border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface, cursor:"pointer" }}>
-              <span style={{ flex:1, textAlign:"left", fontFamily:FONT_SANS, fontSize:16, color:T.textBold, minWidth:0,
-                overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{slug}</span>
-              <Ms name={copied ? "check" : "content_copy"} color={copied ? T.success : T.textBold} />
-            </button>
+        <div style={{ display:"flex", gap:16, alignItems:"flex-start" }}>
+          <div style={{ width:64, height:83, flexShrink:0, overflow:"hidden", borderRadius:4,
+            boxShadow:"2px 4px 10px rgba(0,0,0,.16)" }}>
+            <img src={PRODUCT.img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", transform:"scale(1.2)" }} />
+          </div>
+          <div style={{ flex:1, minWidth:0 }}>
+            <h1 style={{ fontFamily:FONT_HEADING, fontSize: isMobile ? 26 : 32, fontWeight:500, color:T.textBold, margin:"0 0 16px" }}>
+              {PRODUCT.title}
+            </h1>
+            <div style={{ maxWidth:672 }}>
+              {/* Static domain/ID prefix sits outside the field (Figma 4403:45381) —
+                  only the slug itself reads as editable. */}
+              <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+                <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textDisabled, whiteSpace:"nowrap", flexShrink:0 }}>
+                  blurb.com/hub/482910/
+                </span>
+                <button onClick={copyLink} style={{ flex:1, minWidth:0, display:"flex", alignItems:"center", gap:8,
+                  border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface, cursor:"pointer" }}>
+                  <span style={{ flex:1, textAlign:"left", fontFamily:FONT_SANS, fontSize:16, color:T.textBold, minWidth:0,
+                    overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{slug}</span>
+                  <Ms name={copied ? "check" : "content_copy"} color={copied ? T.success : T.textBold} />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
