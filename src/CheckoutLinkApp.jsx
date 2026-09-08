@@ -4274,7 +4274,7 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
   return (
     <>
     <DashboardTopNav />
-    <div style={{ display:"flex", alignItems:"flex-start", background:"#fff" }}>
+    <div style={{ display:"flex", alignItems:"flex-start", background:"#fff", minHeight:"100vh" }}>
       {!isMobile && (
         <WireframeSideNav activeItem={ACTIVE_ITEM_FOR[subPage]}
           onNavigate={item => { if (SIDE_NAV_TARGETS[item]) setSubPage(SIDE_NAV_TARGETS[item]); }} />
