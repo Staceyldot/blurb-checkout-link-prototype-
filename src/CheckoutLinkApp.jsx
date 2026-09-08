@@ -3884,7 +3884,6 @@ function AllProjectsRow({ project, onManageInstantStore }) {
 const INSTANT_STORES = [
   { title:"The Stirred Obsession: A Minimalist's Guide to the Modern Martini", sub:"Photo book · 10×10", link:"blurb.com/1/c1t2k", price:"$28.00", status:"live", orders:3, cover:BOOK_STIRRED_OBSESSION, coverAspect:"square", coverZoom:1.12 },
   { title:"Spirit, Smoke & Salt", sub:"Trade book · 8×10", link:"blurb.com/1/sm5kt", price:"$40.00", status:"live", orders:7, cover:BOOK_SPIRIT_SMOKE_SALT },
-  { title:"Field Notes: Patagonia", sub:"Magazine · 8.5×11", link:null, price:"Not set", status:"draft", orders:null, cover:null },
 ];
 
 function InstantStoresTable({ onManageInstantStore }) {
