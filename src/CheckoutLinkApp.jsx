@@ -4062,6 +4062,75 @@ function CreateInstantStoreModal({ open, onClose, onSelect }) {
   );
 }
 
+/* Payment settings — copied from the reference kit's own payment-settings
+   page (same wireframe family as the rest of the Dashboard). Two dark-header
+   panels of label/value rows with a "Change X" link per field; nothing here
+   is wired up, matching the rest of this page's non-functional controls.
+   Fictional payee data, same convention as the rest of the demo's fake
+   names/addresses. */
+const PAYMENT_INFO_ROWS = [
+  { label:"Pay me by", value:"PayPal", change:"Change to checks (payable in USD only; $5 processing fee)" },
+  { label:"Send payments to", value:"k.arispe@example.com", change:"Change payment email" },
+  { label:"Currency", value:"US $" },
+];
+const TAXPAYER_INFO_ROWS = [
+  { label:"Residency", value:"U.S. Citizen", change:"Change residency" },
+  { label:"Social Security Number", value:"On file", change:"Change Social Security Number" },
+  { label:"Address on your 1099", value:["Kim Arispe", "1420 Alder Street", "Portland, OR 97205", "United States", "(503) 555-0148"],
+    change:"Change 1099 address" },
+];
+
+function PaymentSettingsSection({ title, rows, footnote }) {
+  return (
+    <div style={{ border:`1px solid ${WF.border}`, borderRadius:4, overflow:"hidden" }}>
+      <div style={{ background:"#262626", padding:"12px 20px" }}>
+        <span style={{ fontFamily:WF.font, fontSize:14, fontWeight:700, color:"#fff" }}>{title}</span>
+      </div>
+      <div style={{ background:"#fff", padding:"24px 20px", display:"flex", flexDirection:"column", gap:24 }}>
+        {rows.map(row => (
+          <div key={row.label} style={{ display:"flex", gap:24, flexWrap:"wrap" }}>
+            <span style={{ width:160, flexShrink:0, fontFamily:WF.font, fontSize:14, color:WF.subtle }}>{row.label}</span>
+            <div style={{ display:"flex", flexDirection:"column", gap:2 }}>
+              {Array.isArray(row.value)
+                ? row.value.map((line, i) => (
+                    <span key={i} style={{ fontFamily:WF.font, fontSize:14, color:WF.body }}>{line}</span>
+                  ))
+                : <span style={{ fontFamily:WF.font, fontSize:14, color:WF.body }}>{row.value}</span>}
+              {row.change && (
+                <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:WF.font, fontSize:13.5,
+                  color:WF.body, textDecoration:"underline", marginTop:4 }}>{row.change}</a>
+              )}
+            </div>
+          </div>
+        ))}
+        {footnote && (
+          <p style={{ margin:0, paddingTop:16, borderTop:`1px solid ${WF.borderLight}`,
+            fontFamily:WF.font, fontSize:13.5, color:WF.subtle }}>{footnote}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PaymentSettingsPage() {
+  return (
+    <>
+      <div>
+        <span style={{ display:"block", fontFamily:WF.font, fontSize:22, fontWeight:700, color:WF.text }}>Payment</span>
+        <p style={{ margin:"4px 0 0", fontFamily:WF.font, fontSize:13.5, color:"#3d3d3d" }}>
+          Manage how and where you get paid.
+        </p>
+      </div>
+      <PaymentSettingsSection title="Payment information" rows={PAYMENT_INFO_ROWS} />
+      <PaymentSettingsSection title="Taxpayer information" rows={TAXPAYER_INFO_ROWS}
+        footnote={
+          <>Note that your <a href="#" onClick={e => e.preventDefault()} style={{ color:WF.subtle }}>1099</a> will
+            be issued by Reischling Press, Inc, Blurb's parent company.</>
+        } />
+    </>
+  );
+}
+
 /* Seller dashboard Home — the demo's stop before Setup, so the story starts at
    the seller's home screen rather than dropping straight into Instant Store
    setup. Content and styling copied as closely as possible from the legacy
@@ -4078,8 +4147,8 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
   const { isMobile } = useViewport();
   const [bannerOpen, setBannerOpen] = useState(true);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const SIDE_NAV_TARGETS = { "All projects":"all-projects", "Instant Stores":"instant-stores" };
-  const ACTIVE_ITEM_FOR = { "all-projects":"All projects", "instant-stores":"Instant Stores" };
+  const SIDE_NAV_TARGETS = { "All projects":"all-projects", "Instant Stores":"instant-stores", "Payment settings":"payment-settings" };
+  const ACTIVE_ITEM_FOR = { "all-projects":"All projects", "instant-stores":"Instant Stores", "payment-settings":"Payment settings" };
 
   return (
     <>
@@ -4091,7 +4160,7 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
       )}
       <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column" }}>
         <div style={{ padding: isMobile ? "20px" : "32px 40px", display:"flex", flexDirection:"column", gap:24, maxWidth:934, width:"100%" }}>
-          {bannerOpen && (
+          {bannerOpen && subPage !== "payment-settings" && (
             <div style={{ background:WF.panel, border:`1px solid ${WF.border}`, borderRadius:8, padding:16,
               display:"flex", alignItems:"flex-start", gap:12 }}>
               <Ms name="campaign" size={20} color={WF.subtle} style={{ flexShrink:0, marginTop:2 }} />
@@ -4196,7 +4265,7 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
                 ))}
               </div>
             </>
-          ) : (
+          ) : subPage === "instant-stores" ? (
             <>
               <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
                 <div>
@@ -4214,6 +4283,8 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
                 <InstantStoresTable onManageInstantStore={onContinue} />
               </div>
             </>
+          ) : (
+            <PaymentSettingsPage />
           )}
         </div>
       </div>
@@ -4662,27 +4733,6 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
           )}
         </div>
       </SetupSection>
-
-      {/* Payment and tax info — required nudge, hidden once the page is filled in
-          (matches Figma's Unpublished/Filled state, node 4782:41534/41542, where
-          this instance is hidden). */}
-      {!canPublish && (
-        <SetupSection title="Payment and tax info" action={
-          <span style={{ background:"#ffe1e1", color:"#bd1818", fontFamily:FONT_SANS,
-            fontSize:14, fontWeight:600, borderRadius:999, padding:"4px 8px" }}>Required</span>
-        }>
-          <div style={{ display:"flex", flexWrap:"wrap", gap:16, alignItems:"flex-start", justifyContent:"space-between" }}>
-            <div>
-              <div style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:700, color:T.textSubtle }}>Add your payment details and taxpayer information.</div>
-              <div style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textSubtle }}>Required before your Instant Store can go live.</div>
-            </div>
-            <a href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:4,
-              color:T.textLink, fontWeight:600, fontSize:16, textDecoration:"underline", flexShrink:0 }}>
-              Set up payment &amp; tax info <Ms name="open_in_new" />
-            </a>
-          </div>
-        </SetupSection>
-      )}
 
       {/* Delete Instant Store — last section on the page (Figma 5572:75042).
           Bordered on top rather than wrapped in SetupSection, since this block
