@@ -2792,7 +2792,7 @@ function ConfirmationEmail({ order, onBack }) {
    tooltip and the accessible name. Five full labels can't hold one row on a
    laptop, and a stepper that wraps stops reading as a sequence. */
 const STAGES = [
-  { key:"dashboard", short:"Dashboard", label:"Seller dashboard" },
+  { key:"dashboard", short:"Dashboard (wireframe)", label:"Seller dashboard" },
   { key:"setup",    short:"Setup",    label:"Link setup" },
   { key:"pdp",      short:"PDP",      label:"Product page" },
   { key:"checkout", short:"Checkout", label:"Checkout" },
