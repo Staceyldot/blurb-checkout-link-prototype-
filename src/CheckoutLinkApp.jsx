@@ -5065,7 +5065,7 @@ function CheckoutLinkApp({ onSwitchFlow }) {
      Lifted up here (rather than local state on that component) so Setup's
      "All projects" sidebar link can jump to the Dashboard already on that
      sub-page instead of always landing on Home. */
-  const [dashboardSubPage, setDashboardSubPage] = useState("home");
+  const [dashboardSubPage, setDashboardSubPage] = useState("all-projects");
 
   /* What the seller put on the link (print | digital | both) and what the buyer
      ended up with. Single-format links pin `format` to the only choice. */
