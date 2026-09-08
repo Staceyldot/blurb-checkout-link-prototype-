@@ -4092,10 +4092,9 @@ const ONLINE_EDITOR_PROJECTS = [
    Store" this whole prototype is about), so its live rows link into Setup
    the same way Manage Instant Store does elsewhere on the Dashboard. */
 const INSTANT_STORES = [
-  { title:"Liberal Libations", sub:"Trade book · 10×8", link:"blurb.com/1/ppq8w", price:"$35.00", status:"live", orders:14 },
-  { title:"The Stirred Obsession: A Minimalist's Guide to the Modern Martini", sub:"Photo book · 10×10", link:"blurb.com/1/c1t2k", price:"$28.00", status:"live", orders:3 },
-  { title:"Spirit, Smoke & Salt", sub:"Trade book · 8×10", link:"blurb.com/1/sm5kt", price:"$40.00", status:"live", orders:7 },
-  { title:"Field Notes: Patagonia", sub:"Magazine · 8.5×11", link:null, price:"Not set", status:"draft", orders:null },
+  { title:"The Stirred Obsession: A Minimalist's Guide to the Modern Martini", sub:"Photo book · 10×10", link:"blurb.com/1/c1t2k", price:"$28.00", status:"live", orders:3, cover:BOOK_STIRRED_OBSESSION },
+  { title:"Spirit, Smoke & Salt", sub:"Trade book · 8×10", link:"blurb.com/1/sm5kt", price:"$40.00", status:"live", orders:7, cover:BOOK_SPIRIT_SMOKE_SALT },
+  { title:"Field Notes: Patagonia", sub:"Magazine · 8.5×11", link:null, price:"Not set", status:"draft", orders:null, cover:null },
 ];
 
 function InstantStoresTable({ onManageInstantStore }) {
@@ -4114,10 +4113,19 @@ function InstantStoresTable({ onManageInstantStore }) {
           {INSTANT_STORES.map(s => (
             <tr key={s.title}>
               <td style={{ ...cell, maxWidth:220 }}>
-                <a href="#" onClick={e => { e.preventDefault(); onManageInstantStore?.(); }}
-                  style={{ display:"block", fontWeight:600, color:WF.body, textDecoration:"none",
-                    whiteSpace:"normal", wordBreak:"break-word" }}>{s.title}</a>
-                <span style={{ display:"block", fontSize:12, color:"#6b6b6b", marginTop:2 }}>{s.sub}</span>
+                <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                  {s.cover ? (
+                    <img src={s.cover} alt="" style={{ width:40, height:52, objectFit:"cover", borderRadius:2, flexShrink:0 }} />
+                  ) : (
+                    <div style={{ width:40, height:52, borderRadius:2, background:WF.cover, border:`1px solid ${WF.borderLight}`, flexShrink:0 }} />
+                  )}
+                  <div>
+                    <a href="#" onClick={e => { e.preventDefault(); onManageInstantStore?.(); }}
+                      style={{ display:"block", fontWeight:600, color:WF.body, textDecoration:"none",
+                        whiteSpace:"normal", wordBreak:"break-word" }}>{s.title}</a>
+                    <span style={{ display:"block", fontSize:12, color:"#6b6b6b", marginTop:2 }}>{s.sub}</span>
+                  </div>
+                </div>
               </td>
               <td style={cell}>
                 {s.link ? (
