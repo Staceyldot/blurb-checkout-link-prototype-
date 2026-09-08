@@ -3935,10 +3935,10 @@ function WireframeProjectRow({ project, onManageInstantStore }) {
    covering every row variant the reference shows (selling, plain, expiring
    today + "why order a proof", and one non-book product). */
 const ALL_PROJECTS = [
-  { cover:PRODUCT.img, badge:"Selling", title:"Liberal Libations",
+  { cover:PRODUCT.img, title:"Liberal Libations",
     desc:"Liberal Libations empowers the cocktail enthusiast to craft bar-quality cocktails for a large crowd or for an intimate gathering. Make-ahead batch recipes mean less time mixing drinks and more time enjoying each sip with friends. Over 85 recipes",
     meta:[["Project type","Trade Book"],["Project option","10×8 in, 25×20 cm"],["# of pages","160"],["ISBN","9781733372800"],["Created with","BookWright"],["Created","March 14, 2019"]],
-    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"download", label:"Download PDF" }],
+    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }, { icon:"local_shipping", label:"Set up retail distribution" }],
     share:true },
   { badge:"Selling", title:"Xylophone, glockenspiel & bells for beginner adults",
     desc:"The songs in this book have been adapted and can be played on all models of popular wooden xylophones…",
