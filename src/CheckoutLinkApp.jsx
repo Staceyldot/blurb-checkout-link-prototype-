@@ -3950,16 +3950,10 @@ function InstantStoresTable({ onManageInstantStore }) {
 }
 
 /* Projects with no Instant Store yet — the "Select a project" modal's other
-   list. Type/size copied from their ALL_PROJECTS entries above; only Liberal
-   Libations carries a cover there, so it's the one placeholder-free row. */
+   list. Only Liberal Libations has a real cover; the rest were placeholder
+   gray tiles and were cut, same as the All projects cleanup. */
 const AVAILABLE_TO_SELL = [
   { title:"Liberal Libations", sub:"Trade Book · 10×8 in", cover:BOOK_COVER },
-  { title:"Midnight Harvest", sub:"Trade Book · 6×9 in" },
-  { title:"Late Bloomers: a garden through the seasons", sub:"Photo Book · 10×8 in" },
-  { title:"Wildflower Table", sub:"Photo Book · 10×8 in" },
-  { title:"Watercolor basics: a field guide for outdoor painters", sub:"Photo Book · 7×7 in" },
-  { title:"Hand lettering for beginners: modern calligraphy at home", sub:"Trade Book · 6×9 in" },
-  { title:"The backyard beekeeper: a seasonal guide", sub:"Trade Book · 7×9 in" },
 ];
 
 /* "Select a project for your Instant Store" — opens from the Instant Stores
@@ -4051,7 +4045,7 @@ function CreateInstantStoreModal({ open, onClose, onSelect }) {
               ALREADY HAS AN INSTANT STORE
             </span>
           </div>
-          {INSTANT_STORES.map(p => row(p.title, `${p.sub} · ${p.status === "live" ? "Live" : "Draft"}`, p.cover, p.coverZoom, p.coverPos, p.coverAspect))}
+          {INSTANT_STORES.filter(p => p.cover).map(p => row(p.title, `${p.sub} · ${p.status === "live" ? "Live" : "Draft"}`, p.cover, p.coverZoom, p.coverPos, p.coverAspect))}
         </div>
 
         <div style={{ padding:"14px 20px", textAlign:"center", fontFamily:WF.font, fontSize:12.5, color:"#5a5a5a",
