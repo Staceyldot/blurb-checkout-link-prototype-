@@ -4159,10 +4159,10 @@ function InstantStoresTable({ onManageInstantStore }) {
 }
 
 /* Projects with no Instant Store yet — the "Select a project" modal's other
-   list. Type/size copied from their ALL_PROJECTS entries above; none carry a
-   cover there either, so this list is placeholder-thumbnail only, matching
-   the reference modal (only already-selling rows get real covers). */
+   list. Type/size copied from their ALL_PROJECTS entries above; only Liberal
+   Libations carries a cover there, so it's the one placeholder-free row. */
 const AVAILABLE_TO_SELL = [
+  { title:"Liberal Libations", sub:"Trade Book · 10×8 in", cover:BOOK_COVER },
   { title:"Midnight Harvest", sub:"Trade Book · 6×9 in" },
   { title:"Late Bloomers: a garden through the seasons", sub:"Photo Book · 10×8 in" },
   { title:"Wildflower Table", sub:"Photo Book · 10×8 in" },
@@ -4250,7 +4250,7 @@ function CreateInstantStoreModal({ open, onClose, onSelect }) {
             </span>
             <span style={{ fontFamily:WF.font, fontSize:12, color:"#8a8a8a" }}>Sorted by most recent</span>
           </div>
-          {AVAILABLE_TO_SELL.map(p => row(p.title, p.sub))}
+          {AVAILABLE_TO_SELL.map(p => row(p.title, p.sub, p.cover))}
 
           <div style={{ padding:"14px 20px 6px" }}>
             <span style={{ fontFamily:WF.font, fontSize:11, fontWeight:700, color:"#8a8a8a", letterSpacing:".4px" }}>
