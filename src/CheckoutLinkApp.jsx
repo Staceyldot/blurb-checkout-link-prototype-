@@ -3604,26 +3604,33 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
   );
 }
 
-/* Blurb's own dashboard side nav (Figma "Side Navigation / Blurb", node 2499:5383,
-   expanded state) — "Instant Stores" is the active item since that's the Sell
-   section this Setup page lives under. Sticky like the DraftPanel so it stays in
-   view while the (much taller) main column scrolls past it. */
+/* Blurb's own dashboard side nav — the older, plain wireframe look (Arial,
+   no active-row highlight, bold-only for the active item, solid black "New"
+   pill) copied from the phase-2-checkout-links reference kit's sidebar, now
+   shared by Setup and every Dashboard sub-page so the chrome matches
+   everywhere. `activeItem` picks which item bolds; `badge` on a section is a
+   permanent "New" pill (Instant Stores is a new feature, not an active-state
+   indicator) so it doesn't move around as navigation changes. Sticky like the
+   DraftPanel so it stays in view while the (much taller) main column scrolls
+   past it. */
 const SIDE_NAV_SECTIONS = [
   { key: "projects", label: "Projects", items: ["All projects", "Online editor projects"] },
-  { key: "sell", label: "Sell", items: ["Instant Stores", "Earnings", "Monthly profit reports", "Payment settings"], active: "Instant Stores" },
+  { key: "sell", label: "Sell", items: ["Instant Stores", "Earnings", "Monthly profit reports", "Payment settings"], badge: "Instant Stores" },
   { key: "account", label: "Account", items: ["My orders", "Account settings", "Address book", "My profile"] },
 ];
 
 function SideNavItem({ label, active, badge, onClick }) {
   return (
-    <a href="#" onClick={e => { e.preventDefault(); onClick?.(); }} style={{ display:"flex", alignItems:"center", gap:8,
-      height:48, padding:"0 12px", borderRadius:T.radius, textDecoration:"none",
-      background: active ? "#f1f9fe" : "transparent" }}>
-      <span style={{ flex:1, fontFamily:FONT_SANS, fontSize:16, fontWeight:600,
-        color: active ? T.borderActive : T.textSubtle }}>{label}</span>
+    <a href="#" onClick={e => { e.preventDefault(); onClick?.(); }}
+      onMouseEnter={e => e.currentTarget.style.background = "#f0f0f0"}
+      onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+      style={{ display:"flex", alignItems:"center", gap:8,
+      fontFamily:WF.font, fontSize:13.5, fontWeight: active ? 700 : 400,
+      color:WF.body, textDecoration:"none", padding:"5px 8px", margin:"0 -8px", borderRadius:4 }}>
+      {label}
       {badge && (
-        <span style={{ fontFamily:FONT_SANS, fontSize:12, fontWeight:600, color:T.textBold,
-          border:`1px solid ${T.textBold}`, borderRadius:999, padding:"2px 6px" }}>New</span>
+        <span style={{ fontFamily:WF.font, fontSize:10, fontWeight:700, color:"#fff",
+          background:"#262626", borderRadius:999, padding:"2px 8px" }}>New</span>
       )}
     </a>
   );
@@ -3631,18 +3638,14 @@ function SideNavItem({ label, active, badge, onClick }) {
 
 /* Section headers are static labels, not accordion triggers — the submenu
    is always shown, so there's nothing to collapse or click. `onNavigate`
-   fires for whichever item was clicked; only "All projects" does anything
-   (jumps to the Dashboard's All projects sub-page) — the rest are decorative,
-   matching the rest of this page's non-functional controls. */
-function SideNavSection({ section, onNavigate }) {
+   fires for whichever item was clicked. */
+function SideNavSection({ section, activeItem, onNavigate }) {
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-      <div style={{ display:"flex", alignItems:"center", height:48, padding:"0 12px" }}>
-        <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textSubtle }}>{section.label}</span>
-      </div>
-      <div style={{ display:"flex", flexDirection:"column", gap:8, paddingLeft:8 }}>
+    <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+      <div style={{ fontFamily:WF.font, fontSize:11.5, fontWeight:700, color:WF.text, marginBottom:4 }}>{section.label}</div>
+      <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
         {section.items.map(item => (
-          <SideNavItem key={item} label={item} active={item === section.active} badge={item === section.active}
+          <SideNavItem key={item} label={item} active={item === activeItem} badge={item === section.badge}
             onClick={() => onNavigate?.(item)} />
         ))}
       </div>
@@ -3725,14 +3728,13 @@ function DashboardTopNav() {
   );
 }
 
-function SideNav({ onSelectAllProjects }) {
+function SideNav({ activeItem, onNavigate }) {
   return (
     <div style={{ position:"sticky", top:0, height:"100vh", width:280, flexShrink:0, overflowY:"auto",
-      background:T.surface, borderRight:`1px solid ${T.borderSubtle}`, padding:"24px 16px" }}>
-      <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+      background:"#fff", padding:"32px 24px" }}>
+      <div style={{ display:"flex", flexDirection:"column", gap:28 }}>
         {SIDE_NAV_SECTIONS.map(section => (
-          <SideNavSection key={section.key} section={section}
-            onNavigate={item => { if (item === "All projects") onSelectAllProjects?.(); }} />
+          <SideNavSection key={section.key} section={section} activeItem={activeItem} onNavigate={onNavigate} />
         ))}
       </div>
     </div>
@@ -3763,42 +3765,6 @@ const WF = {
   draftBorder: "#d9d9d9", draftText: "#6b6b6b",
 };
 
-const WF_SIDE_SECTIONS = [
-  { label:"Projects", items:["All projects", "Online editor projects"] },
-  { label:"Sell", items:["Instant Stores", "Earnings", "Monthly profit reports", "Payment settings"], badge:"Instant Stores" },
-  { label:"Account", items:["My orders", "Account settings", "Address book", "My profile"] },
-];
-
-/* `activeItem` bolds whichever sidebar item matches the sub-page actually
-   showing (Home vs All projects) — nothing bolds until that page exists. */
-function WireframeSideNav({ activeItem, onNavigate }) {
-  return (
-    <div style={{ width:280, flexShrink:0, background:"#fff", padding:"32px 24px", display:"flex",
-      flexDirection:"column", gap:28 }}>
-      {WF_SIDE_SECTIONS.map(section => (
-        <div key={section.label} style={{ display:"flex", flexDirection:"column", gap:6 }}>
-          <div style={{ fontFamily:WF.font, fontSize:11.5, fontWeight:700, color:WF.text, marginBottom:4 }}>{section.label}</div>
-          {section.items.map(item => (
-            <a key={item} href="#"
-              onClick={e => { e.preventDefault(); onNavigate?.(item); }}
-              onMouseEnter={e => e.currentTarget.style.background = "#f0f0f0"}
-              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-              style={{ display:"flex", alignItems:"center", gap:8,
-              fontFamily:WF.font, fontSize:13.5, fontWeight: item === activeItem ? 700 : 400,
-              color:WF.body, textDecoration:"none", padding:"5px 8px", margin:"0 -8px", borderRadius:4 }}>
-              {item}
-              {item === section.badge && (
-                <span style={{ fontFamily:WF.font, fontSize:10, fontWeight:700, color:"#fff",
-                  background:"#262626", borderRadius:999, padding:"2px 8px" }}>New</span>
-              )}
-            </a>
-          ))}
-        </div>
-      ))}
-    </div>
-  );
-}
-
 /* Current orders — same three demo orders shown on the reference page (not
    this app's own ORDER_NUMBER/ORDER_DATE/UPS_TRACKING; a faithful copy of the
    reference's content, not this app's checkout-link order). */
@@ -3806,32 +3772,6 @@ const WF_ORDERS = [
   { id:"20481187", status:"In production", shipping:"Delivery by 2026-08-03", tracking:"—" },
   { id:"20481163", status:"Shipped", shipping:"Delivered Jul 15, 2026", tracking:"1Z999AA10123456784" },
   { id:"20475311", status:"Shipped", shipping:"Delivered Jul 6, 2026", tracking:"1Z999AA10123456721" },
-];
-
-/* Most recent projects — copied 1:1 from the reference page's five example
-   rows (an online-editor project, a live PDF, two orderable PDFs, and one
-   still in preflight), so every action/state variant shows up. */
-const WF_PROJECTS = [
-  { badge:"Online editor", title:"Pride and Preconceptions",
-    desc:"A witty modern retelling of a beloved classic, reimagined for today's readers.",
-    meta:[["Project type","Trade Book"],["Project option","6×9 in"],["# of pages","240"],["Created","Mar 14, 2024"]],
-    actions:[{ icon:"launch", label:"Open" }, { icon:"library_add", label:"Duplicate" }] },
-  { badge:"PDF", title:"Field Notes: Patagonia",
-    desc:"A traveler's illustrated journal from six weeks trekking through southern Patagonia.",
-    meta:[["Project type","Magazine"],["Project option","8.5×11 in"],["# of pages","56"],["Created","Oct 2, 2025"]],
-    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }] },
-  { badge:"PDF", title:"PDF-1536774", expiry:"Expires in 4 days — order now before it's gone.",
-    desc:"Preflight check complete — your book is ready to be ordered.",
-    meta:[["Status","Preflight check complete"],["# of pages","32"],["Uploaded","Jul 22, 2026"]],
-    orderNote:"Order a copy to unlock selling options.", actions:[{ icon:"add_link", label:"Create Instant Store" }] },
-  { badge:"PDF", title:"PDF-1538042", expiry:"Expires in 12 days — order now before it's gone.",
-    desc:"Preflight check complete — your book is ready to be ordered.",
-    meta:[["Status","Preflight check complete"],["# of pages","48"],["Uploaded","Jul 30, 2026"]],
-    orderNote:"Order a copy to unlock selling options.", actions:[{ icon:"add_link", label:"Create Instant Store" }] },
-  { badge:"PDF", title:"PDF-1537918", expiry:"Expires in 14 days — order now before it's gone.",
-    desc:"Preflight check in progress — we're checking your file…",
-    meta:[["Status","Preflight check in progress"],["# of pages","—"],["Uploaded","Aug 1, 2026"]],
-    checkingNote:"We're checking your file — actions unlock once preflight finishes." },
 ];
 
 function WfActionLink({ icon, label, danger, onClick }) {
@@ -3843,65 +3783,11 @@ function WfActionLink({ icon, label, danger, onClick }) {
   );
 }
 
-function WireframeProjectRow({ project, onManageInstantStore }) {
-  const { isMobile } = useViewport();
-  return (
-    <div style={{ display:"flex", flexDirection: isMobile ? "column" : "row", gap:20,
-      padding:"22px 0", borderBottom:`1px solid ${WF.border}` }}>
-      <div style={{ position:"relative", width:116, height:148, background:WF.cover, border:`1px solid ${WF.borderLight}`,
-        borderRadius:4, flexShrink:0 }}>
-        <span style={{ position:"absolute", left:0, right:0, bottom:0, background:"rgba(255,255,255,.75)",
-          color:WF.subtle, fontSize:12, fontWeight:700, padding:5, textAlign:"center" }}>Preview</span>
-      </div>
-      <div style={{ flex:"1 1 300px", minWidth:0, display:"flex", flexDirection:"column" }}>
-        <span style={{ alignSelf:"flex-start", fontFamily:WF.font, fontSize:11, fontWeight:600, color:WF.faint,
-          background:"#e8e8e8", border:"1px solid #c0c0c0", borderRadius:999, padding:"2px 9px", marginBottom:8 }}>
-          {project.badge}
-        </span>
-        <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:WF.font, fontSize:18, fontWeight:700,
-          color:WF.body, textDecoration:"none", marginBottom:6 }}>{project.title}</a>
-        {project.expiry && (
-          <span style={{ alignSelf:"flex-start", display:"inline-flex", alignItems:"center", gap:6, fontFamily:WF.font,
-            fontSize:12.5, color:WF.subtle, background:WF.panel, border:"1px solid #ccc", borderRadius:4,
-            padding:"6px 10px", margin:"0 0 8px" }}>
-            <Ms name="schedule" size={14} color={WF.subtle} />{project.expiry}
-          </span>
-        )}
-        <p style={{ margin:"0 0 12px", fontFamily:WF.font, fontSize:13.5, color:"#3d3d3d", lineHeight:1.4 }}>{project.desc}</p>
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(2, minmax(140px, max-content))", gap:"2px 28px", marginBottom:0 }}>
-          {project.meta.map(([label, value]) => (
-            <span key={label} style={{ fontFamily:WF.font, fontSize:13, color:"#3d3d3d" }}><b>{label}:</b> {value}</span>
-          ))}
-        </div>
-      </div>
-      <div style={{ display:"flex", flexDirection:"column", gap:16, flexShrink:0, paddingLeft: isMobile ? 0 : 14 }}>
-        {project.orderNote && (
-          <div>
-            <WfActionLink icon="shopping_cart" label="Order" />
-            <p style={{ margin:"10px 0 0", fontFamily:WF.font, fontSize:12.5, fontStyle:"italic", color:WF.faint }}>
-              {project.orderNote}
-            </p>
-          </div>
-        )}
-        {project.actions?.map(a => (
-          <WfActionLink key={a.label} icon={a.icon} label={a.label}
-            onClick={a.label === "Manage Instant Store" ? onManageInstantStore : undefined} />
-        ))}
-        {project.checkingNote && (
-          <p style={{ margin:0, fontFamily:WF.font, fontSize:12.5, fontStyle:"italic", color:WF.faint }}>{project.checkingNote}</p>
-        )}
-        <div style={{ height:1, background:WF.divider }} />
-        <WfActionLink icon="delete" label="Delete" danger />
-      </div>
-    </div>
-  );
-}
-
 /* All projects — copied from the reference's manage.html the same way Home was
    copied from home.html: content and structure as close as possible, this
-   app's WF tokens instead of the kit's own CSS. 11 of its ~98 demo projects,
-   covering every row variant the reference shows (selling, plain, expiring
-   today + "why order a proof", and one non-book product). */
+   app's WF tokens instead of the kit's own CSS. Only the three projects with a
+   real cover image — every other demo row rendered as a blank gray tile, which
+   read as broken rather than a deliberate placeholder. */
 const ALL_PROJECTS = [
   { cover:PRODUCT.img, title:"Liberal Libations",
     desc:"Liberal Libations empowers the cocktail enthusiast to craft bar-quality cocktails for a large crowd or for an intimate gathering. Make-ahead batch recipes mean less time mixing drinks and more time enjoying each sip with friends. Over 85 recipes",
@@ -3918,48 +3804,6 @@ const ALL_PROJECTS = [
     meta:[["Project type","Trade Book"],["Project option","8×10 in"],["# of pages","112"],["Created with","InDesign"],["Created","Apr 22, 2025"]],
     actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"download", label:"Download PDF" }],
     share:true },
-  { title:"Midnight Harvest",
-    desc:"A slow-burn mystery set across three harvest seasons in a small vineyard town.",
-    meta:[["Project type","Trade Book"],["Project option","6×9 in"],["# of pages","224"],["Created with","BookWright"],["Created","May 2, 2026"]],
-    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }, { icon:"local_shipping", label:"Set up retail distribution" }],
-    share:true },
-  { title:"Late Bloomers: a garden through the seasons",
-    desc:"A year of photos following one backyard garden from first frost to last harvest.",
-    meta:[["Project type","Photo Book"],["Project option","10×8 in"],["# of pages","72"],["Created with","Online editor"],["Created","Jun 11, 2026"]],
-    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }, { icon:"local_shipping", label:"Set up retail distribution" }],
-    share:true },
-  { title:"Wildflower Table",
-    desc:"A seasonal collection of pressed-flower table settings and simple centerpiece ideas.",
-    meta:[["Project type","Photo Book"],["Project option","10×8 in"],["# of pages","96"],["Created with","InDesign"],["Created","Apr 20, 2026"]],
-    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }, { icon:"local_shipping", label:"Set up retail distribution" }],
-    share:true },
-  { title:"Watercolor basics: a field guide for outdoor painters",
-    expiryToday:"This project expires today unless ordered.", proof:true,
-    desc:"A practical guide to watercolor painting outdoors, from gear selection to handling light and weather…",
-    meta:[["Project type","Photo Book"],["Project option","7×7 in, 18×18 cm"],["# of pages","84"],["Created with","InDesign"],["Created","Aug 14, 2023"]],
-    actions:[{ icon:"shopping_cart", label:"Order" }, { icon:"add_link", label:"Create Instant Store" }],
-    share:true },
-  { title:"Hand lettering for beginners: modern calligraphy at home",
-    expiryToday:"This project expires today unless ordered.", proof:true,
-    desc:"A step-by-step guide to modern calligraphy, brush pen lettering, and decorative layouts…",
-    meta:[["Project type","Trade Book"],["Project option","6×9 in, 15×23 cm"],["# of pages","128"],["Created with","BookWright"],["Created","Jan 18, 2023"]],
-    actions:[{ icon:"shopping_cart", label:"Order" }, { icon:"add_link", label:"Create Instant Store" }],
-    share:true },
-  { title:"The backyard beekeeper: a seasonal guide",
-    expiryToday:"This project expires today unless ordered.", proof:true,
-    desc:"A month-by-month guide to keeping bees in a suburban garden — from first hive to first harvest.",
-    meta:[["Project type","Trade Book"],["Project option","7×9 in, 18×23 cm"],["# of pages","156"],["Created with","InDesign"],["Created","Oct 4, 2022"]],
-    actions:[{ icon:"shopping_cart", label:"Order" }, { icon:"add_link", label:"Create Instant Store" }],
-    share:true },
-  { title:"PDF-12537555", proof:true,
-    desc:"Preflight check complete — your book is ready to be ordered.",
-    meta:[["Status","Preflight check complete"],["# of pages","48"],["Uploaded","Jul 28, 2026"],["Expires in","15 days"]],
-    actions:[{ icon:"shopping_cart", label:"Order" }, { icon:"add_link", label:"Create Instant Store" }],
-    share:false },
-  { title:"BW - Wall art",
-    meta:[["Project type","Acrylic Print"],["Project option","Portrait, 16×20 in, 40.6×50.8 cm"],["Created with","BookWright"],["Creation date","Jul 31, 2026, 3:46 AM PDT"]],
-    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }],
-    share:false },
 ];
 
 function AllProjectsRow({ project, onManageInstantStore }) {
@@ -4032,31 +3876,6 @@ function AllProjectsRow({ project, onManageInstantStore }) {
     </div>
   );
 }
-
-/* Online editor projects — copied from the reference's own "Projects — Online
-   editor projects" screen. Simpler than All projects: no badges, no ISBN/share
-   link, just Open/Duplicate/Delete and an occasional expiry pill. Reuses
-   AllProjectsRow, which already treats badge/desc/share/proof as optional. */
-const ONLINE_EDITOR_PROJECTS = [
-  { title:"Xylophone, glockenspiel & bells for beginner adults", expiryToday:"Expires in 3 days unless you order it.",
-    meta:[["Project type","Trade Book"],["Project option","8×10 in, 20×25 cm"],["# of pages","50"],["Last edited","Jun 18, 2026"]],
-    actions:[{ icon:"launch", label:"Open" }, { icon:"library_add", label:"Duplicate" }] },
-  { title:"Watercolor basics: a field guide for outdoor painters",
-    meta:[["Project type","Photo Book"],["Project option","7×7 in, 18×18 cm"],["# of pages","84"],["Last edited","May 30, 2026"]],
-    actions:[{ icon:"launch", label:"Open" }, { icon:"library_add", label:"Duplicate" }] },
-  { title:"52 hikes: a year on the trail in the Pacific Northwest",
-    meta:[["Project type","Trade Book"],["Project option","8×10 in, 20×25 cm"],["# of pages","120"],["Last edited","Apr 12, 2026"]],
-    actions:[{ icon:"launch", label:"Open" }, { icon:"library_add", label:"Duplicate" }] },
-  { title:"Hand lettering for beginners: modern calligraphy at home",
-    meta:[["Project type","Trade Book"],["Project option","6×9 in, 15×23 cm"],["# of pages","64"],["Last edited","Feb 2, 2026"]],
-    actions:[{ icon:"launch", label:"Open" }, { icon:"library_add", label:"Duplicate" }] },
-  { title:"Harbor Lines: a sketchbook of coastal towns", expiryToday:"Expires in 5 days unless you order it.",
-    meta:[["Project type","Trade Book"],["Project option","8×10 in, 20×25 cm"],["# of pages","72"],["Last edited","Jul 9, 2026"]],
-    actions:[{ icon:"launch", label:"Open" }, { icon:"library_add", label:"Duplicate" }] },
-  { title:"Homegrown: a kitchen garden journal",
-    meta:[["Project type","Photo Book"],["Project option","8×8 in, 20×20 cm"],["# of pages","60"],["Last edited","May 27, 2026"]],
-    actions:[{ icon:"launch", label:"Open" }, { icon:"library_add", label:"Duplicate" }] },
-];
 
 /* Instant Stores — copied from the reference's sell-checkout-links.html. The
    most relevant of the wireframe pages to this app (it's the same "Instant
@@ -4256,27 +4075,25 @@ function CreateInstantStoreModal({ open, onClose, onSelect }) {
    phase-2-checkout-links/home.html wireframe (see WF/Wireframe* above) —
    deliberately not this app's Codex design system.
 
-   `subPage`/`setSubPage` pick which sub-screen shows — Home, All projects,
-   Online editor projects, or Instant Stores, per the reference kit's
-   home.html/manage.html/create.html/sell-checkout-links.html. All four share
-   this same shell (top nav, side nav, banner, footer), so it's a sub-view
-   rather than its own top-level stepper stop. Owned by CheckoutLinkApp, not
-   local state, so Setup's "All projects" sidebar link can land here already
-   on that page. */
+   `subPage`/`setSubPage` pick which sub-screen shows — Home, All projects, or
+   Instant Stores, per the reference kit's home.html/manage.html/sell-checkout-
+   links.html. All three share this same shell (top nav, side nav, banner), so
+   it's a sub-view rather than its own top-level stepper stop. Owned by
+   CheckoutLinkApp, not local state, so Setup's "All projects" sidebar link can
+   land here already on that page. */
 function DashboardHomePage({ onContinue, subPage, setSubPage }) {
   const { isMobile } = useViewport();
   const [bannerOpen, setBannerOpen] = useState(true);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const goAllProjects = e => { e?.preventDefault(); setSubPage("all-projects"); };
-  const SIDE_NAV_TARGETS = { "All projects":"all-projects", "Online editor projects":"online-editor", "Instant Stores":"instant-stores" };
-  const ACTIVE_ITEM_FOR = { "all-projects":"All projects", "online-editor":"Online editor projects", "instant-stores":"Instant Stores" };
+  const SIDE_NAV_TARGETS = { "All projects":"all-projects", "Instant Stores":"instant-stores" };
+  const ACTIVE_ITEM_FOR = { "all-projects":"All projects", "instant-stores":"Instant Stores" };
 
   return (
     <>
     <DashboardTopNav />
     <div style={{ display:"flex", alignItems:"flex-start", background:"#fff", minHeight:"100vh" }}>
       {!isMobile && (
-        <WireframeSideNav activeItem={ACTIVE_ITEM_FOR[subPage]}
+        <SideNav activeItem={ACTIVE_ITEM_FOR[subPage]}
           onNavigate={item => { if (SIDE_NAV_TARGETS[item]) setSubPage(SIDE_NAV_TARGETS[item]); }} />
       )}
       <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column" }}>
@@ -4333,23 +4150,6 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
                   </table>
                 </div>
               </div>
-
-              {/* Most recent projects */}
-              <div>
-                <div style={{ display:"flex", alignItems:"baseline", justifyContent:"space-between", marginBottom:2 }}>
-                  <span style={{ fontFamily:WF.font, fontSize:15, fontWeight:700, color:WF.text }}>Most recent projects</span>
-                  <a href="#" onClick={goAllProjects} style={{ fontFamily:WF.font, fontSize:14, fontWeight:600, color:WF.body, textDecoration:"none" }}>See all projects →</a>
-                </div>
-                {WF_PROJECTS.map(p => (
-                  <WireframeProjectRow key={p.title} project={p} onManageInstantStore={onContinue} />
-                ))}
-                <div style={{ display:"flex", justifyContent:"center", marginTop:20 }}>
-                  <a href="#" onClick={goAllProjects} style={{ border:"1px solid #aaa", borderRadius:4, background:"#e4e4e4",
-                    color:WF.text, padding:"10px 22px", fontFamily:WF.font, fontSize:13.5, fontWeight:600, textDecoration:"none" }}>
-                    See all projects →
-                  </a>
-                </div>
-              </div>
             </>
           ) : subPage === "all-projects" ? (
             <>
@@ -4402,34 +4202,6 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
                   </React.Fragment>
                 ))}
               </div>
-            </>
-          ) : subPage === "online-editor" ? (
-            <>
-              <span style={{ display:"block", fontFamily:WF.font, fontSize:22, fontWeight:700, color:WF.text }}>Online editor projects</span>
-
-              {/* Toolbar — just Sort by here, no Show filter, matching the reference */}
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
-                <span style={{ fontFamily:WF.font, fontSize:17, fontWeight:700, color:WF.body }}>
-                  Projects <span style={{ fontWeight:400, color:"#6b6b6b", fontSize:13 }}>{ONLINE_EDITOR_PROJECTS.length} projects</span>
-                </span>
-                <div style={{ display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
-                  <label style={{ display:"flex", alignItems:"center", gap:8, fontFamily:WF.font, fontSize:13, fontWeight:600, color:"#6b6b6b" }}>
-                    Sort by
-                    <span style={{ display:"inline-flex", alignItems:"center", gap:10, background:"#fff",
-                      border:"1px solid #b3b3b3", borderRadius:6, padding:"8px 14px", fontFamily:WF.font,
-                      fontSize:13.5, fontWeight:700, color:WF.body }}>
-                      Date <Ms name="expand_more" size={16} color={WF.body} />
-                    </span>
-                  </label>
-                  <a href="#" onClick={e => e.preventDefault()} style={{ background:"#555", color:"#fff", border:"1px solid #333",
-                    borderRadius:4, padding:"9px 18px", fontFamily:WF.font, fontSize:14, fontWeight:600,
-                    textDecoration:"none", whiteSpace:"nowrap" }}>+ Start a project</a>
-                </div>
-              </div>
-
-              {ONLINE_EDITOR_PROJECTS.map(p => (
-                <AllProjectsRow key={p.title} project={p} onManageInstantStore={onContinue} />
-              ))}
             </>
           ) : (
             <>
@@ -4583,7 +4355,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
     <>
     <DashboardTopNav />
     <div style={{ display:"flex", alignItems:"flex-start" }}>
-    <SideNav onSelectAllProjects={onGoAllProjects} />
+    <SideNav activeItem="Instant Stores" onNavigate={item => { if (item === "All projects") onGoAllProjects?.(); }} />
     <div style={{ flex:1, minWidth:0, minHeight:"100vh", background:T.bg, fontFamily:FONT_SANS }}>
       {/* Order-a-copy nudge — sellers can't buy their own link, so this is the way to
           get a proof copy before going live. Switches to a warning once the link is
