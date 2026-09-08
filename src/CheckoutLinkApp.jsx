@@ -4052,7 +4052,8 @@ function AllProjectsRow({ project, onManageInstantStore }) {
         )}
         {project.actions.map(a => (
           <WfActionLink key={a.label} icon={a.icon} label={a.label}
-            onClick={a.label === "Manage Instant Store" ? onManageInstantStore : undefined} />
+            onClick={a.label === "Manage Instant Store" || (project.title === "Liberal Libations" && a.label === "Create Instant Store")
+              ? onManageInstantStore : undefined} />
         ))}
         <div style={{ height:1, background:WF.divider }} />
         <WfActionLink icon="delete" label="Delete" danger />
