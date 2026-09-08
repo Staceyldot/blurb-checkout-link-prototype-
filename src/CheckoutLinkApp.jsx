@@ -3799,40 +3799,6 @@ function WireframeSideNav({ activeItem, onNavigate }) {
   );
 }
 
-/* Big multi-column global footer (Codex's PdpFooter is a different, smaller
-   "Built with Blurb" trust bar — this page uses the older site-wide one). */
-const WF_FOOTER_COLUMNS = [
-  { title:"Self-Publishing", links:["Self-Publishing", "Creation & Layout Tools", "Sell & Self-Publish", "Sell on Blurb's Bookstore"] },
-  { title:"Photo Books", links:["Photo Books", "Wedding Photo Books", "Family Photo Books"] },
-  { title:"Get Inspired", links:["Blog", "Bookstore"] },
-  { title:"Help", links:["Help Center", "Pricing", "Shipping"] },
-  { title:"Company", links:["About Blurb", "Work at Blurb"] },
-];
-function WireframeFooter() {
-  const { isMobile } = useViewport();
-  return (
-    <div style={{ background:"#fff", borderTop:`1px solid ${WF.borderLight}` }}>
-      <div style={{ padding: isMobile ? "32px 20px" : "40px 80px", display:"flex", flexWrap:"wrap", gap:32 }}>
-        {WF_FOOTER_COLUMNS.map(col => (
-          <div key={col.title} style={{ display:"flex", flexDirection:"column", gap:10, minWidth:160 }}>
-            <div style={{ fontFamily:WF.font, fontSize:13, fontWeight:700, color:WF.text, letterSpacing:".04em", textTransform:"uppercase" }}>{col.title}</div>
-            {col.links.map(l => (
-              <a key={l} href="#" onClick={e => e.preventDefault()} style={{ fontFamily:WF.font, fontSize:13, color:WF.body, textDecoration:"none" }}>{l}</a>
-            ))}
-          </div>
-        ))}
-      </div>
-      <div style={{ background:"#dde3e8", padding:"14px 20px", display:"flex", flexWrap:"wrap",
-        alignItems:"center", justifyContent:"center", gap:20, fontSize:12, color:"#555" }}>
-        <span>© 2016 - 2026 RPI Print, Inc.</span>
-        <a href="#" onClick={e => e.preventDefault()} style={{ color:"#555", textDecoration:"none" }}>Company</a>
-        <a href="#" onClick={e => e.preventDefault()} style={{ color:"#555", textDecoration:"none" }}>Privacy Policy</a>
-        <a href="#" onClick={e => e.preventDefault()} style={{ color:"#555", textDecoration:"none" }}>Support</a>
-      </div>
-    </div>
-  );
-}
-
 /* Current orders — same three demo orders shown on the reference page (not
    this app's own ORDER_NUMBER/ORDER_DATE/UPS_TRACKING; a faithful copy of the
    reference's content, not this app's checkout-link order). */
@@ -4485,8 +4451,6 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
             </>
           )}
         </div>
-
-        <WireframeFooter />
       </div>
     </div>
     <CreateInstantStoreModal open={createModalOpen} onClose={() => setCreateModalOpen(false)}
