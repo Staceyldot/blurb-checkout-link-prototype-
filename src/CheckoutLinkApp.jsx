@@ -3942,15 +3942,15 @@ const ALL_PROJECTS = [
     meta:[["Project type","Trade Book"],["Project option","10×8 in, 25×20 cm"],["# of pages","160"],["ISBN","9781733372800"],["Created with","BookWright"],["Created","March 14, 2019"]],
     actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }, { icon:"local_shipping", label:"Set up retail distribution" }],
     share:true },
-  { badge:"Selling", title:"Xylophone, glockenspiel & bells for beginner adults",
-    desc:"The songs in this book have been adapted and can be played on all models of popular wooden xylophones…",
-    meta:[["Project type","Trade Book"],["Project option","8×10 in, 20×25 cm"],["# of pages","50"],["Created with","BookWright"],["Created","Dec 25, 2023"]],
+  { cover:BOOK_STIRRED_OBSESSION, coverZoom:1, coverPos:"0% center", badge:"Selling", title:"The Stirred Obsession: A Minimalist's Guide to the Modern Martini",
+    desc:"The timeless elegance of the world's most iconic cocktail takes center stage in The Stirred Obsession: A Minimalist's Guide to the Modern Martini.",
+    meta:[["Project type","Photo Book"],["Project option","10×10 in"],["# of pages","96"],["Created with","BookWright"],["Created","Jan 9, 2025"]],
     actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"download", label:"Download PDF" }],
     share:true },
-  { badge:"Selling", title:"Pride and Preconceptions",
-    desc:"A witty modern retelling of a beloved classic, reimagined for today's readers.",
-    meta:[["Project type","Trade Book"],["Project option","6×9 in"],["ISBN","2 ISBNs"],["Created with","InDesign"],["Created","Mar 14, 2024"]],
-    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"storefront", label:"Manage bookstore listing" }],
+  { cover:BOOK_SPIRIT_SMOKE_SALT, badge:"Selling", title:"Spirit, Smoke & Salt",
+    desc:"Rooted in centuries of craftsmanship, agave spirits possess a depth, minerality, and complexity that rival the finest whiskies and brandies in the world.",
+    meta:[["Project type","Trade Book"],["Project option","8×10 in"],["# of pages","112"],["Created with","InDesign"],["Created","Apr 22, 2025"]],
+    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"download", label:"Download PDF" }],
     share:true },
   { title:"Midnight Harvest",
     desc:"A slow-burn mystery set across three harvest seasons in a small vineyard town.",
@@ -4003,7 +4003,10 @@ function AllProjectsRow({ project, onManageInstantStore }) {
       padding:"22px 0", borderBottom:`1px solid ${WF.border}` }}>
       <div style={{ flexShrink:0, width:130 }}>
         {project.cover ? (
-          <img src={project.cover} alt="" style={{ width:130, height:168, objectFit:"cover", boxShadow:"2px 4px 10px rgba(0,0,0,.16)" }} />
+          <div style={{ width:130, height:168, overflow:"hidden", boxShadow:"2px 4px 10px rgba(0,0,0,.16)" }}>
+            <img src={project.cover} alt="" style={{ width:"100%", height:"100%", objectFit:"cover",
+              objectPosition:project.coverPos || "center", transform:`scale(${project.coverZoom ?? 1.2})` }} />
+          </div>
         ) : (
           <div style={{ width:130, height:168, background:WF.cover, border:`1px solid ${WF.borderLight}` }} />
         )}
@@ -4094,7 +4097,7 @@ const ONLINE_EDITOR_PROJECTS = [
    Store" this whole prototype is about), so its live rows link into Setup
    the same way Manage Instant Store does elsewhere on the Dashboard. */
 const INSTANT_STORES = [
-  { title:"The Stirred Obsession: A Minimalist's Guide to the Modern Martini", sub:"Photo book · 10×10", link:"blurb.com/1/c1t2k", price:"$28.00", status:"live", orders:3, cover:BOOK_STIRRED_OBSESSION },
+  { title:"The Stirred Obsession: A Minimalist's Guide to the Modern Martini", sub:"Photo book · 10×10", link:"blurb.com/1/c1t2k", price:"$28.00", status:"live", orders:3, cover:BOOK_STIRRED_OBSESSION, coverZoom:1, coverPos:"0% center" },
   { title:"Spirit, Smoke & Salt", sub:"Trade book · 8×10", link:"blurb.com/1/sm5kt", price:"$40.00", status:"live", orders:7, cover:BOOK_SPIRIT_SMOKE_SALT },
   { title:"Field Notes: Patagonia", sub:"Magazine · 8.5×11", link:null, price:"Not set", status:"draft", orders:null, cover:null },
 ];
@@ -4117,7 +4120,10 @@ function InstantStoresTable({ onManageInstantStore }) {
               <td style={{ ...cell, maxWidth:220 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:12 }}>
                   {s.cover ? (
-                    <img src={s.cover} alt="" style={{ width:40, height:52, objectFit:"cover", borderRadius:2, flexShrink:0 }} />
+                    <div style={{ width:40, height:52, borderRadius:2, overflow:"hidden", flexShrink:0 }}>
+                      <img src={s.cover} alt="" style={{ width:"100%", height:"100%", objectFit:"cover",
+                        objectPosition:s.coverPos || "center", transform:`scale(${s.coverZoom ?? 1.2})` }} />
+                    </div>
                   ) : (
                     <div style={{ width:40, height:52, borderRadius:2, background:WF.cover, border:`1px solid ${WF.borderLight}`, flexShrink:0 }} />
                   )}
@@ -4178,14 +4184,17 @@ const AVAILABLE_TO_SELL = [
    creation are owned elsewhere per the README) so it's decorative. */
 function CreateInstantStoreModal({ open, onClose, onSelect }) {
   if (!open) return null;
-  const row = (title, sub, cover) => (
+  const row = (title, sub, cover, coverZoom, coverPos) => (
     <div key={title} role="button" tabIndex={0} onClick={onSelect}
       onMouseEnter={e => e.currentTarget.style.background = "#f0f0f0"}
       onMouseLeave={e => e.currentTarget.style.background = "transparent"}
       style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 20px", cursor:"pointer",
         borderBottom:`1px solid ${WF.borderLight}` }}>
       {cover ? (
-        <img src={cover} alt="" style={{ width:40, height:52, objectFit:"cover", borderRadius:2, flexShrink:0 }} />
+        <div style={{ width:40, height:52, borderRadius:2, overflow:"hidden", flexShrink:0 }}>
+          <img src={cover} alt="" style={{ width:"100%", height:"100%", objectFit:"cover",
+            objectPosition:coverPos || "center", transform:`scale(${coverZoom ?? 1.2})` }} />
+        </div>
       ) : (
         <div style={{ width:40, height:52, borderRadius:2, background:WF.cover, border:`1px solid ${WF.borderLight}`, flexShrink:0 }} />
       )}
@@ -4257,7 +4266,7 @@ function CreateInstantStoreModal({ open, onClose, onSelect }) {
               ALREADY HAS AN INSTANT STORE
             </span>
           </div>
-          {INSTANT_STORES.map(p => row(p.title, `${p.sub} · ${p.status === "live" ? "Live" : "Draft"}`, p.cover))}
+          {INSTANT_STORES.map(p => row(p.title, `${p.sub} · ${p.status === "live" ? "Live" : "Draft"}`, p.cover, p.coverZoom, p.coverPos))}
         </div>
 
         <div style={{ padding:"14px 20px", textAlign:"center", fontFamily:WF.font, fontSize:12.5, color:"#5a5a5a",
