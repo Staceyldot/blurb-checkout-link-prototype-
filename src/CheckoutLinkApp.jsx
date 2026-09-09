@@ -472,6 +472,18 @@ function useViewport() {
 /* ═══════════════════════════ Money helper ═══════════════════════════ */
 const money = n => `$${n.toFixed(2)}`;
 
+/* Cover thumbnails shouldn't force every book into the same square — a 10×8
+   book is landscape, an 8×10 book is portrait. Since the source photography
+   doesn't reliably match the book's actual trim shape, we size the image's
+   box from the labeled trim dimensions (parsed out of copy like "10×8 in" or
+   "Trade book · 8×10") and fit it inside a `box`×`box` bounding square,
+   cropping the source photo to fill that correctly-shaped box. */
+function trimBoxSize(dimensionText, box) {
+  const m = /(\d+(?:\.\d+)?)\s*[×x]\s*(\d+(?:\.\d+)?)/.exec(dimensionText || "");
+  const ratio = m ? Number(m[1]) / Number(m[2]) : 1;
+  return ratio >= 1 ? { width: box, height: box / ratio } : { width: box * ratio, height: box };
+}
+
 /* ═══════════════════════════ Shared chrome ═══════════════════════════ */
 /* Header — full Blurb logo centered on the page background, matching the
    original first-time-user checkout flow. Used across all checkout-link
@@ -3330,12 +3342,13 @@ function PriceField({ label, hint, prefix, suffix, value, onChange, error, disab
 
 function BookDetailsRow({ showCover, onViewProject }) {
   const bits = ["10×8 in, 25×20 cm", PRODUCT.pages, "Language: English", "Published November 2019"];
+  const coverBox = trimBoxSize(bits[0], 100);
   return (
     <div style={{ display:"flex", gap:16, alignItems:"flex-start" }}>
       {showCover && (
-        <div style={{ width:64, height:83, flexShrink:0, overflow:"hidden", borderRadius:4,
-          boxShadow:"2px 4px 10px rgba(0,0,0,.16)" }}>
-          <img src={PRODUCT.img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", transform:"scale(1.2)" }} />
+        <div style={{ width:100, height:100, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <img src={PRODUCT.img} alt="" style={{ ...coverBox, objectFit:"cover", transform:"scale(1.2)",
+            borderRadius:4, boxShadow:"2px 4px 10px rgba(0,0,0,.16)" }} />
         </div>
       )}
       <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
@@ -3957,12 +3970,12 @@ function InstantStoresTable({ onManageInstantStore }) {
               <td style={{ ...cell, maxWidth:220 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:12 }}>
                   {s.cover ? (
-                    <div style={{ width:40, height:s.coverAspect === "square" ? 40 : 52, borderRadius:2, overflow:"hidden", flexShrink:0 }}>
-                      <img src={s.cover} alt="" style={{ width:"100%", height:"100%", objectFit:"cover",
+                    <div style={{ width:100, height:100, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                      <img src={s.cover} alt="" style={{ ...trimBoxSize(s.sub, 100), objectFit:"cover", borderRadius:2,
                         objectPosition:s.coverPos || "center", transform:`scale(${s.coverZoom ?? 1.2})` }} />
                     </div>
                   ) : (
-                    <div style={{ width:40, height:52, borderRadius:2, background:WF.cover, border:`1px solid ${WF.borderLight}`, flexShrink:0 }} />
+                    <div style={{ width:100, height:100, borderRadius:2, background:WF.cover, border:`1px solid ${WF.borderLight}`, flexShrink:0 }} />
                   )}
                   <div>
                     <a href="#" onClick={e => { e.preventDefault(); onManageInstantStore?.(); }}
