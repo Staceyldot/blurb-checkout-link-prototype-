@@ -3332,12 +3332,22 @@ function BookDetailsRow({ showCover, onViewProject }) {
   );
 }
 
+/* Matches the "Radio Card / Icon States" spec: Default (gray outline, gray
+   icon), Hover (gray outline + light gray fill), Focus (blue ring, gray
+   icon — keyboard focus, independent of selection), Selected (dark border,
+   filled blue radio icon, reveals the "See pages" link). */
 function PreviewCard({ icon, title, sub, selected, onSelect, showLink }) {
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
   return (
-    <button onClick={onSelect} style={{ width:140, height:150, flexShrink:0, textAlign:"left", cursor:"pointer",
-      display:"flex", flexDirection:"column", gap:8, padding:8, borderRadius:T.radius, background:T.surface,
-      border: selected ? `1px solid ${T.borderActive}` : `1px solid ${T.border}`,
-      boxShadow: selected ? `0 0 0 1px ${T.borderActive}` : "none" }}>
+    <button onClick={onSelect}
+      onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
+      style={{ width:140, height:150, flexShrink:0, textAlign:"left", cursor:"pointer",
+      display:"flex", flexDirection:"column", gap:8, padding:8, borderRadius:T.radius,
+      background: hovered && !selected ? "#f5f5f5" : T.surface,
+      border: `1px solid ${selected ? T.textBold : (focused ? T.brand : T.border)}`,
+      boxShadow: focused && !selected ? `0 0 0 1px ${T.brand}` : "none", outline:"none" }}>
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <Ms name={icon} size={20} color={T.textBold} />
         <Ms name={selected ? "radio_button_checked" : "radio_button_unchecked"} size={20} color={selected ? T.brand : T.border} />
@@ -3489,14 +3499,21 @@ function UseThisCheckbox({ checked, onChange }) {
    the viewport top so it stays in view while the (much taller) main column
    scrolls past it. */
 function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setTitleOn, descOn, setDescOn,
-  keywords, onRemoveKeyword, onClose, onStartDraft, onApply }) {
+  keywords, onRemoveKeyword, onClose, onStartDraft, onApply, onBack }) {
   return (
     <div style={{ position:"sticky", top:0, height:"100vh", flexShrink:0,
       width: open ? 400 : 0, maxWidth: open ? "92vw" : 0, overflow:"hidden", transition:"width .3s ease",
       boxShadow: open ? "0px 4px 12px 1px rgba(0,0,0,0.1)" : "none" }}>
       <div style={{ width:400, maxWidth:"92vw", height:"100%",
         background:"#FFFFFF", display:"flex", flexDirection:"column", fontFamily:FONT_SANS }}>
-        <div style={{ display:"flex", justifyContent:"flex-end", padding:24, flexShrink:0 }}>
+        <div style={{ display:"flex", alignItems:"center",
+          justifyContent: phase === "results" ? "space-between" : "flex-end", padding:24, flexShrink:0 }}>
+          {phase === "results" && (
+            <button onClick={onBack} style={{ background:"none", border:"none", cursor:"pointer",
+              display:"flex", alignItems:"center", gap:4, color:"#292929", fontWeight:600, fontSize:14, padding:0 }}>
+              <Ms name="chevron_left" size={20} color="#292929" /> Back
+            </button>
+          )}
           <button onClick={onClose} aria-label="Close" style={{ background:"none", border:"none", cursor:"pointer", display:"flex" }}>
             <Ms name="close" size={24} color={T.textBold} />
           </button>
@@ -4404,6 +4421,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
     }, 1600);
   };
   const removeAiKeyword = i => setAiKeywords(aiKeywords.filter((_, idx) => idx !== i));
+  const backToAiPrompt = () => setAiPhase("prompt");
   const applyDraft = () => {
     if (aiTitleOn) setListingTitle(AI_DRAFT.title);
     if (aiDescOn) setAboutBook(AI_DRAFT.description);
@@ -4542,7 +4560,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
         <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
           <PreviewCard icon="menu_book" title="Sample preview" sub="First 15 pages" showLink
             selected={preview === "sample"} onSelect={() => setPreview("sample")} />
-          <PreviewCard icon="import_contacts" title="Full preview" sub="All pages"
+          <PreviewCard icon="import_contacts" title="Full preview" sub="All pages" showLink
             selected={preview === "full"} onSelect={() => setPreview("full")} />
           <PreviewCard icon="visibility_off" title="No preview" sub="Cover only"
             selected={preview === "none"} onSelect={() => setPreview("none")} />
@@ -4761,7 +4779,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
     <DraftPanel open={aiOpen} phase={aiPhase} input={aiInput} setInput={setAiInput}
       tone={aiTone} setTone={setAiTone} titleOn={aiTitleOn} setTitleOn={setAiTitleOn}
       descOn={aiDescOn} setDescOn={setAiDescOn} keywords={aiKeywords} onRemoveKeyword={removeAiKeyword}
-      onClose={closeAiPanel} onStartDraft={startDraft} onApply={applyDraft} />
+      onClose={closeAiPanel} onStartDraft={startDraft} onApply={applyDraft} onBack={backToAiPrompt} />
     </div>
 
     <StickyCtaBar onPreview={onContinue} canPublish={canPublish} onPublish={doPublish} panelOpen={aiOpen} />
