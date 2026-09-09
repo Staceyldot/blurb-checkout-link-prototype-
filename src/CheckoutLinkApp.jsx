@@ -3514,7 +3514,7 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
               </div>
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 <textarea value={input} onChange={e => setInput(e.target.value)}
-                  placeholder="e.g. It's a modern rom-com retelling of Pride and Prejudice. Witty, a little chaotic, second-chance romance vibes."
+                  placeholder="e.g. A travel photo book of two weeks backpacking through Patagonia"
                   style={{ width:"100%", height:193, minHeight:193, border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
                     fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface, resize:"vertical" }} />
                 <SetupHint>We don't read your book. Don't include sensitive information here.</SetupHint>
@@ -4505,7 +4505,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
             <SetupTextField placeholder="e.g., Where Silence Speaks" value={listingTitle} onChange={setListingTitle} maxLen={70} />
           </SetupFieldRow>
           <SetupFieldRow label="About the book">
-            <SetupTextField placeholder="e.g. keep it playful, mention it’s a gift edition" value={aboutBook} onChange={setAboutBook} maxLen={1466} height={150} />
+            <SetupTextField placeholder="e.g. A witty modern romance for readers who love a slow burn" value={aboutBook} onChange={setAboutBook} maxLen={1466} height={150} />
           </SetupFieldRow>
           <SetupFieldRow label="Keywords" icon="Keywords help buyers find your book on Google. Use words shopper would search for.">
             <SetupKeywordsField keywords={keywords} setKeywords={setKeywords} />
