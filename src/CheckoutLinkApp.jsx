@@ -3678,8 +3678,8 @@ function SideNavItem({ label, active, badge, onClick }) {
       onMouseEnter={e => e.currentTarget.style.background = "#f0f0f0"}
       onMouseLeave={e => e.currentTarget.style.background = "transparent"}
       style={{ display:"flex", alignItems:"center", gap:8,
-      fontFamily:WF.font, fontSize:13.5, fontWeight: active ? 700 : 400,
-      color:WF.body, textDecoration:"none", padding:"5px 8px", margin:"0 -8px", borderRadius:4 }}>
+      fontFamily:WF.font, fontSize:13.5, fontWeight:400,
+      color: active ? "#107EB1" : WF.body, textDecoration:"none", padding:"5px 8px", margin:"0 -8px", borderRadius:4 }}>
       {label}
       {badge && (
         <span style={{ fontFamily:WF.font, fontSize:10, fontWeight:700, color:"#fff",
