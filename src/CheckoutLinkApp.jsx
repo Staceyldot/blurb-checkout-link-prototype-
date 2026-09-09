@@ -651,16 +651,26 @@ function QuantityStepper({ qty, setQty, size=40, onBelowMin }) {
    (Blurb_8x10_Liberal Libations_FirstChapter_Spreads.pdf, 16 pages: one solo
    page + 15 two-page spreads). Page 1 is solo (recto, no verso in the file);
    pages 2-31 come two-at-a-time from spread-01.jpg … spread-15.jpg, each a
-   single pre-composited image covering both pages of that spread. */
-const PREVIEW_LAST_PAGE = 15;   // preview stops here even though the PDF has content through page 31
-function previewSource(n) {
+   single pre-composited image covering both pages of that spread. Cover art
+   comes from a separate file (Blurb_8x10_Cover_Liberal Libations PDF) — its
+   single wide spread is cropped into a front-cover and a back-cover+spine
+   image (no visible fold line in the art to split back cover from spine, so
+   they're kept together as one "back cover" page). Cover pages use negative
+   sentinel numbers so they never collide with real page numbers. */
+const PREVIEW_LAST_PAGE = 15;        // Sample preview stops here
+const PREVIEW_LAST_PAGE_FULL = 31;   // Full preview goes through all the rasterized spreads (spread-01…spread-15)
+const COVER_FRONT = -1;
+const COVER_BACK = -2;
+function previewSource(n, maxPage = PREVIEW_LAST_PAGE) {
+  if (n === COVER_FRONT) return { src: "/assets/preview/cover-front.jpg" };
+  if (n === COVER_BACK) return { src: "/assets/preview/cover-back.jpg" };
   if (n === 1) return { src: "/assets/preview/page-01.jpg" };
-  if (n < 2 || n > PREVIEW_LAST_PAGE) return null;
+  if (n < 2 || n > maxPage) return null;
   const spread = Math.floor(n / 2);
   return { src: `/assets/preview/spread-${String(spread).padStart(2, "0")}.jpg`, side: n % 2 === 0 ? "left" : "right" };
 }
-function PreviewPage({ n }) {
-  const page = previewSource(n);
+function PreviewPage({ n, maxPage = PREVIEW_LAST_PAGE }) {
+  const page = previewSource(n, maxPage);
   if (!page) return <div style={{ width:"100%", height:"100%", background:"#fff" }} />;
   if (!page.side) {
     return (
@@ -683,14 +693,32 @@ function PreviewPage({ n }) {
 
 /* Two-page book spread with a CSS 3D page-turn (animation reference only —
    Blurb's live flipbook). Matches Figma 4401:3307's static look. */
-function Flipbook({ maxWidth = 900, pageBadge = false }) {
-  const LAST = 7;   // slot 0: (blank, page 1) · slots 1-7: spreads [2,3] … [14,15] — stops at page 15
+function Flipbook({ maxWidth = 900, pageBadge = false, totalLabel = PREVIEW_LAST_PAGE, maxPage = PREVIEW_LAST_PAGE,
+  showFrontCover = false, showBackCover = false }) {
+  const coverOffset = showFrontCover ? 1 : 0;
+  const CONTENT_LAST = Math.floor(maxPage / 2);
+  const LAST = CONTENT_LAST + coverOffset + (showBackCover ? 1 : 0);   // total spread slots, cover(s) + content
+
+  // Single source of truth for what's on each side of a given spread index —
+  // used for the current spread and (via ±1) for the flip animation's
+  // underlay/leaf faces, so covers (which break the uniform +2-per-spread
+  // page numbering) don't need special-casing in the animation math below.
+  const pagesForSpread = s => {
+    if (showFrontCover && s === 0) return { left: 0, right: COVER_FRONT };
+    const contentSpread = s - coverOffset;
+    if (contentSpread <= CONTENT_LAST) {
+      const leftNum = contentSpread === 0 ? 0 : contentSpread * 2;
+      const rightNum = contentSpread === 0 ? 1 : leftNum + 1;
+      return { left: leftNum, right: rightNum };
+    }
+    return { left: COVER_BACK, right: 0 };   // trailing back-cover spread
+  };
+
   const [spread, setSpread] = useState(0);
   const [flip, setFlip]     = useState(null);  // "next" | "prev"
   const [angle, setAngle]   = useState(0);
 
-  const leftNum = spread === 0 ? 0 : spread * 2;   // left pages even (verso); 0 = no page (blank)
-  const rightNum = spread === 0 ? 1 : leftNum + 1; // right pages odd (recto)
+  const { left: leftNum, right: rightNum } = pagesForSpread(spread);
 
   useEffect(() => {
     if (!flip) return;
@@ -714,10 +742,12 @@ function Flipbook({ maxWidth = 900, pageBadge = false }) {
 
   // Underlay pages sit behind the turning leaf; pick them so nothing flickers
   // at the start or end of the turn.
-  const underLeft  = flip === "prev" ? leftNum - 2 : leftNum;
-  const underRight = flip === "next" ? rightNum + 2 : rightNum;
+  const prevPages = spread > 0 ? pagesForSpread(spread - 1) : null;
+  const nextPages = spread < LAST ? pagesForSpread(spread + 1) : null;
+  const underLeft  = flip === "prev" ? (prevPages ? prevPages.left : leftNum) : leftNum;
+  const underRight = flip === "next" ? (nextPages ? nextPages.right : rightNum) : rightNum;
   const leafFront  = flip === "next" ? rightNum : leftNum;
-  const leafBack   = flip === "next" ? leftNum + 2 : rightNum - 2;
+  const leafBack   = flip === "next" ? (nextPages ? nextPages.left : leftNum) : (prevPages ? prevPages.right : rightNum);
 
   const circle = (disabled) => ({
     width:40, height:40, borderRadius:"50%", background:"#fff",
@@ -733,8 +763,8 @@ function Flipbook({ maxWidth = 900, pageBadge = false }) {
         {/* Static spread underneath the leaf */}
         <div style={{ position:"absolute", inset:0, display:"flex", borderRadius:8, overflow:"hidden",
           boxShadow:"0 10px 30px rgba(0,0,0,.15)", background:"#fff" }}>
-          <div style={{ width:"50%", height:"100%", containerType:"inline-size", borderRight:"1px solid #eee" }}><PreviewPage n={underLeft} /></div>
-          <div style={{ width:"50%", height:"100%", containerType:"inline-size" }}><PreviewPage n={underRight} /></div>
+          <div style={{ width:"50%", height:"100%", containerType:"inline-size", borderRight:"1px solid #eee" }}><PreviewPage n={underLeft} maxPage={maxPage} /></div>
+          <div style={{ width:"50%", height:"100%", containerType:"inline-size" }}><PreviewPage n={underRight} maxPage={maxPage} /></div>
         </div>
         {/* Center gutter shadow */}
         <div style={{ position:"absolute", top:0, bottom:0, left:"50%", width:40, transform:"translateX(-50%)",
@@ -747,8 +777,8 @@ function Flipbook({ maxWidth = 900, pageBadge = false }) {
               transformStyle:"preserve-3d",
               transformOrigin: flip === "next" ? "left center" : "right center",
               transform:`rotateY(${angle}deg)`, transition:"transform .6s ease", zIndex:4 }}>
-            <div style={{ ...face, boxShadow:"0 0 22px rgba(0,0,0,.14)" }}><PreviewPage n={leafFront} /></div>
-            <div style={{ ...face, transform:"rotateY(180deg)" }}><PreviewPage n={leafBack} /></div>
+            <div style={{ ...face, boxShadow:"0 0 22px rgba(0,0,0,.14)" }}><PreviewPage n={leafFront} maxPage={maxPage} /></div>
+            <div style={{ ...face, transform:"rotateY(180deg)" }}><PreviewPage n={leafBack} maxPage={maxPage} /></div>
           </div>
         )}
       </div>
@@ -760,7 +790,9 @@ function Flipbook({ maxWidth = 900, pageBadge = false }) {
         <span style={pageBadge
           ? { background:"#FFFFFF", borderRadius:4, padding:"4px 8px", fontSize:14, fontWeight:600, color:T.textBold }
           : { fontSize:14, color:T.textBold }}>
-          Page {rightNum > PREVIEW_LAST_PAGE ? leftNum : rightNum} of {PREVIEW_LAST_PAGE}
+          {showFrontCover && spread === 0 ? "Front cover"
+            : showBackCover && spread === LAST ? "Back cover"
+            : `Page ${rightNum > maxPage ? leftNum : rightNum} of ${totalLabel}`}
         </span>
         <button onClick={() => start("next")} disabled={spread >= LAST} aria-label="Next pages" style={circle(spread >= LAST)}>
           <Ms name="chevron_right" size={22} color={T.textBold} />
@@ -1805,7 +1837,6 @@ function GuestSignIn({ open, onToggle, completed, email, onContinue }) {
   const [em, setEm] = useState("");
   const [pw, setPw] = useState("");
   const [showPw, setShowPw] = useState(false);
-  const [marketing, setMarketing] = useState(false);
   const [errors, setErrors] = useState({});
   const valid = v => v && v.includes("@") && v.includes(".");
   const DEMO = DEMO_BUYER_EMAIL;
@@ -1838,10 +1869,6 @@ function GuestSignIn({ open, onToggle, completed, email, onContinue }) {
               <Input label="Email address" required type="email" placeholder="name@example.com"
                 hint="Your order confirmation will be sent here." error={errors.email} value={em}
                 onChange={v => { setEm(v); setErrors({}); }} onClick={fillGuest} />
-              <label style={{ display:"flex", alignItems:"center", gap:8, cursor:"pointer", fontSize:14, color:T.textBold }}>
-                <input type="checkbox" checked={marketing} onChange={() => setMarketing(m => !m)} style={{ accentColor:T.brand, width:16, height:16, flexShrink:0 }} />
-                Yes, I'd like updates and offers from this author.
-              </label>
               <div><Btn onClick={guest} disabled={!valid(em)}>Continue as guest</Btn></div>
             </>
           ) : (
@@ -3336,7 +3363,7 @@ function BookDetailsRow({ showCover, onViewProject }) {
    icon), Hover (gray outline + light gray fill), Focus (blue ring, gray
    icon — keyboard focus, independent of selection), Selected (dark border,
    filled blue radio icon, reveals the "See pages" link). */
-function PreviewCard({ icon, title, sub, selected, onSelect, showLink }) {
+function PreviewCard({ icon, title, sub, selected, onSelect, showLink, onSeePages }) {
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   return (
@@ -3358,7 +3385,8 @@ function PreviewCard({ icon, title, sub, selected, onSelect, showLink }) {
       </div>
       {showLink && selected && (
         <div style={{ flex:1, display:"flex", alignItems:"flex-end" }}>
-          <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textLink, textDecoration:"underline" }}>See pages</span>
+          <span onClick={e => { e.stopPropagation(); onSeePages(); }}
+            style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textLink, textDecoration:"underline" }}>See pages</span>
         </div>
       )}
     </button>
@@ -4170,7 +4198,6 @@ function PaymentSettingsPage() {
    land here already on that page. */
 function DashboardHomePage({ onContinue, subPage, setSubPage }) {
   const { isMobile } = useViewport();
-  const [bannerOpen, setBannerOpen] = useState(true);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const SIDE_NAV_TARGETS = { "All projects":"all-projects", "Instant Stores":"instant-stores", "Payment settings":"payment-settings" };
   const ACTIVE_ITEM_FOR = { "all-projects":"All projects", "instant-stores":"Instant Stores", "payment-settings":"Payment settings" };
@@ -4185,26 +4212,6 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
       )}
       <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column" }}>
         <div style={{ padding: isMobile ? "20px" : "32px 40px", display:"flex", flexDirection:"column", gap:24, maxWidth:934, width:"100%" }}>
-          {bannerOpen && subPage !== "payment-settings" && (
-            <div style={{ background:WF.panel, border:`1px solid ${WF.border}`, borderRadius:8, padding:16,
-              display:"flex", alignItems:"flex-start", gap:12 }}>
-              <Ms name="campaign" size={20} color={WF.subtle} style={{ flexShrink:0, marginTop:2 }} />
-              <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ fontFamily:WF.font, fontSize:14, fontWeight:700, color:WF.text }}>We're retiring BookWright Online.</div>
-                <div style={{ fontFamily:WF.font, fontSize:13, color:WF.subtle, marginTop:2 }}>
-                  Your existing projects are right where you left them. <b>What's changing and why</b>
-                </div>
-              </div>
-              <button onClick={e => e.preventDefault()} style={{ background:"#fff", color:WF.body, border:"1px solid #ccc",
-                borderRadius:4, padding:"8px 16px", fontFamily:WF.font, fontSize:13, fontWeight:600, cursor:"pointer",
-                whiteSpace:"nowrap", flexShrink:0 }}>Open BookWright Online</button>
-              <button onClick={() => setBannerOpen(false)} aria-label="Dismiss" style={{ background:"none", border:"none",
-                cursor:"pointer", color:WF.subtle, flexShrink:0, display:"flex" }}>
-                <Ms name="close" size={18} color={WF.subtle} />
-              </button>
-            </div>
-          )}
-
           {subPage === "home" ? (
             <>
               {/* Current orders */}
@@ -4324,6 +4331,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
   const { isMobile } = useViewport();
   const [copied, setCopied] = useState(false);
   const [preview, setPreview] = useState("sample");
+  const [previewModalKind, setPreviewModalKind] = useState(null);   // null | "sample" | "full"
   const [openMaterials, setOpenMaterials] = useState({ cover: true, linen: false, endsheet: false });
   const toggleMaterial = key => setOpenMaterials(m => ({ ...m, [key]: !m[key] }));
   const [finish, setFinish] = useState(null);
@@ -4447,36 +4455,6 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
     <div style={{ display:"flex", alignItems:"flex-start" }}>
     <SideNav activeItem="Instant Stores" onNavigate={item => { if (item === "All projects") onGoAllProjects?.(); }} divider />
     <div style={{ flex:1, minWidth:0, minHeight:"100vh", background:T.bg, fontFamily:FONT_SANS }}>
-      {/* Order-a-copy nudge — sellers can't buy their own link, so this is the way to
-          get a proof copy before going live. Switches to a warning once the link is
-          actually published: it's live, but still can't take an order until a proof
-          copy is ordered. */}
-      <div style={{ padding: isMobile ? "16px 20px" : "24px 80px", background:T.surface }}>
-        <div style={{ background: published ? "#fdf6db" : T.panel, borderRadius:T.radius, padding:16, display:"flex",
-          flexWrap:"wrap", gap:12, alignItems:"flex-start", justifyContent:"space-between" }}>
-          <div style={{ display:"flex", gap:8, alignItems:"flex-start", flex:"1 1 320px", minWidth:0 }}>
-            {published
-              ? <Ms name="warning" color="#8a6d1f" style={{ marginTop:2 }} />
-              : <Ms name="info" color={T.brand} style={{ marginTop:2 }} />}
-            <div>
-              <div style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:600, color:T.textBold }}>
-                {published ? "Your link is live, but buyers can't purchase yet." : "Order a copy before you go live"}
-              </div>
-              <div style={{ fontFamily:FONT_SANS, fontSize:14, color:T.textSubtle, marginTop:2 }}>
-                {published
-                  ? "Order a copy now and save 50% with code FREECOPY."
-                  : "Buyers can't purchase until you do. You'll save 50% with code FREECOPY."}
-              </div>
-            </div>
-          </div>
-          <button onClick={e => e.preventDefault()} style={{ background:"none", border:"none", cursor:"pointer",
-            display:"flex", alignItems:"center", gap:4, color:T.brand, fontWeight:600, fontSize:14,
-            borderBottom:`1px solid ${T.brand}`, paddingBottom:2, flexShrink:0 }}>
-            {published ? "Order a copy now" : "Order a copy"} <Ms name="arrow_forward" size={16} color={T.brand} />
-          </button>
-        </div>
-      </div>
-
       {/* Header: breadcrumb, title, and the auto-generated link field */}
       <div style={{ background:T.surface, padding: isMobile ? "16px 20px 24px" : "32px 80px 24px" }}>
         <div style={{ display:"flex", alignItems:"center", gap:4, fontFamily:FONT_SANS, fontSize:14, marginBottom:16 }}>
@@ -4559,9 +4537,11 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
       <SetupSection title="Book preview settings">
         <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
           <PreviewCard icon="menu_book" title="Sample preview" sub="First 15 pages" showLink
-            selected={preview === "sample"} onSelect={() => setPreview("sample")} />
+            selected={preview === "sample"} onSelect={() => setPreview("sample")}
+            onSeePages={() => setPreviewModalKind("sample")} />
           <PreviewCard icon="import_contacts" title="Full preview" sub="All pages" showLink
-            selected={preview === "full"} onSelect={() => setPreview("full")} />
+            selected={preview === "full"} onSelect={() => setPreview("full")}
+            onSeePages={() => setPreviewModalKind("full")} />
           <PreviewCard icon="visibility_off" title="No preview" sub="Cover only"
             selected={preview === "none"} onSelect={() => setPreview("none")} />
         </div>
@@ -4786,6 +4766,8 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
     <PublishModal open={publishOpen} onClose={() => setPublishOpen(false)} onViewLive={onContinue}
       copied={copied} onCopyLink={copyLink} />
 
+    <BookPreviewModal open={!!previewModalKind} kind={previewModalKind} onClose={() => setPreviewModalKind(null)} />
+
     <Toast show={toast}>Draft applied to your listing.</Toast>
     </>
   );
@@ -4831,6 +4813,47 @@ function Toast({ show, children }) {
       <Ms name="check_circle" size={20} color={T.success} />
       <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textBold }}>{children}</span>
     </div>
+  );
+}
+
+/* Total page count for the "Full preview" mock's counter. The seller's PDF
+   (Blurb_8x10_Liberal Libations_FirstChapter_Spreads.pdf) only rasterizes
+   through page 31 (PREVIEW_LAST_PAGE_FULL) — no full 160-page book PDF
+   exists yet — so the counter's denominator is still the real book length
+   while navigation is capped where the actual asset content runs out. Swap
+   maxPage/totalLabel below for the real page count once a full-book PDF exists. */
+const FULL_BOOK_PAGE_COUNT = parseInt(PRODUCT.pages, 10);
+
+/* "Book preview" modal (Figma "Modal / Large", node 4480:61779) — shown from
+   Setup's "See pages" link on the Sample/Full preview cards. Reuses the same
+   Flipbook the PDP's fullscreen viewer uses (page-turn, prev/next circles,
+   "Page X of N" badge) instead of a static Figma export, since it's already
+   a faithful match to the design's flipbook + counter. Centered overlay like
+   PublishModal, not a fullscreen takeover, since this is a seller preview, not
+   the buyer-facing PDP experience. `kind` is "sample" or "full" — "sample"
+   caps at page 15 like the PDP's own sample viewer and opens on the front
+   cover only; "full" continues through all the rasterized spreads (to page
+   31) and bookends them with both the front and back cover. */
+function BookPreviewModal({ open, kind, onClose }) {
+  if (!open) return null;
+  return (
+    <>
+      <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.45)", zIndex:200 }} />
+      <div style={{ position:"fixed", top:"50%", left:"50%", transform:"translate(-50%,-50%)", zIndex:210,
+        width:1000, maxWidth:"92vw", maxHeight:"88vh", overflowY:"auto", background:T.surface, borderRadius:T.radius,
+        padding:24, boxShadow:"0px 8px 16px rgba(0,0,0,.16)", display:"flex", flexDirection:"column", gap:16,
+        fontFamily:FONT_SANS }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <span style={{ fontFamily:FONT_HEADING, fontSize:32, fontWeight:500, lineHeight:1.2, color:T.textBold }}>Book preview</span>
+          <button onClick={onClose} aria-label="Close" style={{ background:"none", border:"none", cursor:"pointer", display:"flex", flexShrink:0 }}>
+            <Ms name="close" size={24} color={T.textBold} />
+          </button>
+        </div>
+        <Flipbook maxWidth={900} pageBadge showFrontCover showBackCover={kind === "full"}
+          totalLabel={kind === "full" ? FULL_BOOK_PAGE_COUNT : PREVIEW_LAST_PAGE}
+          maxPage={kind === "full" ? PREVIEW_LAST_PAGE_FULL : PREVIEW_LAST_PAGE} />
+      </div>
+    </>
   );
 }
 
