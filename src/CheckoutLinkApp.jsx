@@ -4640,8 +4640,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
               ))
             )}
           </div>
-          {!invalidPriceField && <SetupHint>Editing one updates the others automatically.</SetupHint>}
-          <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:18, color:T.textBold }}>
+          <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, color:T.textBold }}>
             Shipping isn't included here. It's added at checkout based on buyer location.
           </p>
         </div>
