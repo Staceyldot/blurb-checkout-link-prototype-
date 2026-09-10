@@ -63,11 +63,12 @@ const BLURB_LOGO_EMAIL = "/assets/blurb-logo-email.png";  // full-color logo for
 const US_FLAG = "/assets/us-flag.png";  // Codex dashboard nav region flag (node 4248:8889) — flat icon, not the emoji glyph
 const BOOK_STIRRED_OBSESSION = "/assets/book-stirred-obsession.jpg";
 const BOOK_SPIRIT_SMOKE_SALT = "/assets/book-spirit-smoke-salt.jpg";
-/* Same front covers as above, given a soft drop shadow (front cover only, no
-   spine) matching BOOK_COVER's treatment — used only on the PDP's "More from
-   author" carousel, which shows other titles as physical books rather than
-   flat cover art. Setup/Instant Stores/All Projects keep the flat,
-   trim-accurate crops above. */
+/* Same front covers as above, composited onto a neutral gray/white spine
+   bevel (a lighting gradient + crease, not printed spine art) plus a soft
+   drop shadow (Figma 3709:18021, "Product Carousel") — used only on the
+   PDP's "More from author" carousel, which shows other titles as physical
+   books rather than flat cover art. Setup/Instant Stores/All Projects keep
+   the flat, trim-accurate crops above. */
 const BOOK_EVERYDAY_MOCKTAILS_MOCKUP = "/assets/book-everyday-mocktails-mockup.png";
 const BOOK_UPGRADED_SNACKS_MOCKUP = "/assets/book-upgraded-snacks-mockup.png";
 const PUBLISH_CELEBRATION = "/assets/publish-celebration.png";
@@ -1447,12 +1448,11 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
             {[["Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks","Craft artfully balanced recipes that apply authentic cocktail craft, complex botanicals, and sophisticated flavor pairings to every glass. Author Kim Newton Arispe elevates non-alcoholic mixology into a refined culinary art, giving zero-proof drinks the prestige, care, and attention they deserve. Designed for intentional drinkers and elevated hosts, this vibrant guide demonstrates how house-infused teas, artisanal syrups, and precise technique turn every pour into an extraordinary experience. Inside you'll find: Chef-Level Craft — artfully balanced flavor profiles featuring artisanal syrups, fresh garden botanicals, and layered aromatic bitters; Bar-Quality Presentation — professional techniques for selecting glassware, carving ice, and finishing drinks with modern garnishes; Elevated Sips — rich, complex drinks engineered for quiet lounge evenings, high-energy celebrations, and memorable dinner pairings; and Precision Balance — straightforward methods that master acidity, sweetness, texture, and body in every glass. Transform your home bar into a world-class lounge and savor the refined art of high-end mixology.","$28.00",BOOK_EVERYDAY_MOCKTAILS_MOCKUP],
               ["Upgraded Snacks","Turn casual drink nights into extraordinary culinary events with chef-inspired small plates, savory bites, and gourmet pub fare explicitly crafted to complement modern cocktails. Designed for adventurous home hosts, this practical cookbook bridges the gap between craft mixology and restaurant-quality lounge food. Discover how rich cheeses, bold spices, cured meats, and crispy textures balance sweet, bitter, and botanical spirits to create perfect flavor harmony on your palate.","$40.00",BOOK_UPGRADED_SNACKS_MOCKUP]].map(([t,d,p,img]) => (
               <div key={t} style={{ width:410.67, maxWidth:"100%", display:"flex", flexDirection:"column", gap:16 }}>
-                {/* Square frame (Figma 410.667²); absolutely-positioned img so aspect-ratio
-                    controls the height and the portrait cover is contained (gaps on the sides) */}
-                <div style={{ position:"relative", width:"100%", aspectRatio:"1 / 1", borderRadius:8, overflow:"hidden" }}>
-                  <img src={img} alt={t} style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"contain", display:"block" }} />
-                </div>
+                {/* Fixed-width card; each mockup keeps its own natural aspect ratio (no
+                    forced square/letterboxing) — a portrait cover just runs taller. */}
+                <img src={img} alt={t} style={{ width:"100%", height:"auto", display:"block" }} />
                 <div style={{ display:"flex", flexDirection:"column", gap:8, padding:"0 12px" }}>
+                  <p style={{ fontSize:14, color:T.textSubtle, lineHeight:1.4 }}>{PRODUCT.author}</p>
                   <p style={{ fontFamily:FONT_HEADING, fontSize:24, fontWeight:500, lineHeight:1.2, color:T.textBold }}>{t}</p>
                   <p style={{ fontSize:16, color:T.textSubtle, lineHeight:1.4,
                     display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{d}</p>
