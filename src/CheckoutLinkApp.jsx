@@ -3547,7 +3547,7 @@ function UseThisCheckbox({ checked, onChange }) {
    the viewport top so it stays in view while the (much taller) main column
    scrolls past it. */
 function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setTitleOn, descOn, setDescOn,
-  keywords, onRemoveKeyword, onClose, onStartDraft, onApply, onBack }) {
+  keywords, onRemoveKeyword, titleText, setTitleText, descText, setDescText, onClose, onStartDraft, onApply, onBack }) {
   return (
     <div style={{ position:"sticky", top:0, height:"100vh", flexShrink:0,
       width: open ? 400 : 0, maxWidth: open ? "92vw" : 0, overflow:"hidden", transition:"width .3s ease",
@@ -3614,12 +3614,17 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
                   <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>Listing title</span>
                   {phase === "results" && <UseThisCheckbox checked={titleOn} onChange={() => setTitleOn(v => !v)} />}
                 </div>
-                <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface,
-                  fontSize:16, color:T.textBold, minHeight:40, display:"flex", alignItems:"center" }}>
-                  {phase === "results" && AI_DRAFT.title}
-                  {phase === "loading" && <div style={{ height:16, width:"70%", borderRadius:4, backgroundImage:AI_SHIMMER }} />}
-                </div>
-                {phase === "results" && <SetupHint>{AI_DRAFT.title.length}/70</SetupHint>}
+                {phase === "results" ? (
+                  <input value={titleText} onChange={e => setTitleText(e.target.value.slice(0, 70))}
+                    style={{ width:"100%", border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
+                      fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface, minHeight:40, boxSizing:"border-box" }} />
+                ) : (
+                  <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface,
+                    fontSize:16, color:T.textBold, minHeight:40, display:"flex", alignItems:"center" }}>
+                    <div style={{ height:16, width:"70%", borderRadius:4, backgroundImage:AI_SHIMMER }} />
+                  </div>
+                )}
+                {phase === "results" && <SetupHint>{titleText.length}/70</SetupHint>}
               </div>
 
               <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:8 }}>
@@ -3627,19 +3632,22 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
                   <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>About the book</span>
                   {phase === "results" && <UseThisCheckbox checked={descOn} onChange={() => setDescOn(v => !v)} />}
                 </div>
-                <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface,
-                  fontSize:16, color:T.textBold, height:150, minHeight:150, overflowY:"auto", whiteSpace:"pre-wrap",
-                  resize:"vertical" }}>
-                  {phase === "results" && AI_DRAFT.description}
-                  {phase === "loading" && (
+                {phase === "results" ? (
+                  <textarea value={descText} onChange={e => setDescText(e.target.value.slice(0, 1466))}
+                    style={{ width:"100%", height:150, minHeight:150, border:`1px solid ${T.border}`, borderRadius:T.radius,
+                      padding:8, fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface,
+                      resize:"vertical", boxSizing:"border-box" }} />
+                ) : (
+                  <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface,
+                    fontSize:16, color:T.textBold, height:150, minHeight:150, overflowY:"auto", whiteSpace:"pre-wrap" }}>
                     <div style={{ display:"flex", flexDirection:"column", gap:8, paddingTop:4 }}>
                       {[100, 100, 80].map((w, i) => (
                         <div key={i} style={{ height:16, width:`${w}%`, borderRadius:4, backgroundImage:AI_SHIMMER }} />
                       ))}
                     </div>
-                  )}
-                </div>
-                {phase === "results" && <SetupHint>{AI_DRAFT.description.length}/1466</SetupHint>}
+                  </div>
+                )}
+                {phase === "results" && <SetupHint>{descText.length}/1466</SetupHint>}
               </div>
 
               <div>
@@ -4436,6 +4444,10 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
   const [aiTitleOn, setAiTitleOn] = useState(true);
   const [aiDescOn, setAiDescOn] = useState(true);
   const [aiKeywords, setAiKeywords] = useState([]);
+  // Editable copies of the AI draft — seeded from AI_DRAFT once results come
+  // back, then freely typed over so Stacey can tweak the draft before Apply.
+  const [aiTitleText, setAiTitleText] = useState(AI_DRAFT.title);
+  const [aiDescText, setAiDescText] = useState(AI_DRAFT.description);
 
   const openAiPanel = () => { setAiOpen(true); setAiPhase("prompt"); };
   const closeAiPanel = () => { setAiOpen(false); setAiPhase("prompt"); setAiInput(""); };
@@ -4445,14 +4457,16 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
       setAiKeywords(AI_DRAFT.keywords);
       setAiTitleOn(true);
       setAiDescOn(true);
+      setAiTitleText(AI_DRAFT.title);
+      setAiDescText(AI_DRAFT.description);
       setAiPhase("results");
     }, 1600);
   };
   const removeAiKeyword = i => setAiKeywords(aiKeywords.filter((_, idx) => idx !== i));
   const backToAiPrompt = () => setAiPhase("prompt");
   const applyDraft = () => {
-    if (aiTitleOn) setListingTitle(AI_DRAFT.title);
-    if (aiDescOn) setAboutBook(AI_DRAFT.description);
+    if (aiTitleOn) setListingTitle(aiTitleText);
+    if (aiDescOn) setAboutBook(aiDescText);
     if (aiKeywords.length) {
       setKeywords(prev => Array.from(new Set([...prev, ...aiKeywords])).slice(0, 7));
     }
@@ -4778,6 +4792,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
     <DraftPanel open={aiOpen} phase={aiPhase} input={aiInput} setInput={setAiInput}
       tone={aiTone} setTone={setAiTone} titleOn={aiTitleOn} setTitleOn={setAiTitleOn}
       descOn={aiDescOn} setDescOn={setAiDescOn} keywords={aiKeywords} onRemoveKeyword={removeAiKeyword}
+      titleText={aiTitleText} setTitleText={setAiTitleText} descText={aiDescText} setDescText={setAiDescText}
       onClose={closeAiPanel} onStartDraft={startDraft} onApply={applyDraft} onBack={backToAiPrompt} />
     </div>
 
