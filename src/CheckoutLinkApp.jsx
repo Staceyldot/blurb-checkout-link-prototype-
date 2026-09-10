@@ -4502,29 +4502,32 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
         <h1 style={{ fontFamily:FONT_HEADING, fontSize: isMobile ? 26 : 32, fontWeight:500, color:T.textBold, margin:"0 0 16px" }}>
           {PRODUCT.title}
         </h1>
-        <div style={{ maxWidth:672 }}>
-          {/* Static domain/ID prefix sits outside the field (Figma 4403:45381) —
-              only the slug itself is editable. Typing sanitizes to lowercase
-              letters, digits, and hyphens as you go; stray/duplicate hyphens
-              collapse on blur so the URL never ends up with "--" or a
-              trailing "-" mid-edit. */}
-          <div style={{ display:"flex", alignItems:"center", gap:4 }}>
-            <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textDisabled, whiteSpace:"nowrap", flexShrink:0 }}>
+        {/* Link row (Figma 4403:45381, "Link + Button"): the domain/ID prefix
+            and the slug field share a 672px-capped "Link Container", and the
+            copy control is its own square icon button outside it with a
+            brand-blue border — not an icon tucked inside the field. Typing
+            sanitizes to lowercase letters, digits, and hyphens as you go;
+            stray/duplicate hyphens collapse on blur so the URL never ends up
+            with "--" or a trailing "-" mid-edit. */}
+        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:4, width:"100%", maxWidth:672 }}>
+            <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textBold, whiteSpace:"nowrap", flexShrink:0 }}>
               blurb.com/hub/482910/
             </span>
-            <div style={{ flex:1, minWidth:0, position:"relative", display:"flex", alignItems:"center",
+            <div style={{ flex:1, minWidth:0, display:"flex", alignItems:"center",
               border:`1px solid ${T.border}`, borderRadius:T.radius, background:T.surface }}>
               <input value={slug}
                 onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
                 onBlur={() => setSlug(s => s.replace(/-+/g, "-").replace(/(^-|-$)/g, "") || slugify(PRODUCT.title))}
-                style={{ flex:1, minWidth:0, border:"none", background:"transparent", padding:8, paddingRight:36,
+                style={{ flex:1, minWidth:0, border:"none", background:"transparent", padding:8,
                   fontFamily:FONT_SANS, fontSize:16, color:T.textBold }} />
-              <button onClick={copyLink} aria-label="Copy link" style={{ position:"absolute", right:8,
-                display:"flex", alignItems:"center", background:"none", border:"none", cursor:"pointer", padding:0 }}>
-                <Ms name={copied ? "check" : "content_copy"} color={copied ? T.success : T.textBold} />
-              </button>
             </div>
           </div>
+          <button onClick={copyLink} aria-label="Copy link" style={{ flexShrink:0, display:"flex",
+            alignItems:"center", justifyContent:"center", padding:8, border:`1px solid ${T.brand}`,
+            borderRadius:T.radius, background:T.surface, cursor:"pointer" }}>
+            <Ms name={copied ? "check" : "content_copy"} size={24} color={copied ? T.success : T.brand} />
+          </button>
         </div>
       </div>
 
