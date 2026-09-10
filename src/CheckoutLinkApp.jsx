@@ -4475,7 +4475,10 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
     setTimeout(() => { setToast(false); setShowFeedback(true); }, 3000);
   };
 
-  const slug = PRODUCT.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  const slugify = title => title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  // Seeded from the book title, then freely editable — sellers pick their own
+  // link, it doesn't have to track the title forever.
+  const [slug, setSlug] = useState(() => slugify(PRODUCT.title));
   const linkUrl = `blurb.com/hub/482910/${slug}`;
   const copyLink = () => {
     if (navigator.clipboard) navigator.clipboard.writeText(`https://${linkUrl}`).catch(() => {});
@@ -4501,17 +4504,26 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
         </h1>
         <div style={{ maxWidth:672 }}>
           {/* Static domain/ID prefix sits outside the field (Figma 4403:45381) —
-              only the slug itself reads as editable. */}
+              only the slug itself is editable. Typing sanitizes to lowercase
+              letters, digits, and hyphens as you go; stray/duplicate hyphens
+              collapse on blur so the URL never ends up with "--" or a
+              trailing "-" mid-edit. */}
           <div style={{ display:"flex", alignItems:"center", gap:4 }}>
             <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textDisabled, whiteSpace:"nowrap", flexShrink:0 }}>
               blurb.com/hub/482910/
             </span>
-            <button onClick={copyLink} style={{ flex:1, minWidth:0, display:"flex", alignItems:"center", gap:8,
-              border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface, cursor:"pointer" }}>
-              <span style={{ flex:1, textAlign:"left", fontFamily:FONT_SANS, fontSize:16, color:T.textBold, minWidth:0,
-                overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{slug}</span>
-              <Ms name={copied ? "check" : "content_copy"} color={copied ? T.success : T.textBold} />
-            </button>
+            <div style={{ flex:1, minWidth:0, position:"relative", display:"flex", alignItems:"center",
+              border:`1px solid ${T.border}`, borderRadius:T.radius, background:T.surface }}>
+              <input value={slug}
+                onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
+                onBlur={() => setSlug(s => s.replace(/-+/g, "-").replace(/(^-|-$)/g, "") || slugify(PRODUCT.title))}
+                style={{ flex:1, minWidth:0, border:"none", background:"transparent", padding:8, paddingRight:36,
+                  fontFamily:FONT_SANS, fontSize:16, color:T.textBold }} />
+              <button onClick={copyLink} aria-label="Copy link" style={{ position:"absolute", right:8,
+                display:"flex", alignItems:"center", background:"none", border:"none", cursor:"pointer", padding:0 }}>
+                <Ms name={copied ? "check" : "content_copy"} color={copied ? T.success : T.textBold} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
