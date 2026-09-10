@@ -69,11 +69,11 @@ const PUBLISH_CELEBRATION = "/assets/publish-celebration.png";
    carousel on Setup (Figma 5203:102590) shows what a buyer sees below this
    listing. Copy and covers match the PDP's own carousel (Figma 3709:18021). */
 const CROSS_SELL_BOOKS = [
-  { title:"The Stirred Obsession: A Minimalist's Guide to the Modern Martini", author:"Kim Newton Arispe",
-    blurb:"The timeless elegance of the world's most iconic cocktail takes center stage in The Stirred Obsession: A Minimalist's Guide to the Modern Martini.",
+  { title:"Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks", author:"Kim Newton Arispe",
+    blurb:"Craft artfully balanced recipes that apply authentic cocktail craft, complex botanicals, and sophisticated flavor pairings to every glass. Author Kim Newton Arispe elevates non-alcoholic mixology into a refined culinary art, giving zero-proof drinks the prestige, care, and attention they deserve. Designed for intentional drinkers and elevated hosts, this vibrant guide demonstrates how house-infused teas, artisanal syrups, and precise technique turn every pour into an extraordinary experience. Inside you'll find: Chef-Level Craft — artfully balanced flavor profiles featuring artisanal syrups, fresh garden botanicals, and layered aromatic bitters; Bar-Quality Presentation — professional techniques for selecting glassware, carving ice, and finishing drinks with modern garnishes; Elevated Sips — rich, complex drinks engineered for quiet lounge evenings, high-energy celebrations, and memorable dinner pairings; and Precision Balance — straightforward methods that master acidity, sweetness, texture, and body in every glass. Transform your home bar into a world-class lounge and savor the refined art of high-end mixology.",
     price:28.00, img:BOOK_STIRRED_OBSESSION },
-  { title:"Spirit, Smoke & Salt", author:"Kim Newton Arispe",
-    blurb:"Rooted in centuries of craftsmanship, agave spirits possess a depth, minerality, and complexity that rival the finest whiskies and brandies in the world. This volume bridges ancient distillation traditions with modern cocktail architecture, showing you how to turn primitive, earth-bound flavors into sleek, high-end drinks.",
+  { title:"Upgraded Snacks", author:"Kim Newton Arispe",
+    blurb:"Turn casual drink nights into extraordinary culinary events with chef-inspired small plates, savory bites, and gourmet pub fare explicitly crafted to complement modern cocktails. Designed for adventurous home hosts, this practical cookbook bridges the gap between craft mixology and restaurant-quality lounge food. Discover how rich cheeses, bold spices, cured meats, and crispy textures balance sweet, bitter, and botanical spirits to create perfect flavor harmony on your palate.",
     price:40.00, img:BOOK_SPIRIT_SMOKE_SALT },
 ];
 
@@ -1437,8 +1437,8 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
         <div style={{ marginTop:0, paddingTop:80, paddingBottom:80, display:"flex", flexDirection:"column", gap:48 }}>
           <h2 style={{ fontFamily:FONT_HEADING, fontSize: isDesktop ? 44 : 32, fontWeight:500, lineHeight:1.2, color:T.textBold }}>More from {PRODUCT.author}</h2>
           <div style={{ display:"flex", flexWrap:"wrap", gap:24 }}>
-            {[["The Stirred Obsession: A Minimalist's Guide to the Modern Martini","The timeless elegance of the world's most iconic cocktail takes center stage in The Stirred Obsession: A Minimalist's Guide to the Modern Martini.","$28.00",BOOK_STIRRED_OBSESSION],
-              ["Spirit, Smoke & Salt","Rooted in centuries of craftsmanship, agave spirits possess a depth, minerality, and complexity that rival the finest whiskies and brandies in the world. This volume bridges ancient distillation traditions with modern cocktail architecture, showing you how to turn primitive, earth-bound flavors into sleek, high-end drinks.","$40.00",BOOK_SPIRIT_SMOKE_SALT]].map(([t,d,p,img]) => (
+            {[["Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks","Craft artfully balanced recipes that apply authentic cocktail craft, complex botanicals, and sophisticated flavor pairings to every glass. Author Kim Newton Arispe elevates non-alcoholic mixology into a refined culinary art, giving zero-proof drinks the prestige, care, and attention they deserve. Designed for intentional drinkers and elevated hosts, this vibrant guide demonstrates how house-infused teas, artisanal syrups, and precise technique turn every pour into an extraordinary experience. Inside you'll find: Chef-Level Craft — artfully balanced flavor profiles featuring artisanal syrups, fresh garden botanicals, and layered aromatic bitters; Bar-Quality Presentation — professional techniques for selecting glassware, carving ice, and finishing drinks with modern garnishes; Elevated Sips — rich, complex drinks engineered for quiet lounge evenings, high-energy celebrations, and memorable dinner pairings; and Precision Balance — straightforward methods that master acidity, sweetness, texture, and body in every glass. Transform your home bar into a world-class lounge and savor the refined art of high-end mixology.","$28.00",BOOK_STIRRED_OBSESSION],
+              ["Upgraded Snacks","Turn casual drink nights into extraordinary culinary events with chef-inspired small plates, savory bites, and gourmet pub fare explicitly crafted to complement modern cocktails. Designed for adventurous home hosts, this practical cookbook bridges the gap between craft mixology and restaurant-quality lounge food. Discover how rich cheeses, bold spices, cured meats, and crispy textures balance sweet, bitter, and botanical spirits to create perfect flavor harmony on your palate.","$40.00",BOOK_SPIRIT_SMOKE_SALT]].map(([t,d,p,img]) => (
               <div key={t} style={{ width:410.67, maxWidth:"100%", display:"flex", flexDirection:"column", gap:16 }}>
                 {/* Square frame (Figma 410.667²); absolutely-positioned img so aspect-ratio
                     controls the height and the portrait cover is contained (gaps on the sides) */}
@@ -3860,13 +3860,13 @@ const ALL_PROJECTS = [
     meta:[["Project type","Trade Book"],["Project option","10×8 in, 25×20 cm"],["# of pages","160"],["ISBN","9781733372800"],["Created with","BookWright"],["Created","March 14, 2019"]],
     actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }, { icon:"local_shipping", label:"Set up retail distribution" }],
     share:true },
-  { cover:BOOK_STIRRED_OBSESSION, coverAspect:"square", coverZoom:1.12, badge:"Selling", title:"The Stirred Obsession: A Minimalist's Guide to the Modern Martini",
-    desc:"The timeless elegance of the world's most iconic cocktail takes center stage in The Stirred Obsession: A Minimalist's Guide to the Modern Martini.",
+  { cover:BOOK_STIRRED_OBSESSION, coverAspect:"square", coverZoom:1.12, badge:"Selling", title:"Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks",
+    desc:"Craft artfully balanced recipes that apply authentic cocktail craft, complex botanicals, and sophisticated flavor pairings to every glass. Author Kim Newton Arispe elevates non-alcoholic mixology into a refined culinary art, giving zero-proof drinks the prestige, care, and attention they deserve. Designed for intentional drinkers and elevated hosts, this vibrant guide demonstrates how house-infused teas, artisanal syrups, and precise technique turn every pour into an extraordinary experience. Inside you'll find: Chef-Level Craft — artfully balanced flavor profiles featuring artisanal syrups, fresh garden botanicals, and layered aromatic bitters; Bar-Quality Presentation — professional techniques for selecting glassware, carving ice, and finishing drinks with modern garnishes; Elevated Sips — rich, complex drinks engineered for quiet lounge evenings, high-energy celebrations, and memorable dinner pairings; and Precision Balance — straightforward methods that master acidity, sweetness, texture, and body in every glass. Transform your home bar into a world-class lounge and savor the refined art of high-end mixology.",
     meta:[["Project type","Photo Book"],["Project option","10×10 in"],["# of pages","96"],["Created with","BookWright"],["Created","Jan 9, 2025"]],
     actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"download", label:"Download PDF" }],
     share:true },
-  { cover:BOOK_SPIRIT_SMOKE_SALT, badge:"Selling", title:"Spirit, Smoke & Salt",
-    desc:"Rooted in centuries of craftsmanship, agave spirits possess a depth, minerality, and complexity that rival the finest whiskies and brandies in the world.",
+  { cover:BOOK_SPIRIT_SMOKE_SALT, badge:"Selling", title:"Upgraded Snacks",
+    desc:"Turn casual drink nights into extraordinary culinary events with chef-inspired small plates, savory bites, and gourmet pub fare explicitly crafted to complement modern cocktails. Designed for adventurous home hosts, this practical cookbook bridges the gap between craft mixology and restaurant-quality lounge food. Discover how rich cheeses, bold spices, cured meats, and crispy textures balance sweet, bitter, and botanical spirits to create perfect flavor harmony on your palate.",
     meta:[["Project type","Trade Book"],["Project option","8×10 in"],["# of pages","112"],["Created with","InDesign"],["Created","Apr 22, 2025"]],
     actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"download", label:"Download PDF" }],
     share:true },
@@ -3948,8 +3948,8 @@ function AllProjectsRow({ project, onManageInstantStore }) {
    Store" this whole prototype is about), so its live rows link into Setup
    the same way Manage Instant Store does elsewhere on the Dashboard. */
 const INSTANT_STORES = [
-  { title:"The Stirred Obsession: A Minimalist's Guide to the Modern Martini", sub:"Photo book · 10×10", link:"blurb.com/1/c1t2k", price:"$28.00", status:"live", orders:3, cover:BOOK_STIRRED_OBSESSION, coverAspect:"square", coverZoom:1.12 },
-  { title:"Spirit, Smoke & Salt", sub:"Trade book · 8×10", link:"blurb.com/1/sm5kt", price:"$40.00", status:"live", orders:7, cover:BOOK_SPIRIT_SMOKE_SALT },
+  { title:"Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks", sub:"Photo book · 10×10", link:"blurb.com/1/c1t2k", price:"$28.00", status:"live", orders:3, cover:BOOK_STIRRED_OBSESSION, coverAspect:"square", coverZoom:1.12 },
+  { title:"Upgraded Snacks", sub:"Trade book · 8×10", link:"blurb.com/1/sm5kt", price:"$40.00", status:"live", orders:7, cover:BOOK_SPIRIT_SMOKE_SALT },
 ];
 
 function InstantStoresTable({ onManageInstantStore }) {
