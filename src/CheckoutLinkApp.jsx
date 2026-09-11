@@ -377,6 +377,7 @@ function Btn({ children, onClick, variant="primary", disabled, fullWidth }) {
   const variants = {
     primary:   { background:T.brand, color:"#fff" },
     secondary: { background:"transparent", color:T.brand, border:`1px solid ${T.brand}` },
+    danger:    { background:T.textError, color:"#fff" },
     disabled:  { background:T.disabled, color:T.textDisabled, border:`1px solid ${T.border}` },
   };
   const s = disabled ? variants.disabled : variants[variant];
@@ -4420,6 +4421,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
      filled state — independent of canPublish, which only flips once a cover
      finish is chosen further down the page. */
   const authorFilled = canPublish || !!copyFromStore;
+  const [deleteStoreOpen, setDeleteStoreOpen] = useState(false);
   const [sectionPreviewVisible, setSectionPreviewVisible] = useState(true);
 
   // Listing content fields — plain state so the AI draft panel has something to write into.
@@ -4833,7 +4835,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
           <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, color:T.textBold, lineHeight:1.4 }}>
             Buyers will no longer be able to purchase through this link.
           </p>
-          <button onClick={e => e.preventDefault()} style={{ alignSelf:"flex-start", background:"none", border:"none",
+          <button onClick={() => setDeleteStoreOpen(true)} style={{ alignSelf:"flex-start", background:"none", border:"none",
             cursor:"pointer", padding:"8px 24px 8px 0", display:"flex", alignItems:"center", gap:8 }}>
             <Ms name="delete" size={24} color={T.textError} />
             <span style={{ fontSize:16, fontWeight:600, color:T.textError, lineHeight:"24px",
@@ -4859,6 +4861,9 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
       copied={copied} onCopyLink={copyLink} />
 
     <BookPreviewModal open={!!previewModalKind} kind={previewModalKind} onClose={() => setPreviewModalKind(null)} />
+
+    <DeleteStoreModal open={deleteStoreOpen} onClose={() => setDeleteStoreOpen(false)}
+      onConfirm={() => { setDeleteStoreOpen(false); onGoAllProjects?.(); }} />
 
     <Toast show={toast}>Draft applied to your listing.</Toast>
     </>
@@ -4945,6 +4950,32 @@ function BookPreviewModal({ open, kind, onClose }) {
         <Flipbook maxWidth={900} pageBadge showFrontCover showBackCover={kind === "full"}
           totalLabel={kind === "full" ? FULL_BOOK_PAGE_COUNT : PREVIEW_LAST_PAGE}
           maxPage={kind === "full" ? PREVIEW_LAST_PAGE_FULL : PREVIEW_LAST_PAGE} />
+      </div>
+    </>
+  );
+}
+
+/* "Delete this Instant Store?" double-confirm modal, shown before the
+   destructive Delete Instant Store action actually fires. */
+function DeleteStoreModal({ open, onClose, onConfirm }) {
+  if (!open) return null;
+  return (
+    <>
+      <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.45)", zIndex:140 }} />
+      <div style={{ position:"fixed", top:"50%", left:"50%", transform:"translate(-50%,-50%)", zIndex:150,
+        width:440, maxWidth:"92vw", background:T.surface, borderRadius:T.radius, padding:24,
+        boxShadow:"0 8px 32px rgba(0,0,0,.16)", display:"flex", flexDirection:"column", gap:16,
+        fontFamily:FONT_SANS }}>
+        <p style={{ margin:0, fontFamily:FONT_HEADING, fontSize:24, fontWeight:500, lineHeight:1.2, color:T.textBold }}>
+          Delete this Instant Store?
+        </p>
+        <p style={{ margin:0, fontSize:16, color:T.textBold, lineHeight:1.4 }}>
+          This can't be undone. Buyers will no longer be able to purchase through this link.
+        </p>
+        <div style={{ display:"flex", gap:12, justifyContent:"flex-end" }}>
+          <Btn variant="secondary" onClick={onClose}>Cancel</Btn>
+          <Btn variant="danger" onClick={onConfirm}>Delete link</Btn>
+        </div>
       </div>
     </>
   );
