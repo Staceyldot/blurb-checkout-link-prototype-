@@ -61,14 +61,14 @@ const BLURB_MARK  = "/assets/blurb-mark.svg";
 const AUTHOR_PHOTO = "/assets/author-kim.png";
 const BLURB_LOGO_EMAIL = "/assets/blurb-logo-email.png";  // full-color logo for the email header
 const US_FLAG = "/assets/us-flag.png";  // Codex dashboard nav region flag (node 4248:8889) — flat icon, not the emoji glyph
-const BOOK_STIRRED_OBSESSION = "/assets/book-stirred-obsession.jpg";
-const BOOK_SPIRIT_SMOKE_SALT = "/assets/book-spirit-smoke-salt.jpg";
-/* Same front covers as above, composited onto a neutral gray/white spine
-   bevel (a lighting gradient + crease, not printed spine art) plus a soft
-   drop shadow (Figma 3709:18021, "Product Carousel") — used only on the
-   PDP's "More from author" carousel, which shows other titles as physical
-   books rather than flat cover art. Setup/Instant Stores/All Projects keep
-   the flat, trim-accurate crops above. */
+/* Book-mockup renders (Figma 5722:89683 / 5727:89746) — the book shown as a
+   physical object with real depth and its own soft drop shadow, on a
+   transparent ground. Used everywhere these two titles show a cover: the
+   PDP's "More from author" carousel, Setup's "Other books preview"
+   carousel, the Instant Stores table, and the Dashboard's All Projects
+   list. Each spot fits the whole mockup into its own box with
+   objectFit:"contain" (see `coverFit` below) rather than cropping into it
+   like a flat trim photo. */
 const BOOK_EVERYDAY_MOCKTAILS_MOCKUP = "/assets/book-everyday-mocktails-mockup.png";
 const BOOK_UPGRADED_SNACKS_MOCKUP = "/assets/book-upgraded-snacks-mockup.png";
 const PUBLISH_CELEBRATION = "/assets/publish-celebration.png";
@@ -79,10 +79,10 @@ const PUBLISH_CELEBRATION = "/assets/publish-celebration.png";
 const CROSS_SELL_BOOKS = [
   { title:"Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks", author:"Kim Newton Arispe",
     blurb:"Craft artfully balanced recipes that apply authentic cocktail craft, complex botanicals, and sophisticated flavor pairings to every glass. Author Kim Newton Arispe elevates non-alcoholic mixology into a refined culinary art, giving zero-proof drinks the prestige, care, and attention they deserve. Designed for intentional drinkers and elevated hosts, this vibrant guide demonstrates how house-infused teas, artisanal syrups, and precise technique turn every pour into an extraordinary experience. Inside you'll find: Chef-Level Craft — artfully balanced flavor profiles featuring artisanal syrups, fresh garden botanicals, and layered aromatic bitters; Bar-Quality Presentation — professional techniques for selecting glassware, carving ice, and finishing drinks with modern garnishes; Elevated Sips — rich, complex drinks engineered for quiet lounge evenings, high-energy celebrations, and memorable dinner pairings; and Precision Balance — straightforward methods that master acidity, sweetness, texture, and body in every glass. Transform your home bar into a world-class lounge and savor the refined art of high-end mixology.",
-    price:28.00, img:BOOK_STIRRED_OBSESSION },
+    price:28.00, img:BOOK_EVERYDAY_MOCKTAILS_MOCKUP },
   { title:"Upgraded Snacks", author:"Kim Newton Arispe",
     blurb:"Turn casual drink nights into extraordinary culinary events with chef-inspired small plates, savory bites, and gourmet pub fare explicitly crafted to complement modern cocktails. Designed for adventurous home hosts, this practical cookbook bridges the gap between craft mixology and restaurant-quality lounge food. Discover how rich cheeses, bold spices, cured meats, and crispy textures balance sweet, bitter, and botanical spirits to create perfect flavor harmony on your palate.",
-    price:40.00, img:BOOK_SPIRIT_SMOKE_SALT },
+    price:40.00, img:BOOK_UPGRADED_SNACKS_MOCKUP },
 ];
 
 /* Setup page Materials swatches (Figma node 4806:45519, "Unpublished / Filled"
@@ -3875,12 +3875,12 @@ const ALL_PROJECTS = [
     meta:[["Project type","Trade Book"],["Project option","10×8 in, 25×20 cm"],["# of pages","160"],["ISBN","9781733372800"],["Created with","BookWright"],["Created","March 14, 2019"]],
     actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }, { icon:"local_shipping", label:"Set up retail distribution" }],
     share:true },
-  { cover:BOOK_STIRRED_OBSESSION, coverAspect:"square", coverZoom:1.12, badge:"Selling", title:"Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks",
+  { cover:BOOK_EVERYDAY_MOCKTAILS_MOCKUP, coverAspect:"square", coverFit:"contain", badge:"Selling", title:"Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks",
     desc:"Craft artfully balanced recipes that apply authentic cocktail craft, complex botanicals, and sophisticated flavor pairings to every glass. Author Kim Newton Arispe elevates non-alcoholic mixology into a refined culinary art, giving zero-proof drinks the prestige, care, and attention they deserve. Designed for intentional drinkers and elevated hosts, this vibrant guide demonstrates how house-infused teas, artisanal syrups, and precise technique turn every pour into an extraordinary experience. Inside you'll find: Chef-Level Craft — artfully balanced flavor profiles featuring artisanal syrups, fresh garden botanicals, and layered aromatic bitters; Bar-Quality Presentation — professional techniques for selecting glassware, carving ice, and finishing drinks with modern garnishes; Elevated Sips — rich, complex drinks engineered for quiet lounge evenings, high-energy celebrations, and memorable dinner pairings; and Precision Balance — straightforward methods that master acidity, sweetness, texture, and body in every glass. Transform your home bar into a world-class lounge and savor the refined art of high-end mixology.",
     meta:[["Project type","Photo Book"],["Project option","10×10 in"],["# of pages","96"],["Created with","BookWright"],["Created","Jan 9, 2025"]],
     actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"download", label:"Download PDF" }],
     share:true },
-  { cover:BOOK_SPIRIT_SMOKE_SALT, badge:"Selling", title:"Upgraded Snacks",
+  { cover:BOOK_UPGRADED_SNACKS_MOCKUP, coverAspect:"square", coverFit:"contain", badge:"Selling", title:"Upgraded Snacks",
     desc:"Turn casual drink nights into extraordinary culinary events with chef-inspired small plates, savory bites, and gourmet pub fare explicitly crafted to complement modern cocktails. Designed for adventurous home hosts, this practical cookbook bridges the gap between craft mixology and restaurant-quality lounge food. Discover how rich cheeses, bold spices, cured meats, and crispy textures balance sweet, bitter, and botanical spirits to create perfect flavor harmony on your palate.",
     meta:[["Project type","Trade Book"],["Project option","8×10 in"],["# of pages","112"],["Created with","InDesign"],["Created","Apr 22, 2025"]],
     actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"download", label:"Download PDF" }],
@@ -3894,9 +3894,11 @@ function AllProjectsRow({ project, onManageInstantStore }) {
       padding:"22px 0", borderBottom:`1px solid ${WF.border}` }}>
       <div style={{ flexShrink:0, width:130 }}>
         {project.cover ? (
-          <div style={{ width:130, height:project.coverAspect === "square" ? 130 : 168, overflow:"hidden", boxShadow:"2px 4px 10px rgba(0,0,0,.16)" }}>
-            <img src={project.cover} alt="" style={{ width:"100%", height:"100%", objectFit:"cover",
-              objectPosition:project.coverPos || "center", transform:`scale(${project.coverZoom ?? 1.2})` }} />
+          <div style={{ width:130, height:project.coverAspect === "square" ? 130 : 168, overflow:"hidden",
+            boxShadow: project.coverFit === "contain" ? "none" : "2px 4px 10px rgba(0,0,0,.16)" }}>
+            <img src={project.cover} alt="" style={{ width:"100%", height:"100%", objectFit:project.coverFit || "cover",
+              objectPosition:project.coverPos || "center",
+              transform: project.coverFit === "contain" ? "none" : `scale(${project.coverZoom ?? 1.2})` }} />
           </div>
         ) : (
           <div style={{ width:130, height:168, background:WF.cover, border:`1px solid ${WF.borderLight}` }} />
@@ -3963,8 +3965,8 @@ function AllProjectsRow({ project, onManageInstantStore }) {
    Store" this whole prototype is about), so its live rows link into Setup
    the same way Manage Instant Store does elsewhere on the Dashboard. */
 const INSTANT_STORES = [
-  { title:"Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks", sub:"Photo book · 10×10", link:"blurb.com/1/c1t2k", price:"$28.00", status:"live", orders:3, cover:BOOK_STIRRED_OBSESSION, coverAspect:"square", coverZoom:1.12 },
-  { title:"Upgraded Snacks", sub:"Trade book · 8×10", link:"blurb.com/1/sm5kt", price:"$40.00", status:"live", orders:7, cover:BOOK_SPIRIT_SMOKE_SALT },
+  { title:"Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks", sub:"Photo book · 10×10", link:"blurb.com/1/c1t2k", price:"$28.00", status:"live", orders:3, cover:BOOK_EVERYDAY_MOCKTAILS_MOCKUP, coverFit:"contain" },
+  { title:"Upgraded Snacks", sub:"Trade book · 8×10", link:"blurb.com/1/sm5kt", price:"$40.00", status:"live", orders:7, cover:BOOK_UPGRADED_SNACKS_MOCKUP, coverFit:"contain" },
 ];
 
 function InstantStoresTable({ onManageInstantStore }) {
@@ -3986,8 +3988,9 @@ function InstantStoresTable({ onManageInstantStore }) {
                 <div style={{ display:"flex", alignItems:"center", gap:12 }}>
                   {s.cover ? (
                     <div style={{ width:100, height:100, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                      <img src={s.cover} alt="" style={{ ...trimBoxSize(s.sub, 100), objectFit:"cover", borderRadius:2,
-                        objectPosition:s.coverPos || "center", transform:`scale(${s.coverZoom ?? 1.2})` }} />
+                      <img src={s.cover} alt="" style={{ ...trimBoxSize(s.sub, 100), objectFit:s.coverFit || "cover", borderRadius:2,
+                        objectPosition:s.coverPos || "center",
+                        transform: s.coverFit === "contain" ? "none" : `scale(${s.coverZoom ?? 1.2})` }} />
                     </div>
                   ) : (
                     <div style={{ width:100, height:100, borderRadius:2, background:WF.cover, border:`1px solid ${WF.borderLight}`, flexShrink:0 }} />
