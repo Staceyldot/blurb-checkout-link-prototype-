@@ -3169,7 +3169,7 @@ const initialStage = () => {
 function SetupSection({ title, action, dividerless, children }) {
   const { isMobile } = useViewport();
   return (
-    <div style={{ background:T.surface, width:"100%", padding: isMobile ? "24px 20px" : "32px 80px" }}>
+    <div style={{ background:T.surface, width:"100%", padding: isMobile ? "24px 20px" : "32px 16px" }}>
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16,
         borderBottom: dividerless ? "none" : `1px solid ${T.borderSubtle}`, paddingBottom: dividerless ? 0 : 16,
         marginBottom: dividerless ? 0 : 16 }}>
@@ -3786,24 +3786,27 @@ function HamburgerMenu() {
    other stages share. Responsive per Codex's Tablet (4141:5458) and Mobile
    (4141:5560) variants: cart/flag/Log out/Help collapse into a single dark
    hamburger button below desktop. */
+/* Header (Figma 5696:57693) — a fixed 1180×105 bar (pt:20, px:20), centered
+   on the page rather than spanning full-bleed edge to edge. */
 function DashboardTopNav() {
   const { isMobile, isTablet } = useViewport();
   const collapsed = isMobile || isTablet;
-  const padX = isMobile ? 20 : isTablet ? 40 : 80;
+  const padX = isMobile ? 20 : isTablet ? 40 : 20;
   return (
-    <div style={{ background:T.surface, borderBottom:`1px solid ${T.borderSubtle}`, display:"flex",
-      alignItems:"center", justifyContent:"space-between", padding:`0 ${padX}px`, height:60, flexShrink:0 }}>
+    <div style={{ width:"100%", maxWidth:1180, height:105, margin:"0 auto", boxSizing:"border-box",
+      background:T.surface, borderBottom:`1px solid ${T.borderSubtle}`, flexShrink:0,
+      display:"flex", alignItems:"center", justifyContent:"space-between", padding:`20px ${padX}px 0` }}>
       <img src={BLURB_LOGO} alt="Blurb" style={{ height:48.39, width:"auto", display:"block" }} />
       {collapsed ? (
         <HamburgerMenu />
       ) : (
         <div style={{ display:"flex", alignItems:"center", gap:24 }}>
-          <Ms name="shopping_cart" size={24} color={T.textBold} />
-          <img src={US_FLAG} alt="United States" style={{ width:25, height:18, display:"block" }} />
-          <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:16,
+          <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:"Arial, sans-serif", fontSize:14,
             fontWeight:400, color:T.textBold, textDecoration:"none" }}>Log out</a>
-          <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:FONT_SANS, fontSize:16,
+          <a href="#" onClick={e => e.preventDefault()} style={{ fontFamily:"Arial, sans-serif", fontSize:14,
             fontWeight:400, color:T.textBold, textDecoration:"none" }}>Help</a>
+          <img src={US_FLAG} alt="United States" style={{ width:25, height:18, display:"block" }} />
+          <Ms name="shopping_cart" size={24} color={T.textBold} />
         </div>
       )}
     </div>
@@ -3813,7 +3816,7 @@ function DashboardTopNav() {
 function SideNav({ activeItem, onNavigate, divider }) {
   return (
     <div style={{ position:"sticky", top:0, height:"100vh", width:280, flexShrink:0, overflowY:"auto",
-      background:"#fff", padding:"32px 24px", borderRight: divider ? `1px solid ${WF.borderLight}` : "none" }}>
+      background:"#fff", padding:"32px 24px 32px 20px", borderRight: divider ? `1px solid ${WF.borderLight}` : "none" }}>
       <div style={{ display:"flex", flexDirection:"column", gap:28 }}>
         {SIDE_NAV_SECTIONS.map(section => (
           <SideNavSection key={section.key} section={section} activeItem={activeItem} onNavigate={onNavigate} />
@@ -4237,7 +4240,8 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
   return (
     <>
     <DashboardTopNav />
-    <div style={{ display:"flex", alignItems:"flex-start", background:"#fff", minHeight:"100vh" }}>
+    <div style={{ display:"flex", alignItems:"flex-start", background:"#fff", minHeight:"100vh",
+      width:"100%", maxWidth:1180, margin:"0 auto" }}>
       {!isMobile && (
         <SideNav activeItem={ACTIVE_ITEM_FOR[subPage]}
           onNavigate={item => { if (SIDE_NAV_TARGETS[item]) setSubPage(SIDE_NAV_TARGETS[item]); }} />
@@ -4493,11 +4497,11 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
   return (
     <>
     <DashboardTopNav />
-    <div style={{ display:"flex", alignItems:"flex-start" }}>
-    <SideNav activeItem="Instant Stores" onNavigate={item => { if (item === "All projects") onGoAllProjects?.(); }} divider />
+    <div style={{ display:"flex", alignItems:"flex-start", width:"100%", maxWidth:1180, margin:"0 auto" }}>
+    <SideNav activeItem="Instant Stores" onNavigate={item => { if (item === "All projects") onGoAllProjects?.(); }} />
     <div style={{ flex:1, minWidth:0, minHeight:"100vh", background:T.bg, fontFamily:FONT_SANS }}>
       {/* Header: breadcrumb, title, and the auto-generated link field */}
-      <div style={{ background:T.surface, padding: isMobile ? "16px 20px 24px" : "32px 80px 24px" }}>
+      <div style={{ background:T.surface, padding: isMobile ? "16px 20px 24px" : "32px 16px 24px" }}>
         <div style={{ display:"flex", alignItems:"center", gap:4, fontFamily:FONT_SANS, fontSize:14, marginBottom:16 }}>
           <a href="#" onClick={e => e.preventDefault()} style={{ color:T.textLink }}>Instant Stores</a>
           <Ms name="chevron_right" size={16} color={T.textSubtle} />
@@ -4789,7 +4793,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
           has no title row to divide from. The divider sits inside the padded
           content (not on the outer full-bleed div) so it spans the same width
           as every other section's header divider. */}
-      <div style={{ background:T.surface, width:"100%", padding: isMobile ? "24px 20px" : "32px 80px" }}>
+      <div style={{ background:T.surface, width:"100%", padding: isMobile ? "24px 20px" : "32px 16px" }}>
         <div style={{ borderTop:`1px solid ${T.borderSubtle}`, marginBottom:24 }} />
         <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
           <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, color:T.textBold, lineHeight:1.4 }}>
@@ -4839,7 +4843,7 @@ function StickyCtaBar({ onPreview, canPublish, onPublish, panelOpen }) {
     <div style={{ position:"fixed", left:280, right: panelOpen ? 400 : 0, bottom:0, zIndex:30, background:T.surface,
       borderTop:`1px solid ${T.borderSubtle}`, boxShadow:"0 -4px 16px rgba(0,0,0,0.08)",
       display:"flex", alignItems:"center", justifyContent:"space-between", gap:16,
-      padding: isMobile ? "16px 20px" : "16px 80px", transition:"right .3s ease" }}>
+      padding: isMobile ? "16px 20px" : "16px 16px", transition:"right .3s ease" }}>
       <button onClick={onPreview} style={{ background:"none", border:"none", cursor:"pointer",
         display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:16,
         fontFamily:FONT_SANS, textDecoration:"underline", padding:0 }}>
