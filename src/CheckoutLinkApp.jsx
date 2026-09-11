@@ -3836,7 +3836,7 @@ function PreviewCard({ icon, title, sub, selected, onSelect, showLink, onSeePage
 function ProductCarouselCard({ title, blurb, price, img }) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:16, width:410.67, flexShrink:0 }}>
-      <div style={{ position:"relative", width:"100%", aspectRatio:"1 / 1", borderRadius:8, overflow:"hidden", opacity:.8 }}>
+      <div style={{ position:"relative", width:"100%", aspectRatio:"1 / 1", borderRadius:8, overflow:"hidden" }}>
         <img src={img} alt="" style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"contain", display:"block" }} />
       </div>
       <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
