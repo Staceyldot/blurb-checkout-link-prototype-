@@ -3494,9 +3494,12 @@ function RadioCardImage({ name, img, extra, selected, onSelect }) {
 function SwitchToggle({ on, onToggle }) {
   return (
     <button onClick={onToggle} aria-pressed={on} style={{ width:52, height:28, borderRadius:14, border:"none",
-      cursor:"pointer", padding:2, background: on ? T.brand : "#c4c4c4", display:"flex",
-      justifyContent: on ? "flex-end" : "flex-start", transition:"background .15s" }}>
-      <span style={{ width:24, height:24, borderRadius:"50%", background:"#fff", display:"block" }} />
+      cursor:"pointer", padding:2, background: on ? T.brand : "#c4c4c4", position:"relative",
+      transition:"background .2s ease" }}>
+      <span style={{ width:24, height:24, borderRadius:"50%", background:"#fff", display:"block",
+        position:"absolute", top:2, left:2, boxShadow:"0 1px 3px rgba(0,0,0,.2)",
+        transform: on ? "translateX(24px)" : "translateX(0)",
+        transition:"transform .2s cubic-bezier(.4,0,.2,1)" }} />
     </button>
   );
 }
@@ -4859,14 +4862,20 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
               ? "Shown on your checkout page unless you turn this off."
               : "This section won't show on your checkout page."}
           </p>
-          {sectionPreviewVisible && (
-            <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:"24px 24px 8px",
-              display:"flex", flexDirection:"column", gap:24, overflow:"hidden" }}>
-              <div className="other-books-scroll" style={{ display:"flex", gap:24, alignItems:"flex-start", overflowX:"auto", overflowY:"hidden", paddingBottom:24 }}>
-                {CROSS_SELL_BOOKS.map(b => <ProductCarouselCard key={b.title} {...b} />)}
+          {/* Grid-rows collapse (rather than a hard mount/unmount) so hiding the
+              carousel eases the page height in instead of jumping instantly. */}
+          <div style={{ display:"grid", gridTemplateRows: sectionPreviewVisible ? "1fr" : "0fr",
+            transition:"grid-template-rows .25s ease", overflow:"hidden" }}>
+            <div style={{ minHeight:0, overflow:"hidden", opacity: sectionPreviewVisible ? 1 : 0,
+              transition:"opacity .2s ease" }}>
+              <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:"24px 24px 8px",
+                display:"flex", flexDirection:"column", gap:24 }}>
+                <div className="other-books-scroll" style={{ display:"flex", gap:24, alignItems:"flex-start", overflowX:"auto", overflowY:"hidden", paddingBottom:24 }}>
+                  {CROSS_SELL_BOOKS.map(b => <ProductCarouselCard key={b.title} {...b} />)}
+                </div>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </SetupSection>
 
