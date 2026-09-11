@@ -1547,7 +1547,7 @@ function EverydayMocktailsPdp({ onBack }) {
           <div style={{ flex:1, display:"flex", flexDirection:"column", gap:14, alignItems:"flex-start", width:"100%" }}>
             <div style={{ width:"100%", maxWidth:628, aspectRatio:"1 / 1", border:`1px solid ${T.disabled}`,
               display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
-              <img src={book.img} alt={book.title} style={{ maxWidth:"100%", maxHeight:"100%", objectFit:"contain", display:"block" }} />
+              <img src={book.img} alt={book.title} style={{ maxWidth:"85%", maxHeight:"85%", objectFit:"contain", display:"block" }} />
             </div>
           </div>
 
@@ -1636,6 +1636,44 @@ function EverydayMocktailsPdp({ onBack }) {
               <div key={s.label} style={{ display:"flex", alignItems:"center", gap:8, padding:"4px 0" }}>
                 <img src={s.icon} alt="" style={{ width:20, height:20, flexShrink:0 }} />
                 <span style={{ fontSize:16, color:T.textBold, lineHeight:"24px" }}>{s.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* More from author — same card pattern as the main PDP's carousel.
+          Liberal Libations routes back via onBack; Upgraded Snacks has no
+          standalone PDP yet, so its CTA stays inert like it does on the
+          main PDP. */}
+      <div style={{ maxWidth:1280, margin:"0 auto", width:"100%", padding: isDesktop ? "0 40px" : "0 20px" }}>
+        <div style={{ marginTop:0, paddingTop:80, paddingBottom:80, display:"flex", flexDirection:"column", gap:48 }}>
+          <h2 style={{ fontFamily:FONT_HEADING, fontSize: isDesktop ? 44 : 32, fontWeight:500, lineHeight:1.2, color:T.textBold }}>More from {book.author}</h2>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:24 }}>
+            {[
+              { title: PRODUCT.title,
+                blurb: "Liberal Libations empowers the cocktail enthusiast to craft bar-quality cocktails for a large crowd or for an intimate gathering. Make-ahead batch recipes mean less time mixing drinks and more time enjoying each sip with friends. Over 85 recipes feature timeless classics and playful originals.",
+                price: money(PRODUCT.price), img: BOOK_COVER, onView: onBack },
+              { title: CROSS_SELL_BOOKS[1].title, blurb: CROSS_SELL_BOOKS[1].blurb,
+                price: money(CROSS_SELL_BOOKS[1].price), img: CROSS_SELL_BOOKS[1].img, onView: null },
+            ].map(({ title, blurb, price, img, onView }) => (
+              <div key={title} style={{ width:410.67, maxWidth:"100%", display:"flex", flexDirection:"column", gap:16 }}>
+                <div style={{ width:"100%", aspectRatio:"1 / 1", overflow:"hidden" }}>
+                  <img src={img} alt={title} style={{ width:"100%", height:"100%", objectFit:"contain", display:"block" }} />
+                </div>
+                <div style={{ display:"flex", flexDirection:"column", gap:8, padding:"0 12px" }}>
+                  <p style={{ fontSize:14, color:T.textSubtle, lineHeight:1.4 }}>{book.author}</p>
+                  <p style={{ fontFamily:FONT_HEADING, fontSize:24, fontWeight:500, lineHeight:1.2, color:T.textBold }}>{title}</p>
+                  <p style={{ fontSize:16, color:T.textSubtle, lineHeight:1.4,
+                    display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{blurb}</p>
+                  <p style={{ fontSize:16, fontWeight:700, color:T.textSubtle, lineHeight:1.4 }}>Starting at {price}</p>
+                  <button onClick={onView || (e => e.preventDefault())} style={{ background:"none", border:"none", cursor:"pointer",
+                    padding:"8px 24px 8px 0", display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ fontSize:16, fontWeight:600, color:T.brand, lineHeight:"24px",
+                      borderBottom:`1px solid ${T.brand}`, paddingBottom:2 }}>View book</span>
+                    <Ms name="arrow_forward" size={24} color={T.brand} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
