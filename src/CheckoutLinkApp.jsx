@@ -3861,9 +3861,9 @@ const WF_ORDERS = [
 
 function WfActionLink({ icon, label, danger, onClick }) {
   return (
-    <a href="#" onClick={e => { e.preventDefault(); onClick?.(); }} style={{ display:"flex", alignItems:"center", gap:6,
-      fontFamily:WF.font, fontSize:13, color: danger ? "#bd1818" : WF.subtle, textDecoration:"none" }}>
-      <Ms name={icon} size={16} color={danger ? "#bd1818" : WF.subtle} /> {label}
+    <a href="#" onClick={e => { e.preventDefault(); onClick?.(); }} style={{ display:"flex", alignItems:"flex-start", gap:6,
+      fontFamily:WF.font, fontSize:13, lineHeight:1.4, color: danger ? "#bd1818" : WF.subtle, textDecoration:"none" }}>
+      <Ms name={icon} size={16} color={danger ? "#bd1818" : WF.subtle} style={{ flexShrink:0, marginTop:1 }} /> {label}
     </a>
   );
 }
@@ -3887,7 +3887,7 @@ const ALL_PROJECTS = [
   { cover:BOOK_UPGRADED_SNACKS_MOCKUP, coverAspect:"square", coverFit:"contain", badge:"Selling", title:"Upgraded Snacks",
     desc:"Turn casual drink nights into extraordinary culinary events with chef-inspired small plates, savory bites, and gourmet pub fare explicitly crafted to complement modern cocktails. Designed for adventurous home hosts, this practical cookbook bridges the gap between craft mixology and restaurant-quality lounge food. Discover how rich cheeses, bold spices, cured meats, and crispy textures balance sweet, bitter, and botanical spirits to create perfect flavor harmony on your palate.",
     meta:[["Project type","Trade Book"],["Project option","8×10 in, 20×25 cm"],["# of pages","112"],["Created with","InDesign"],["Created","Apr 22, 2025"]],
-    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"download", label:"Download PDF" }],
+    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"storefront", label:"Manage Blurb Bookstore listing" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"download", label:"Download PDF" }],
     share:true },
 ];
 
@@ -3945,7 +3945,8 @@ function AllProjectsRow({ project, onManageInstantStore }) {
           </a>
         )}
       </div>
-      <div style={{ display:"flex", flexDirection:"column", gap:16, flexShrink:0, paddingLeft: isMobile ? 0 : 14 }}>
+      <div style={{ display:"flex", flexDirection:"column", gap:16, flexShrink:0, width: isMobile ? "auto" : 190,
+        paddingLeft: isMobile ? 0 : 14 }}>
         {project.proof && (
           <span style={{ display:"inline-flex", alignItems:"center", gap:6, fontFamily:WF.font, fontSize:12.5,
             color:WF.proofText, background:WF.proofBg, border:`1px solid ${WF.proofBorder}`, borderRadius:6, padding:"6px 12px" }}>
