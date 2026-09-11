@@ -133,7 +133,7 @@ const PRODUCT = {
   author: "Kim Newton Arispe",
   format: "Hardcover, ImageWrap",
   paper:  "Premium Paper, matte finish",
-  options:"Standard Landscape, 10×8 in (25×20 cm)",
+  options:"Standard Portrait, 8×10 in (20×25 cm)",
   pages:  "160 pages",
   price:  35.0,
   img:    BOOK_COVER,
@@ -885,7 +885,7 @@ function BookPreview() {
    values (and drop TbcValue) once signed off. */
 const FORMAT_DETAIL_ROWS = [
   { label:"What you get",
-    print:  "Hardcover with ImageWrap cover, premium matte paper, 10×8 in (25×20 cm), 160 pages",
+    print:  "Hardcover with ImageWrap cover, premium matte paper, 8×10 in (20×25 cm), 160 pages",
     digital:`A single PDF file · ${PDF_FILE.size} · 160 pages` },
   { label:"How it reaches you",
     print:  "Printed to order, then shipped — 5–7 days",
@@ -1267,7 +1267,7 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
     { icon:"/assets/social/link.svg",      label:"Substack" },
   ];
   const detail = [
-    ...(hasPrint(format) ? ["10x8 in, 25x20 cm"] : []),
+    ...(hasPrint(format) ? ["8x10 in, 20x25 cm"] : []),
     ...(hasDigital(format) ? [`PDF, ${PDF_FILE.size}`] : []),
     "160 pages", "Language: English", "Published November 2019", "ISBN 9781733372800",
   ];
@@ -3351,14 +3351,12 @@ function PriceField({ label, hint, prefix, suffix, value, onChange, error, disab
 }
 
 function BookDetailsRow({ showCover, onViewProject }) {
-  const bits = ["10×8 in, 25×20 cm", PRODUCT.pages, "Language: English", "Published November 2019"];
-  const coverBox = trimBoxSize(bits[0], 100);
+  const bits = ["8×10 in, 20×25 cm", PRODUCT.pages, "Language: English", "Published November 2019"];
   return (
     <div style={{ display:"flex", gap:16, alignItems:"flex-start" }}>
       {showCover && (
         <div style={{ width:100, height:100, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <img src={PRODUCT.img} alt="" style={{ ...coverBox, objectFit:"cover", transform:"scale(1.2)",
-            borderRadius:4, boxShadow:"2px 4px 10px rgba(0,0,0,.16)" }} />
+          <img src={PRODUCT.img} alt="" style={{ width:"100%", height:"100%", objectFit:"contain" }} />
         </div>
       )}
       <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
@@ -3873,9 +3871,9 @@ function WfActionLink({ icon, label, danger, onClick }) {
    real cover image — every other demo row rendered as a blank gray tile, which
    read as broken rather than a deliberate placeholder. */
 const ALL_PROJECTS = [
-  { cover:PRODUCT.img, title:"Liberal Libations",
+  { cover:PRODUCT.img, coverAspect:"square", coverFit:"contain", title:"Liberal Libations",
     desc:"Liberal Libations empowers the cocktail enthusiast to craft bar-quality cocktails for a large crowd or for an intimate gathering. Make-ahead batch recipes mean less time mixing drinks and more time enjoying each sip with friends. Over 85 recipes",
-    meta:[["Project type","Trade Book"],["Project option","10×8 in, 25×20 cm"],["# of pages","160"],["ISBN","9781733372800"],["Created with","BookWright"],["Created","March 14, 2019"]],
+    meta:[["Project type","Trade Book"],["Project option","8×10 in, 20×25 cm"],["# of pages","160"],["ISBN","9781733372800"],["Created with","BookWright"],["Created","March 14, 2019"]],
     actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }, { icon:"local_shipping", label:"Set up retail distribution" }],
     share:true },
   { cover:BOOK_EVERYDAY_MOCKTAILS_MOCKUP, coverAspect:"square", coverFit:"contain", badge:"Selling", title:"Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks",
@@ -4039,7 +4037,7 @@ function InstantStoresTable({ onManageInstantStore }) {
    list. Only Liberal Libations has a real cover; the rest were placeholder
    gray tiles and were cut, same as the All projects cleanup. */
 const AVAILABLE_TO_SELL = [
-  { title:"Liberal Libations", sub:"Trade Book · 10×8 in", cover:BOOK_COVER },
+  { title:"Liberal Libations", sub:"Trade Book · 8×10 in", cover:BOOK_COVER },
 ];
 
 /* "Select a project for your Instant Store" — opens from the Instant Stores
@@ -4292,7 +4290,7 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
                   rest of the app's decorative-only controls */}
               <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
                 <span style={{ fontFamily:WF.font, fontSize:17, fontWeight:700, color:WF.body }}>
-                  Projects <span style={{ fontWeight:400, color:"#6b6b6b", fontSize:13 }}>{ALL_PROJECTS.length} of 98 projects</span>
+                  Projects <span style={{ fontWeight:400, color:"#6b6b6b", fontSize:13 }}>{ALL_PROJECTS.length} of {ALL_PROJECTS.length} projects</span>
                 </span>
                 <div style={{ display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
                   <label style={{ display:"flex", alignItems:"center", gap:8, fontFamily:WF.font, fontSize:13, fontWeight:600, color:"#6b6b6b" }}>
