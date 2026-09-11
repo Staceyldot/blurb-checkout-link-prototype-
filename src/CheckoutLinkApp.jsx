@@ -4422,6 +4422,11 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
      finish is chosen further down the page. */
   const authorFilled = canPublish || !!copyFromStore;
   const [deleteStoreOpen, setDeleteStoreOpen] = useState(false);
+  const [extraAuthors, setExtraAuthors] = useState([]);
+  const MAX_AUTHORS = 3;   // PRODUCT.author counts as the first slot
+  const addAuthorField = () => setExtraAuthors(prev => prev.length >= MAX_AUTHORS - 1 ? prev : [...prev, ""]);
+  const updateAuthorField = (i, v) => setExtraAuthors(prev => prev.map((a, idx) => idx === i ? v : a));
+  const removeAuthorField = i => setExtraAuthors(prev => prev.filter((_, idx) => idx !== i));
   const [sectionPreviewVisible, setSectionPreviewVisible] = useState(true);
 
   // Listing content fields — plain state so the AI draft panel has something to write into.
@@ -4753,11 +4758,24 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
           <SetupFieldRow label="Author(s)">
             <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, fontFamily:FONT_SANS,
               fontSize:16, color:T.textBold }}>{PRODUCT.author}</div>
-            <button onClick={e => e.preventDefault()} style={{ alignSelf:"flex-start", display:"flex", alignItems:"center",
-              gap:8, border:`1px solid ${T.brand}`, borderRadius:T.radius, background:T.surface, padding:"8px 24px", cursor:"pointer" }}>
-              <Ms name="add" size={20} color={T.brand} />
-              <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.brand }}>Add author</span>
-            </button>
+            {extraAuthors.map((a, i) => (
+              <div key={i} style={{ display:"flex", gap:8, alignItems:"center" }}>
+                <div style={{ flex:1 }}>
+                  <SetupTextField placeholder="Author name" value={a} onChange={v => updateAuthorField(i, v)} />
+                </div>
+                <button onClick={() => removeAuthorField(i)} aria-label="Remove author"
+                  style={{ background:"none", border:"none", cursor:"pointer", display:"flex" }}>
+                  <Ms name="remove" color={T.textSubtle} />
+                </button>
+              </div>
+            ))}
+            {extraAuthors.length < MAX_AUTHORS - 1 && (
+              <button onClick={addAuthorField} style={{ alignSelf:"flex-start", display:"flex", alignItems:"center",
+                gap:8, border:`1px solid ${T.brand}`, borderRadius:T.radius, background:T.surface, padding:"8px 24px", cursor:"pointer" }}>
+                <Ms name="add" size={20} color={T.brand} />
+                <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.brand }}>Add author</span>
+              </button>
+            )}
           </SetupFieldRow>
           <SetupFieldRow label="About the author(s)">
             {authorFilled ? (
