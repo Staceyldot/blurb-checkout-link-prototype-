@@ -3301,6 +3301,7 @@ function SetupKeywordsField({ keywords, setKeywords }) {
     setDraft("");
   };
   const removeKeyword = i => setKeywords(keywords.filter((_, idx) => idx !== i));
+  const clearAll = () => setKeywords([]);
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
       <input value={draft} onChange={e => setDraft(e.target.value)}
@@ -3309,15 +3310,23 @@ function SetupKeywordsField({ keywords, setKeywords }) {
         style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, width:"100%",
           fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background: keywords.length >= 7 ? T.disabled : T.surface }} />
       {keywords.length > 0 && (
-        <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-          {keywords.map((k, i) => <Chip key={k} label={k} onRemove={() => removeKeyword(i)} />)}
-        </div>
+        <>
+          <button type="button" onClick={clearAll}
+            style={{ alignSelf:"flex-end", background:"none", border:"none", padding:0, cursor:"pointer",
+              color:T.textLink, fontSize:14, fontWeight:600, textDecoration:"underline" }}>
+            Clear all
+          </button>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+            {keywords.map((k, i) => <Chip key={k} label={k} onRemove={() => removeKeyword(i)} />)}
+          </div>
+        </>
       )}
-      <SetupHint>
-        {keywords.length >= 7
-          ? "Maximum keywords reached. Remove one to add another."
-          : "Press Enter to add each keyword. Up to 7 keywords."}
-      </SetupHint>
+      {keywords.length === 0 && (
+        <SetupHint>Press Enter to add each keyword. Up to 7 keywords.</SetupHint>
+      )}
+      {keywords.length >= 7 && (
+        <SetupHint>Maximum keywords reached. Remove one to add another.</SetupHint>
+      )}
     </div>
   );
 }
@@ -4840,8 +4849,9 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
    here rather than needing a separate, Figma-less "continue" control. */
 function StickyCtaBar({ onPreview, canPublish, onPublish, panelOpen }) {
   const { isMobile } = useViewport();
+  if (panelOpen) return null;
   return (
-    <div style={{ position:"fixed", left:0, right: panelOpen ? 400 : 0, bottom:0, zIndex:30, background:T.surface,
+    <div style={{ position:"fixed", left:0, right:0, bottom:0, zIndex:30, background:T.surface,
       borderTop:`1px solid ${T.borderSubtle}`, boxShadow:"0 -4px 16px rgba(0,0,0,0.08)",
       display:"flex", alignItems:"center", justifyContent:"space-between", gap:16,
       padding: isMobile ? "16px 20px" : "16px 80px", transition:"right .3s ease" }}>
