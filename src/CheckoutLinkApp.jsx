@@ -3216,7 +3216,7 @@ function SetupFieldRow({ label, icon, children }) {
   return (
     <div style={{ display:"flex", gap:16, alignItems:"flex-start", width:"100%",
       flexDirection: isMobile ? "column" : "row" }}>
-      <div style={{ width: isMobile ? "auto" : 154, flexShrink:0, paddingTop:8, display:"flex", gap:4, alignItems:"center",
+      <div style={{ width: isMobile ? "auto" : 154, flexShrink:0, paddingTop:8, display:"flex", gap:4, alignItems:"flex-end",
         fontFamily:FONT_SANS, fontSize:18, fontWeight:600, color:T.textSubtle }}>
         {label}
         {icon && (typeof icon === "string"
@@ -3262,7 +3262,25 @@ function SetupTextField({ placeholder, hint, height, value, onChange, maxLen }) 
   );
 }
 
-function SetupDropdown({ value = "Select.." }) {
+/* When `options` is passed, renders a real (native) select styled to match the
+   static placeholder look used elsewhere — e.g. the "Copy from Instant Store"
+   field, which needs actual book choices rather than a decorative box. */
+function SetupDropdown({ value = "Select..", options, onChange }) {
+  if (options) {
+    return (
+      <div style={{ position:"relative" }}>
+        <select value={value} onChange={e => onChange && onChange(e.target.value)}
+          style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:"8px 36px 8px 8px", height:40,
+            width:"100%", appearance:"none", background:T.surface, fontFamily:FONT_SANS, fontSize:16,
+            color: value ? T.textBold : T.textDisabled }}>
+          <option value="" disabled>Select..</option>
+          {options.map(o => <option key={o} value={o}>{o}</option>)}
+        </select>
+        <Ms name="expand_more" size={20} color={T.textBold}
+          style={{ position:"absolute", right:8, top:10, pointerEvents:"none" }} />
+      </div>
+    );
+  }
   return (
     <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, height:40,
       display:"flex", alignItems:"center", justifyContent:"space-between", background:T.surface }}>
@@ -4397,6 +4415,11 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackChoice, setFeedbackChoice] = useState(null);
   const [authorVisible, setAuthorVisible] = useState(true);
+  const [copyFromStore, setCopyFromStore] = useState("");
+  /* Choosing a store to copy from is its own trigger for the author profile's
+     filled state — independent of canPublish, which only flips once a cover
+     finish is chosen further down the page. */
+  const authorFilled = canPublish || !!copyFromStore;
   const [sectionPreviewVisible, setSectionPreviewVisible] = useState(true);
 
   // Listing content fields — plain state so the AI draft panel has something to write into.
@@ -4703,8 +4726,9 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
         </div>
       }>
         <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
-          <SetupFieldRow label={<>Copy from<br />Instant Store</>} icon>
-            <SetupDropdown />
+          <SetupFieldRow label={<>Copy from<br />Instant Store</>} icon="Reuses details from another link.">
+            <SetupDropdown value={copyFromStore} onChange={setCopyFromStore}
+              options={["Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks", "Upgraded Snacks"]} />
           </SetupFieldRow>
           <SetupFieldRow label="Profile photo">
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
@@ -4732,7 +4756,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
             </button>
           </SetupFieldRow>
           <SetupFieldRow label="About the author(s)">
-            {canPublish ? (
+            {authorFilled ? (
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, height:150,
                   overflowY:"auto", fontFamily:FONT_SANS, fontSize:16, color:T.textBold }}>{AUTHOR_BIO}</div>
@@ -4743,7 +4767,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
             )}
           </SetupFieldRow>
           <SetupFieldRow label="Social links">
-            {canPublish ? (
+            {authorFilled ? (
               <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
                 {AUTHOR_SOCIALS.map(s => (
                   <div key={s.platform} style={{ display:"flex", gap:8, alignItems:"center" }}>
