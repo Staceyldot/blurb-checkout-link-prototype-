@@ -1267,7 +1267,7 @@ function ExpressBuySection({ wallets, format, style = "single", onPress, note = 
   );
 }
 
-function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, cartCount, onCheckout, onViewMocktails }) {
+function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, cartCount, onCheckout, onViewMocktails, onViewSnacks }) {
   const { isDesktop } = useViewport();
   const [qty, setQty] = useState(1);
   const [detailsOpen, setDetailsOpen] = useState(false);   // "Book details" accordion
@@ -1478,7 +1478,10 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
                   <p style={{ fontSize:16, color:T.textSubtle, lineHeight:1.4,
                     display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{d}</p>
                   <p style={{ fontSize:16, fontWeight:700, color:T.textSubtle, lineHeight:1.4 }}>Starting at {p}</p>
-                  <button onClick={t.startsWith("Everyday Mocktails") ? onViewMocktails : e => e.preventDefault()}
+                  <button onClick={
+                      t.startsWith("Everyday Mocktails") ? onViewMocktails
+                      : t.startsWith("Upgraded Snacks") ? onViewSnacks
+                      : e => e.preventDefault()}
                     style={{ background:"none", border:"none", cursor:"pointer", padding:"8px 24px 8px 0",
                     display:"flex", alignItems:"center", gap:8 }}>
                     <span style={{ fontSize:16, fontWeight:600, color:T.brand, lineHeight:"24px",
@@ -1516,7 +1519,7 @@ const MOCKTAILS_ABOUT = {
   outro: "Transform your home bar into a world-class lounge and savor the refined art of high-end mixology.",
 };
 
-function EverydayMocktailsPdp({ onBack }) {
+function EverydayMocktailsPdp({ onBack, onViewSnacks }) {
   const { isDesktop } = useViewport();
   const book = CROSS_SELL_BOOKS[0];
   const [readMore, setReadMore] = useState(false);
@@ -1655,7 +1658,195 @@ function EverydayMocktailsPdp({ onBack }) {
                 blurb: "Liberal Libations empowers the cocktail enthusiast to craft bar-quality cocktails for a large crowd or for an intimate gathering. Make-ahead batch recipes mean less time mixing drinks and more time enjoying each sip with friends. Over 85 recipes feature timeless classics and playful originals.",
                 price: money(PRODUCT.price), img: BOOK_COVER, onView: onBack },
               { title: CROSS_SELL_BOOKS[1].title, blurb: CROSS_SELL_BOOKS[1].blurb,
-                price: money(CROSS_SELL_BOOKS[1].price), img: CROSS_SELL_BOOKS[1].img, onView: null },
+                price: money(CROSS_SELL_BOOKS[1].price), img: CROSS_SELL_BOOKS[1].img, onView: onViewSnacks },
+            ].map(({ title, blurb, price, img, onView }) => (
+              <div key={title} style={{ width:410.67, maxWidth:"100%", display:"flex", flexDirection:"column", gap:16 }}>
+                <div style={{ width:"100%", aspectRatio:"1 / 1", overflow:"hidden" }}>
+                  <img src={img} alt={title} style={{ width:"100%", height:"100%", objectFit:"contain", display:"block" }} />
+                </div>
+                <div style={{ display:"flex", flexDirection:"column", gap:8, padding:"0 12px" }}>
+                  <p style={{ fontSize:14, color:T.textSubtle, lineHeight:1.4 }}>{book.author}</p>
+                  <p style={{ fontFamily:FONT_HEADING, fontSize:24, fontWeight:500, lineHeight:1.2, color:T.textBold }}>{title}</p>
+                  <p style={{ fontSize:16, color:T.textSubtle, lineHeight:1.4,
+                    display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{blurb}</p>
+                  <p style={{ fontSize:16, fontWeight:700, color:T.textSubtle, lineHeight:1.4 }}>Starting at {price}</p>
+                  <button onClick={onView || (e => e.preventDefault())} style={{ background:"none", border:"none", cursor:"pointer",
+                    padding:"8px 24px 8px 0", display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ fontSize:16, fontWeight:600, color:T.brand, lineHeight:"24px",
+                      borderBottom:`1px solid ${T.brand}`, paddingBottom:2 }}>View book</span>
+                    <Ms name="arrow_forward" size={24} color={T.brand} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <PdpFooter />
+    </div>
+  );
+}
+
+/* Standalone PDP for the other cross-sell title — same pattern as
+   EverydayMocktailsPdp (not part of the buyable checkout-link flow, so Buy
+   now/Add to cart are decorative). Reachable only via "View book" on the
+   Upgraded Snacks card in the More from carousels on the Liberal Libations
+   and Everyday Mocktails PDPs. */
+/* Structured "About the book" copy for Upgraded Snacks — same content as
+   CROSS_SELL_BOOKS[1].blurb, broken back into paragraphs/bulleted
+   features/outro for this page's fuller layout (mirrors MOCKTAILS_ABOUT). */
+const SNACKS_ABOUT = {
+  intro: "Turn casual drink nights into extraordinary culinary events with chef-inspired small plates, savory bites, and gourmet pub fare explicitly crafted to complement modern cocktails.",
+  intro2: "Designed for adventurous home hosts, this practical cookbook bridges the gap between craft mixology and restaurant-quality lounge food. Discover how rich cheeses, bold spices, cured meats, and crispy textures balance sweet, bitter, and botanical spirits to create perfect flavor harmony on your palate.",
+  bullets: [
+    { label: "Flavor-Matched Recipes", text: "Dishes categorized by beverage profiles, ranging from rich bourbon pours to crisp gin spritzes." },
+    { label: "Upgraded Classics", text: "Gourmet twists on sliders, skewers, fries, dips, and crostini." },
+    { label: "Effortless Hosting", text: "Make-ahead strategies that allow you to relax alongside your guests throughout the night." },
+    { label: "Pairing Mechanics", text: "Clear guidance on balancing salt, fat, acid, and heat with high-proof drinks." },
+  ],
+  outro: "Transform your kitchen counter into a premier culinary lounge and savor every bite alongside your favorite pour.",
+};
+
+function UpgradedSnacksPdp({ onBack, onViewMocktails }) {
+  const { isDesktop } = useViewport();
+  const book = CROSS_SELL_BOOKS[1];
+  const [readMore, setReadMore] = useState(false);
+  const [authorReadMore, setAuthorReadMore] = useState(false);
+  const bio = "Kim Newton Arispe has appreciated the power of a good cocktail from an early age when she watched her grandparents gather with friends to sip margaritas and share stories. Years later, her passion for bringing people together over cocktails led her to create the website, Random Acts of Comfort, where she makes bar-quality beverages accessible to the home bartender. When she's not crafting cocktails for a party or a charity fundraiser, you'll find her on video teaching Instagram and Facebook followers how to create seasonal drinks for easy entertaining. As a native Texan living in Seattle, she enjoys mixing up margaritas and hunting for good Tex-Mex with her husband of 20 years.";
+  const AUTHOR_SOCIAL_ROWS = [
+    { icon:"/assets/social/website.svg",   label:"www.randomactsofcomfort.net" },
+    { icon:"/assets/social/facebook.svg",  label:"Facebook" },
+    { icon:"/assets/social/instagram.svg", label:"Instagram" },
+    { icon:"/assets/social/x.svg",         label:"X" },
+    { icon:"/assets/social/tiktok.svg",    label:"TikTok" },
+    { icon:"/assets/social/link.svg",      label:"Substack" },
+  ];
+
+  return (
+    <div style={{ minHeight:"100vh", background:T.surface, display:"flex", flexDirection:"column" }}>
+      <div style={{ background:T.surface, borderBottom:"1px solid #eee", display:"flex", alignItems:"center",
+        padding:"10px 40px", flexShrink:0, position:"sticky", top:0, zIndex:20 }}>
+        <button onClick={onBack} style={{ background:"none", border:"none", cursor:"pointer", padding:6,
+          display:"flex", alignItems:"center", gap:4 }}>
+          <Ms name="arrow_back" size={20} color={T.brand} />
+          <span style={{ fontSize:14, fontWeight:600, color:T.textLink, textDecoration:"underline" }}>Back to {PRODUCT.title}</span>
+        </button>
+      </div>
+
+      <div style={{ maxWidth:1280, margin:"0 auto", width:"100%", padding: isDesktop ? "40px 40px 0" : "24px 20px 0" }}>
+        <div style={{ display:"flex", gap:40, alignItems:"flex-start", flexDirection: isDesktop ? "row" : "column" }}>
+          <div style={{ flex:1, display:"flex", flexDirection:"column", gap:14, alignItems:"flex-start", width:"100%" }}>
+            <div style={{ width:"100%", maxWidth:628, aspectRatio:"1 / 1", border:`1px solid ${T.disabled}`,
+              display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
+              <img src={book.img} alt={book.title} style={{ maxWidth:"85%", maxHeight:"85%", objectFit:"contain", display:"block" }} />
+            </div>
+          </div>
+
+          <div style={{ flex:1, display:"flex", flexDirection:"column", gap:22, width:"100%" }}>
+            <h1 style={{ fontFamily:FONT_HEADING, fontSize:44, fontWeight:400, lineHeight:1.2, color:T.textBold }}>{book.title}</h1>
+            <p style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:500, lineHeight:1.2, color:T.textBold }}>by <span style={{ color:T.textSubtle }}>{book.author}</span></p>
+
+            <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+              <p style={{ margin:0, fontSize:16, fontWeight:600, color:T.textBold }}>About the book</p>
+              <p style={{ margin:0, fontSize:16, color:T.textSubtle, lineHeight:1.5,
+                ...(!readMore && { display:"-webkit-box", WebkitLineClamp:3, WebkitBoxOrient:"vertical", overflow:"hidden" }) }}>
+                {SNACKS_ABOUT.intro}
+              </p>
+              {readMore && (
+                <>
+                  <p style={{ margin:0, fontSize:16, color:T.textSubtle, lineHeight:1.5 }}>{SNACKS_ABOUT.intro2}</p>
+                  <p style={{ margin:0, fontSize:16, fontWeight:700, color:T.textBold }}>Inside You'll Find:</p>
+                  <ul style={{ margin:0, paddingLeft:20, display:"flex", flexDirection:"column", gap:12 }}>
+                    {SNACKS_ABOUT.bullets.map(b => (
+                      <li key={b.label} style={{ fontSize:16, color:T.textSubtle, lineHeight:1.5 }}>
+                        <span style={{ fontWeight:700, color:T.textBold }}>{b.label}:</span> {b.text}
+                      </li>
+                    ))}
+                  </ul>
+                  <p style={{ margin:0, fontSize:16, color:T.textSubtle, lineHeight:1.5 }}>{SNACKS_ABOUT.outro}</p>
+                </>
+              )}
+              <button onClick={() => setReadMore(r => !r)}
+                style={{ alignSelf:"flex-start", background:"none", border:"none", cursor:"pointer", padding:0,
+                  color:T.textLink, fontWeight:600, fontSize:16, textDecoration:"underline" }}>
+                {readMore ? "Show less" : "Read more"}
+              </button>
+            </div>
+
+            <div style={{ borderTop:`1px solid ${T.borderSubtle}`, paddingTop:24 }}>
+              <p style={{ fontFamily:FONT_HEADING, fontSize:32, fontWeight:500, lineHeight:1.2, color:T.textBold }}>
+                {money(book.price)} USD
+              </p>
+            </div>
+
+            <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+              <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+                <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:T.brand, color:"#fff",
+                  border:"none", borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
+                  display:"flex", alignItems:"center", justifyContent:"center" }}
+                  onMouseEnter={e => e.currentTarget.style.opacity=".85"}
+                  onMouseLeave={e => e.currentTarget.style.opacity="1"}>
+                  Buy now
+                </button>
+                <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:T.surface, color:T.brand,
+                  border:`1px solid ${T.brand}`, borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}
+                  onMouseEnter={e => e.currentTarget.style.opacity=".85"}
+                  onMouseLeave={e => e.currentTarget.style.opacity="1"}>
+                  <Ms name="shopping_cart" size={20} color={T.brand} /> Add to cart
+                </button>
+              </div>
+              <WeAcceptRow />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Author profile — same full-bleed band pattern as the main PDP */}
+      <div style={{ marginTop:56, background:"#f9f6f3", padding: isDesktop ? "80px 40px" : "40px 20px" }}>
+        <div style={{ maxWidth:1280, margin:"0 auto", display:"flex", gap:24, flexWrap:"wrap" }}>
+          <div style={{ flex:"1 1 500px", maxWidth:845, display:"flex", flexDirection:"column", gap:16 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:16 }}>
+              <img src={AUTHOR_PHOTO} alt={book.author}
+                style={{ width:40, height:40, borderRadius:"50%", objectFit:"cover", flexShrink:0 }} />
+              <h2 style={{ fontFamily:FONT_HEADING, fontSize: isDesktop ? 44 : 28, fontWeight:500, lineHeight:1.2, color:T.textBold, margin:0 }}>About the author</h2>
+            </div>
+            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+              <p style={{ margin:0, fontSize:16, color:T.textSubtle, lineHeight:1.5,
+                ...(!authorReadMore && { display:"-webkit-box", WebkitLineClamp:3, WebkitBoxOrient:"vertical", overflow:"hidden" }) }}>
+                {bio}
+              </p>
+              <button onClick={() => setAuthorReadMore(r => !r)}
+                style={{ alignSelf:"flex-start", background:"none", border:"none", cursor:"pointer", padding:0,
+                  color:T.textLink, fontWeight:600, fontSize:16, textDecoration:"underline" }}>
+                {authorReadMore ? "Show less" : "Read more"}
+              </button>
+            </div>
+          </div>
+          <div style={{ flex:"0 0 250px", display:"flex", flexDirection:"column", paddingTop: isDesktop ? 64 : 0 }}>
+            {AUTHOR_SOCIAL_ROWS.map(s => (
+              <div key={s.label} style={{ display:"flex", alignItems:"center", gap:8, padding:"4px 0" }}>
+                <img src={s.icon} alt="" style={{ width:20, height:20, flexShrink:0 }} />
+                <span style={{ fontSize:16, color:T.textBold, lineHeight:"24px" }}>{s.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* More from author — Liberal Libations routes back via onBack, Everyday
+          Mocktails routes to its own PDP via onViewMocktails. */}
+      <div style={{ maxWidth:1280, margin:"0 auto", width:"100%", padding: isDesktop ? "0 40px" : "0 20px" }}>
+        <div style={{ marginTop:0, paddingTop:80, paddingBottom:80, display:"flex", flexDirection:"column", gap:48 }}>
+          <h2 style={{ fontFamily:FONT_HEADING, fontSize: isDesktop ? 44 : 32, fontWeight:500, lineHeight:1.2, color:T.textBold }}>More from {book.author}</h2>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:24 }}>
+            {[
+              { title: PRODUCT.title,
+                blurb: "Liberal Libations empowers the cocktail enthusiast to craft bar-quality cocktails for a large crowd or for an intimate gathering. Make-ahead batch recipes mean less time mixing drinks and more time enjoying each sip with friends. Over 85 recipes feature timeless classics and playful originals.",
+                price: money(PRODUCT.price), img: BOOK_COVER, onView: onBack },
+              { title: CROSS_SELL_BOOKS[0].title, blurb: CROSS_SELL_BOOKS[0].blurb,
+                price: money(CROSS_SELL_BOOKS[0].price), img: CROSS_SELL_BOOKS[0].img, onView: onViewMocktails },
             ].map(({ title, blurb, price, img, onView }) => (
               <div key={title} style={{ width:410.67, maxWidth:"100%", display:"flex", flexDirection:"column", gap:16 }}>
                 <div style={{ width:"100%", aspectRatio:"1 / 1", overflow:"hidden" }}>
@@ -5489,6 +5680,9 @@ function CheckoutLinkApp({ onSwitchFlow }) {
        again — otherwise one express purchase would lock the chip out for good. */
     if (key === "pdp") { setCartOpen(false); setCheckoutSkipped(false); }
     setView(key);
+    // Each jump renders a whole new "page" in this SPA — start it at the top
+    // rather than wherever the previous page happened to be scrolled to.
+    window.scrollTo(0, 0);
   };
 
   return (
@@ -5514,7 +5708,7 @@ function CheckoutLinkApp({ onSwitchFlow }) {
             cartCount={inCart ? (hasPrint(format) ? qty : 0) + (hasDigital(format) ? 1 : 0) : 0}
             onAddToCart={addToCart}
             onCartClick={() => setCartOpen(true)} onCheckout={goCheckout}
-            onViewMocktails={() => jump("pdp-mocktails")} />
+            onViewMocktails={() => jump("pdp-mocktails")} onViewSnacks={() => jump("pdp-snacks")} />
           <CartDrawer open={cartOpen} empty={!inCart} qty={qty} setQty={setQty}
             variant={variant} format={format} setFormat={setFormat} onExpressBuy={expressBuy}
             expressStyle={expressStyle}
@@ -5526,7 +5720,11 @@ function CheckoutLinkApp({ onSwitchFlow }) {
       )}
 
       {view === "pdp-mocktails" && (
-        <EverydayMocktailsPdp onBack={() => jump("pdp")} />
+        <EverydayMocktailsPdp onBack={() => jump("pdp")} onViewSnacks={() => jump("pdp-snacks")} />
+      )}
+
+      {view === "pdp-snacks" && (
+        <UpgradedSnacksPdp onBack={() => jump("pdp")} onViewMocktails={() => jump("pdp-mocktails")} />
       )}
 
       {view === "checkout" && (
