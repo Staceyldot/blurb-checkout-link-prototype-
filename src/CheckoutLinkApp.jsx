@@ -4841,10 +4841,10 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
 function StickyCtaBar({ onPreview, canPublish, onPublish, panelOpen }) {
   const { isMobile } = useViewport();
   return (
-    <div style={{ position:"fixed", left:280, right: panelOpen ? 400 : 0, bottom:0, zIndex:30, background:T.surface,
+    <div style={{ position:"fixed", left:0, right: panelOpen ? 400 : 0, bottom:0, zIndex:30, background:T.surface,
       borderTop:`1px solid ${T.borderSubtle}`, boxShadow:"0 -4px 16px rgba(0,0,0,0.08)",
       display:"flex", alignItems:"center", justifyContent:"space-between", gap:16,
-      padding: isMobile ? "16px 20px" : "16px 16px", transition:"right .3s ease" }}>
+      padding: isMobile ? "16px 20px" : "16px 80px", transition:"right .3s ease" }}>
       <button onClick={onPreview} style={{ background:"none", border:"none", cursor:"pointer",
         display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:16,
         fontFamily:FONT_SANS, textDecoration:"underline", padding:0 }}>
