@@ -525,7 +525,7 @@ function Header() {
    Duplicated in App.jsx — keep the two in step. */
 const FOOTER_BG    = "#292929";
 const FOOTER_LINKS = ["Privacy policy", "Return policy", "Terms of service", "Cookie policy", "Support"];
-const FOOTER_COPY  = "©2015-2026 RPI Print, Inc.";
+const FOOTER_COPY  = "©2026 RPI Print, Inc.";
 const footerText   = { fontSize:12, lineHeight:1.4, color:"#fff", whiteSpace:"nowrap" };
 
 function FooterLink({ children }) {
@@ -4941,8 +4941,8 @@ function StickyCtaBar({ onPreview, canPublish, onPublish, panelOpen }) {
       padding: isMobile ? "16px 20px" : "16px 80px", transition:"right .3s ease" }}>
       <button onClick={onPreview} style={{ background:"none", border:"none", cursor:"pointer",
         display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:16,
-        fontFamily:FONT_SANS, textDecoration:"underline", padding:0 }}>
-        Preview listing <Ms name="open_in_new" />
+        fontFamily:FONT_SANS, padding:0 }}>
+        <span style={{ textDecoration:"underline" }}>Preview listing</span> <Ms name="open_in_new" color={T.textLink} />
       </button>
       <div style={{ display:"flex", gap:8, flexShrink:0 }}>
         <Btn variant="secondary" onClick={() => {}}>Save draft</Btn>
