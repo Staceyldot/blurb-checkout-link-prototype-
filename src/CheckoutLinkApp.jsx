@@ -4736,8 +4736,10 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
               <div style={{ position:"relative", width:80, height:80 }}>
                 <div style={{ width:80, height:80, borderRadius:"50%", background:"#f5f0ea", position:"relative", overflow:"hidden" }}>
-                  <img src="/assets/avatar-placeholder.png" alt="" style={{ position:"absolute", top:"-5.25%", left:"-9.37%",
-                    width:"118.96%", height:"117.01%", maxWidth:"none", opacity:0.4 }} />
+                  {authorFilled
+                    ? <img src={AUTHOR_PHOTO} alt={PRODUCT.author} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                    : <img src="/assets/avatar-placeholder.png" alt="" style={{ position:"absolute", top:"-5.25%", left:"-9.37%",
+                        width:"118.96%", height:"117.01%", maxWidth:"none", opacity:0.4 }} />}
                 </div>
                 <button onClick={e => e.preventDefault()} style={{ position:"absolute", bottom:-4, right:2, width:28, height:28,
                   borderRadius:"50%", background:T.brand, border:"2px solid #f5f5f5", display:"flex", alignItems:"center",
