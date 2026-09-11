@@ -271,6 +271,23 @@ function FacebookGlyph({ size=20 }) {
     </svg>
   );
 }
+/* Plain white marks — for brand-colored share buttons (X/Facebook), where the
+   colored badge versions above (FacebookGlyph) would clash with the button's
+   own background. */
+function FacebookMarkWhite({ size=18 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" style={{ display:"block", flexShrink:0 }}>
+      <path fill="#fff" d="M15.12 8.29h1.98V5.11C16.79 5.05 15.49 4.94 14 4.94c-3.05 0-5.14 1.92-5.14 5.44v2.74H5.6v3.56h3.26V22h3.56v-5.32h3.13l.5-3.56h-3.63V10.8c0-1.03.28-1.73 1.7-1.73z"/>
+    </svg>
+  );
+}
+function XMarkWhite({ size=16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" style={{ display:"block", flexShrink:0 }}>
+      <path fill="#fff" d="M16.1625 5.5H18.3688L13.55 11.0062L19.2188 18.5H14.7813L11.3031 13.9563L7.32812 18.5H5.11875L10.2719 12.6094L4.8375 5.5H9.3875L12.5281 9.65312L16.1625 5.5ZM15.3875 17.1812H16.6094L8.72188 6.75H7.40938L15.3875 17.1812Z"/>
+    </svg>
+  );
+}
 
 /* ═══════════════════════════ Primitives ═══════════════════════════ */
 function Divider() { return <div style={{ height:1, background:"#e0e0e0", width:"100%", flexShrink:0 }} />; }
@@ -4414,6 +4431,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
      validation across every required field, just this one representative trigger. */
   const [canPublish, setCanPublish] = useState(false);
   const [publishOpen, setPublishOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [published, setPublished] = useState(false);
   const doPublish = () => { setPublished(true); setPublishOpen(true); };
   const [toast, setToast] = useState(false);
@@ -4913,7 +4931,9 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
     <StickyCtaBar onPreview={onContinue} canPublish={canPublish} onPublish={doPublish} panelOpen={aiOpen} />
 
     <PublishModal open={publishOpen} onClose={() => setPublishOpen(false)} onViewLive={onContinue}
-      copied={copied} onCopyLink={copyLink} />
+      copied={copied} onCopyLink={copyLink} onShareSocial={() => { setPublishOpen(false); setShareOpen(true); }} />
+
+    <ShareSocialPanel open={shareOpen} onClose={() => setShareOpen(false)} />
 
     <BookPreviewModal open={!!previewModalKind} kind={previewModalKind} onClose={() => setPreviewModalKind(null)} />
 
@@ -5036,7 +5056,7 @@ function DeleteStoreModal({ open, onClose, onConfirm }) {
   );
 }
 
-function PublishModal({ open, onClose, onViewLive, copied, onCopyLink }) {
+function PublishModal({ open, onClose, onViewLive, copied, onCopyLink, onShareSocial }) {
   if (!open) return null;
   return (
     <>
@@ -5060,14 +5080,86 @@ function PublishModal({ open, onClose, onViewLive, copied, onCopyLink }) {
           Buyers can now order {PRODUCT.title}.
         </p>
         <button onClick={onCopyLink} style={{ background:"none", border:"none", cursor:"pointer",
-          display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:18,
-          textDecoration:"underline" }}>
+          display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:18 }}>
           <Ms name={copied ? "check" : "link"} color={copied ? T.success : T.textLink} />
-          {copied ? "Copied!" : "Copy link"}
+          <span style={{ textDecoration:"underline" }}>{copied ? "Copied!" : "Copy link"}</span>
         </button>
         <div style={{ display:"flex", gap:12, justifyContent:"flex-end", width:"100%" }}>
           <Btn variant="secondary" onClick={onViewLive}>View live page</Btn>
-          <Btn onClick={() => {}}><Ms name="share" size={20} color="#fff" style={{ marginRight:4 }} />Share on social</Btn>
+          <Btn onClick={onShareSocial}><Ms name="share" size={20} color="#fff" style={{ marginRight:4 }} />Share on social</Btn>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* "Share your book on social" slide-over — opens from PublishModal's Share on
+   social CTA, same fixed-drawer pattern as CartDrawer. A pre-written post
+   (editable, 280-char cap like a tweet) plus one-tap buttons per platform;
+   these don't actually post anything in this prototype. */
+function ShareSocialPanel({ open, onClose }) {
+  const [message, setMessage] = useState(
+    `${PRODUCT.title} just launched. Grab a copy straight from me. Link below if you want one. 🎉`);
+  const [msgCopied, setMsgCopied] = useState(false);
+  const copyMessage = () => {
+    navigator.clipboard?.writeText(message).catch(() => {});
+    setMsgCopied(true);
+    setTimeout(() => setMsgCopied(false), 1500);
+  };
+  const platforms = [
+    { label: "X", bg: "#000", icon: <XMarkWhite size={16} /> },
+    { label: "Substack", bg: "#FF6719", icon: <Ms name="reorder" size={18} color="#fff" /> },
+    { label: "Facebook", bg: "#1877F2", icon: <FacebookMarkWhite size={18} /> },
+  ];
+  return (
+    <>
+      <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.45)", zIndex:160,
+        opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none", transition:"opacity .25s" }} />
+      <div style={{ position:"fixed", top:0, right:0, bottom:0, width:400, maxWidth:"92vw", background:T.surface, zIndex:170,
+        transform: open ? "translateX(0)" : "translateX(100%)", transition:"transform .3s ease",
+        display:"flex", flexDirection:"column", fontFamily:FONT_SANS }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:24, flexShrink:0 }}>
+          <span style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:500, color:T.textBold }}>Share your book on social</span>
+          <button onClick={onClose} aria-label="Close" style={{ background:"none", border:"none", cursor:"pointer", display:"flex" }}>
+            <Ms name="close" size={24} color={T.textBold} />
+          </button>
+        </div>
+
+        <div style={{ flex:1, overflowY:"auto", padding:"0 24px 24px", display:"flex", flexDirection:"column", gap:24 }}>
+          <p style={{ margin:0, fontSize:16, color:T.textSubtle }}>Here's a ready-to-post message about your book.</p>
+
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+              <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>Message</span>
+              <button onClick={copyMessage} style={{ background:"none", border:"none", cursor:"pointer",
+                display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:14, padding:0 }}>
+                <span style={{ textDecoration:"underline" }}>{msgCopied ? "Copied!" : "Copy"}</span>
+                <Ms name={msgCopied ? "check" : "content_copy"} size={16} color={msgCopied ? T.success : T.textLink} />
+              </button>
+            </div>
+            <textarea value={message} onChange={e => setMessage(e.target.value.slice(0, 280))}
+              style={{ width:"100%", height:100, minHeight:100, border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
+                fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface, resize:"vertical" }} />
+            <SetupHint>{message.length}/280</SetupHint>
+          </div>
+
+          <Divider />
+
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            <span style={{ fontSize:14, fontWeight:600, color:T.textSubtle }}>Ready to post</span>
+            {platforms.map(p => (
+              <button key={p.label} onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center",
+                justifyContent:"center", gap:8, background:p.bg, border:"none", borderRadius:T.radius,
+                padding:"10px 16px", cursor:"pointer" }}>
+                {p.icon}
+                <span style={{ color:"#fff", fontWeight:600, fontSize:16, fontFamily:FONT_SANS }}>{p.label}</span>
+              </button>
+            ))}
+          </div>
+
+          <Divider />
+
+          <Btn variant="secondary" onClick={onClose} fullWidth>Back to editing</Btn>
         </div>
       </div>
     </>
