@@ -1501,10 +1501,11 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
 }
 
 /* Standalone PDP for the cross-sell title from "More from" — reachable only
-   via that carousel's "View book" CTA (not part of the buyable checkout-link
-   flow the rest of the app is wired around, so Buy now/Add to cart here are
-   decorative rather than tied into the shared single-product cart). Reuses
-   the same author (Kim Newton Arispe) bio/socials as the main PDP's author band. */
+   via that carousel's "View book" CTA. Buy now/Add to cart match the main
+   PDP's active styling but aren't wired to a real purchase, since this
+   title isn't part of the buyable checkout-link the rest of the app is
+   wired around. Reuses the same author (Kim Newton Arispe) bio/socials as
+   the main PDP's author band. */
 /* Structured "About the book" copy — same content as CROSS_SELL_BOOKS[0].blurb
    (the flat string used for the compact carousel card), broken back out into
    its intro/bulleted-features/outro parts for this page's fuller layout. */
@@ -1519,7 +1520,7 @@ const MOCKTAILS_ABOUT = {
   outro: "Transform your home bar into a world-class lounge and savor the refined art of high-end mixology.",
 };
 
-function EverydayMocktailsPdp({ onBack, onViewSnacks }) {
+function EverydayMocktailsPdp({ onBack, onViewSnacks, cartCount, onCartClick }) {
   const { isDesktop } = useViewport();
   const book = CROSS_SELL_BOOKS[0];
   const [readMore, setReadMore] = useState(false);
@@ -1536,14 +1537,7 @@ function EverydayMocktailsPdp({ onBack, onViewSnacks }) {
 
   return (
     <div style={{ minHeight:"100vh", background:T.surface, display:"flex", flexDirection:"column" }}>
-      <div style={{ background:T.surface, borderBottom:"1px solid #eee", display:"flex", alignItems:"center",
-        padding:"10px 40px", flexShrink:0, position:"sticky", top:0, zIndex:20 }}>
-        <button onClick={onBack} style={{ background:"none", border:"none", cursor:"pointer", padding:6,
-          display:"flex", alignItems:"center", gap:4 }}>
-          <Ms name="arrow_back" size={20} color={T.brand} />
-          <span style={{ fontSize:14, fontWeight:600, color:T.textLink, textDecoration:"underline" }}>Back to {PRODUCT.title}</span>
-        </button>
-      </div>
+      <PdpNav cartCount={cartCount} onCartClick={onCartClick} />
 
       <div style={{ maxWidth:1280, margin:"0 auto", width:"100%", padding: isDesktop ? "40px 40px 0" : "24px 20px 0" }}>
         <div style={{ display:"flex", gap:40, alignItems:"flex-start", flexDirection: isDesktop ? "row" : "column" }}>
@@ -1590,6 +1584,9 @@ function EverydayMocktailsPdp({ onBack, onViewSnacks }) {
               </p>
             </div>
 
+            {/* Same active-looking Buy now/Add to cart styling as the main PDP —
+                not wired to a real purchase, since this title isn't part of
+                the buyable checkout-link the rest of the app is wired around. */}
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                 <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:T.brand, color:"#fff",
@@ -1689,10 +1686,10 @@ function EverydayMocktailsPdp({ onBack, onViewSnacks }) {
 }
 
 /* Standalone PDP for the other cross-sell title — same pattern as
-   EverydayMocktailsPdp (not part of the buyable checkout-link flow, so Buy
-   now/Add to cart are decorative). Reachable only via "View book" on the
-   Upgraded Snacks card in the More from carousels on the Liberal Libations
-   and Everyday Mocktails PDPs. */
+   EverydayMocktailsPdp (Buy now/Add to cart styled active but not wired to
+   a real purchase; not part of the buyable checkout-link flow). Reachable
+   only via "View book" on the Upgraded Snacks card in the More from
+   carousels on the Liberal Libations and Everyday Mocktails PDPs. */
 /* Structured "About the book" copy for Upgraded Snacks — same content as
    CROSS_SELL_BOOKS[1].blurb, broken back into paragraphs/bulleted
    features/outro for this page's fuller layout (mirrors MOCKTAILS_ABOUT). */
@@ -1708,7 +1705,7 @@ const SNACKS_ABOUT = {
   outro: "Transform your kitchen counter into a premier culinary lounge and savor every bite alongside your favorite pour.",
 };
 
-function UpgradedSnacksPdp({ onBack, onViewMocktails }) {
+function UpgradedSnacksPdp({ onBack, onViewMocktails, cartCount, onCartClick }) {
   const { isDesktop } = useViewport();
   const book = CROSS_SELL_BOOKS[1];
   const [readMore, setReadMore] = useState(false);
@@ -1725,14 +1722,7 @@ function UpgradedSnacksPdp({ onBack, onViewMocktails }) {
 
   return (
     <div style={{ minHeight:"100vh", background:T.surface, display:"flex", flexDirection:"column" }}>
-      <div style={{ background:T.surface, borderBottom:"1px solid #eee", display:"flex", alignItems:"center",
-        padding:"10px 40px", flexShrink:0, position:"sticky", top:0, zIndex:20 }}>
-        <button onClick={onBack} style={{ background:"none", border:"none", cursor:"pointer", padding:6,
-          display:"flex", alignItems:"center", gap:4 }}>
-          <Ms name="arrow_back" size={20} color={T.brand} />
-          <span style={{ fontSize:14, fontWeight:600, color:T.textLink, textDecoration:"underline" }}>Back to {PRODUCT.title}</span>
-        </button>
-      </div>
+      <PdpNav cartCount={cartCount} onCartClick={onCartClick} />
 
       <div style={{ maxWidth:1280, margin:"0 auto", width:"100%", padding: isDesktop ? "40px 40px 0" : "24px 20px 0" }}>
         <div style={{ display:"flex", gap:40, alignItems:"flex-start", flexDirection: isDesktop ? "row" : "column" }}>
@@ -1780,6 +1770,9 @@ function UpgradedSnacksPdp({ onBack, onViewMocktails }) {
               </p>
             </div>
 
+            {/* Same active-looking Buy now/Add to cart styling as the main PDP —
+                not wired to a real purchase, since this title isn't part of
+                the buyable checkout-link the rest of the app is wired around. */}
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                 <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:T.brand, color:"#fff",
@@ -5720,11 +5713,27 @@ function CheckoutLinkApp({ onSwitchFlow }) {
       )}
 
       {view === "pdp-mocktails" && (
-        <EverydayMocktailsPdp onBack={() => jump("pdp")} onViewSnacks={() => jump("pdp-snacks")} />
+        <>
+          <EverydayMocktailsPdp onBack={() => jump("pdp")} onViewSnacks={() => jump("pdp-snacks")}
+            cartCount={inCart ? (hasPrint(format) ? qty : 0) + (hasDigital(format) ? 1 : 0) : 0}
+            onCartClick={() => setCartOpen(true)} />
+          <CartDrawer open={cartOpen} empty={!inCart} qty={qty} setQty={setQty}
+            variant={variant} format={format} setFormat={setFormat} onExpressBuy={expressBuy}
+            expressStyle={expressStyle}
+            onClose={() => setCartOpen(false)} onRemove={() => setInCart(false)} onCheckout={goCheckout} />
+        </>
       )}
 
       {view === "pdp-snacks" && (
-        <UpgradedSnacksPdp onBack={() => jump("pdp")} onViewMocktails={() => jump("pdp-mocktails")} />
+        <>
+          <UpgradedSnacksPdp onBack={() => jump("pdp")} onViewMocktails={() => jump("pdp-mocktails")}
+            cartCount={inCart ? (hasPrint(format) ? qty : 0) + (hasDigital(format) ? 1 : 0) : 0}
+            onCartClick={() => setCartOpen(true)} />
+          <CartDrawer open={cartOpen} empty={!inCart} qty={qty} setQty={setQty}
+            variant={variant} format={format} setFormat={setFormat} onExpressBuy={expressBuy}
+            expressStyle={expressStyle}
+            onClose={() => setCartOpen(false)} onRemove={() => setInCart(false)} onCheckout={goCheckout} />
+        </>
       )}
 
       {view === "checkout" && (
