@@ -3524,8 +3524,9 @@ const AUTHOR_BIO = "Kim Newton Arispe writes contemporary romance set in small t
 const AUTHOR_SOCIALS = [
   { platform: "Instagram", url: "instagram.com/kimnewtonarispeauthor" },
   { platform: "Website", url: "kimnewtonarispeauthor.com" },
-  { platform: "Other", url: "substack.com/kimnewtonarispeauthor" },
+  { platform: "Other", label: "Substack", url: "substack.com/kimnewtonarispeauthor" },
 ];
+const SOCIAL_PLATFORM_OPTIONS = ["Facebook", "Instagram", "X", "TikTok", "Website", "Other"];
 
 /* Matches Figma "AI Flow (Inline)" (node 5423:93216) — a right-side slide-over,
    same overlay/slide pattern as CartDrawer, with three phases: prompt, loading
@@ -4427,6 +4428,19 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
   const addAuthorField = () => setExtraAuthors(prev => prev.length >= MAX_AUTHORS - 1 ? prev : [...prev, ""]);
   const updateAuthorField = (i, v) => setExtraAuthors(prev => prev.map((a, idx) => idx === i ? v : a));
   const removeAuthorField = i => setExtraAuthors(prev => prev.filter((_, idx) => idx !== i));
+  const [socialLinks, setSocialLinks] = useState([{ platform: "", label: "", url: "" }]);
+  const MAX_SOCIAL_LINKS = 6;
+  useEffect(() => {
+    // Seed with the demo author's real socials the first time the profile fills in,
+    // but only if the seller hasn't already started editing the (still-empty) row.
+    if (authorFilled) {
+      setSocialLinks(prev => (prev.length === 1 && !prev[0].platform && !prev[0].url)
+        ? AUTHOR_SOCIALS.map(s => ({ ...s })) : prev);
+    }
+  }, [authorFilled]);
+  const addSocialLink = () => setSocialLinks(prev => prev.length >= MAX_SOCIAL_LINKS ? prev : [...prev, { platform: "", label: "", url: "" }]);
+  const updateSocialLink = (i, field, v) => setSocialLinks(prev => prev.map((s, idx) => idx === i ? { ...s, [field]: v } : s));
+  const removeSocialLink = i => setSocialLinks(prev => prev.filter((_, idx) => idx !== i));
   const [sectionPreviewVisible, setSectionPreviewVisible] = useState(true);
 
   // Listing content fields — plain state so the AI draft panel has something to write into.
@@ -4789,29 +4803,41 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
             )}
           </SetupFieldRow>
           <SetupFieldRow label="Social links">
-            {authorFilled ? (
-              <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-                {AUTHOR_SOCIALS.map(s => (
-                  <div key={s.platform} style={{ display:"flex", gap:8, alignItems:"center" }}>
-                    <div style={{ width:125, flexShrink:0 }}><SetupDropdown value={s.platform} /></div>
-                    <div style={{ flex:1, border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
-                      fontFamily:FONT_SANS, fontSize:16, color:T.textBold }}>{s.url}</div>
-                    <Ms name="remove" color={T.textSubtle} />
+            <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+              {socialLinks.map((s, i) => {
+                const isOther = s.platform === "Other";
+                return (
+                  <div key={i} style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                    <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                      <div style={{ width:125, flexShrink:0 }}>
+                        <SetupDropdown value={s.platform} options={SOCIAL_PLATFORM_OPTIONS}
+                          onChange={v => updateSocialLink(i, "platform", v)} />
+                      </div>
+                      <div style={{ flex:1 }}>
+                        {isOther
+                          ? <SetupTextField placeholder="Label (e.g. Substack)" value={s.label || ""}
+                              onChange={v => updateSocialLink(i, "label", v)} />
+                          : <SetupTextField placeholder="Profile URL" value={s.url} onChange={v => updateSocialLink(i, "url", v)} />}
+                      </div>
+                      <button onClick={() => removeSocialLink(i)} aria-label="Remove link"
+                        style={{ background:"none", border:"none", cursor:"pointer", display:"flex", flexShrink:0 }}>
+                        <Ms name="remove" color={T.textSubtle} />
+                      </button>
+                    </div>
+                    {isOther && (
+                      <SetupTextField placeholder="Profile URL" value={s.url} onChange={v => updateSocialLink(i, "url", v)} />
+                    )}
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-                <div style={{ width:125, flexShrink:0 }}><SetupDropdown /></div>
-                <div style={{ flex:1 }}><SetupTextField placeholder="Profile URL" /></div>
-                <Ms name="remove" color={T.textSubtle} />
-              </div>
+                );
+              })}
+            </div>
+            {socialLinks.length < MAX_SOCIAL_LINKS && (
+              <button onClick={addSocialLink} style={{ alignSelf:"flex-start", display:"flex", alignItems:"center",
+                gap:8, border:`1px solid ${T.brand}`, borderRadius:T.radius, background:T.surface, padding:"8px 24px", cursor:"pointer" }}>
+                <Ms name="add" size={20} color={T.brand} />
+                <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.brand }}>Add link</span>
+              </button>
             )}
-            <button onClick={e => e.preventDefault()} style={{ alignSelf:"flex-start", display:"flex", alignItems:"center",
-              gap:8, border:`1px solid ${T.brand}`, borderRadius:T.radius, background:T.surface, padding:"8px 24px", cursor:"pointer" }}>
-              <Ms name="add" size={20} color={T.brand} />
-              <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.brand }}>Add link</span>
-            </button>
           </SetupFieldRow>
         </div>
       </SetupSection>
