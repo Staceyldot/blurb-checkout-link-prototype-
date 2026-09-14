@@ -4809,10 +4809,10 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
   const [toast, setToast] = useState(false);
   const [authorVisible, setAuthorVisible] = useState(true);
   const [copyFromStore, setCopyFromStore] = useState("");
-  /* Choosing a store to copy from is its own trigger for the author profile's
-     filled state — independent of canPublish, which only flips once a cover
-     finish is chosen further down the page. */
-  const authorFilled = canPublish || !!copyFromStore;
+  /* Choosing a store to copy from is the only trigger for the author profile's
+     filled state — picking a cover finish further down the page no longer
+     auto-fills it. */
+  const authorFilled = !!copyFromStore;
   const [deleteStoreOpen, setDeleteStoreOpen] = useState(false);
   const [extraAuthors, setExtraAuthors] = useState([]);
   const MAX_AUTHORS = 3;   // PRODUCT.author counts as the first slot
