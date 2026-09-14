@@ -4810,6 +4810,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
   const [shareOpen, setShareOpen] = useState(false);
   const [published, setPublished] = useState(false);
   const doPublish = () => { setPublished(true); setPublishOpen(true); };
+  const [storeVisible, setStoreVisible] = useState(true);
   const [toast, setToast] = useState(false);
   const [authorVisible, setAuthorVisible] = useState(true);
   const [copyFromStore, setCopyFromStore] = useState("");
@@ -4986,26 +4987,62 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
             sanitizes to lowercase letters, digits, and hyphens as you go;
             stray/duplicate hyphens collapse on blur so the URL never ends up
             with "--" or a trailing "-" mid-edit. */}
-        <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:4, width:"100%", maxWidth:672 }}>
-            <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textBold, whiteSpace:"nowrap", flexShrink:0 }}>
-              blurb.com/hub/482910/
-            </span>
-            <div style={{ flex:1, minWidth:0, display:"flex", alignItems:"center",
-              border:`1px solid ${T.border}`, borderRadius:T.radius, background:T.surface }}>
-              <input value={slug}
-                onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
-                onBlur={() => setSlug(s => s.replace(/-+/g, "-").replace(/(^-|-$)/g, "") || slugify(PRODUCT.title))}
-                style={{ flex:1, minWidth:0, border:"none", background:"transparent", padding:8,
-                  fontFamily:FONT_SANS, fontSize:16, color:T.textBold }} />
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, width:"100%",
+          flexWrap: isMobile ? "wrap" : "nowrap" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:8, flex:"1 1 auto", minWidth:0, maxWidth: isMobile ? "100%" : 688 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:4, flex:1, minWidth:0 }}>
+              <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textBold, whiteSpace:"nowrap", flexShrink:0 }}>
+                blurb.com/hub/482910/
+              </span>
+              <div style={{ flex:1, minWidth:0, display:"flex", alignItems:"center",
+                border:`1px solid ${T.border}`, borderRadius:T.radius, background:T.surface }}>
+                <input value={slug}
+                  onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
+                  onBlur={() => setSlug(s => s.replace(/-+/g, "-").replace(/(^-|-$)/g, "") || slugify(PRODUCT.title))}
+                  style={{ flex:1, minWidth:0, border:"none", background:"transparent", padding:8,
+                    fontFamily:FONT_SANS, fontSize:16, color:T.textBold }} />
+              </div>
+            </div>
+            <button onClick={copyLink} aria-label="Copy link" style={{ flexShrink:0, display:"flex",
+              alignItems:"center", justifyContent:"center", padding:8, border:`1px solid ${T.brand}`,
+              borderRadius:T.radius, background:T.surface, cursor:"pointer" }}>
+              <Ms name={copied ? "check" : "content_copy"} size={24} color={copied ? T.success : T.brand} />
+            </button>
+          </div>
+          {/* Store-level visibility toggle only shows up once the link is actually
+              live (Figma "Header", publish="On", node 3403:20356) — before that,
+              there's nothing yet for a buyer to see or not see. */}
+          {published && (
+            <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
+              <SwitchToggle on={storeVisible} onToggle={() => setStoreVisible(v => !v)} />
+              <span style={{ fontFamily:FONT_SANS, fontSize:18, fontWeight:700, color:T.textBold, whiteSpace:"nowrap" }}>
+                {storeVisible ? "Visible to buyers" : "Hidden from buyers"}
+              </span>
+            </div>
+          )}
+        </div>
+        {published && (
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap",
+            width:"100%", borderTop:`1px solid ${T.borderSubtle}`, paddingTop:16 }}>
+            <button onClick={onContinue} style={{ background:"none", border:"none", cursor:"pointer",
+              display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:16,
+              fontFamily:FONT_SANS, padding:0 }}>
+              <span style={{ textDecoration:"underline" }}>View live page</span> <Ms name="open_in_new" color={T.textLink} />
+            </button>
+            <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+              <button onClick={() => setShareOpen(true)} style={{ display:"flex", alignItems:"center", gap:8,
+                minWidth:100, padding:"8px 24px", border:`1px solid ${T.textBold}`, borderRadius:T.radius,
+                background:T.surface, cursor:"pointer", fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>
+                <Ms name="share" size={20} color={T.textBold} /> Share on social
+              </button>
+              <button onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:8,
+                minWidth:100, padding:"8px 24px", border:`1px solid ${T.textBold}`, borderRadius:T.radius,
+                background:T.surface, cursor:"pointer", fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>
+                <Ms name="download" size={20} color={T.textBold} /> Download QR
+              </button>
             </div>
           </div>
-          <button onClick={copyLink} aria-label="Copy link" style={{ flexShrink:0, display:"flex",
-            alignItems:"center", justifyContent:"center", padding:8, border:`1px solid ${T.brand}`,
-            borderRadius:T.radius, background:T.surface, cursor:"pointer" }}>
-            <Ms name={copied ? "check" : "content_copy"} size={24} color={copied ? T.success : T.brand} />
-          </button>
-        </div>
+        )}
       </div>
 
       {/* Book details */}
