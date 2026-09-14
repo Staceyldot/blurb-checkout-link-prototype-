@@ -4833,6 +4833,13 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
         ? AUTHOR_SOCIALS.map(s => ({ ...s })) : prev);
     }
   }, [authorFilled]);
+  const [authorBio, setAuthorBio] = useState("");
+  useEffect(() => {
+    // Same seed-once-if-still-empty pattern as socialLinks above.
+    if (authorFilled) {
+      setAuthorBio(prev => prev ? prev : AUTHOR_BIO);
+    }
+  }, [authorFilled]);
   const addSocialLink = () => setSocialLinks(prev => prev.length >= MAX_SOCIAL_LINKS ? prev : [...prev, { platform: "", label: "", url: "" }]);
   const updateSocialLink = (i, field, v) => setSocialLinks(prev => prev.map((s, idx) => idx === i ? { ...s, [field]: v } : s));
   const removeSocialLink = i => setSocialLinks(prev => prev.filter((_, idx) => idx !== i));
@@ -4843,10 +4850,14 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
   const [aboutBook, setAboutBook] = useState("");
   const [keywords, setKeywords] = useState([]);
 
-  /* Pricing calculator. Print cost is fixed (set by format/size/materials,
-     not editable here); Listing Price, Profit margin, and Profit are three
+  /* Pricing calculator. Print cost is the base cost plus any linen/endsheet
+     upcharge (+US $3 swatches carry an `extra`) — set by format/size/materials,
+     not editable here. Listing Price, Profit margin, and Profit are three
      views onto the same number, so editing any one recomputes the other two. */
-  const PRINT_COST = 12.50;
+  const BASE_PRINT_COST = 12.50;
+  const linenExtra = LINEN_COLORS.find(c => c.name === linenColor)?.extra || 0;
+  const endsheetExtra = ENDSHEET_COLORS.find(c => c.name === endsheetColor)?.extra || 0;
+  const PRINT_COST = BASE_PRINT_COST + linenExtra + endsheetExtra;
   const [listingPrice, setListingPrice] = useState(PRINT_COST.toFixed(2));
   const [profitMargin, setProfitMargin] = useState("0.0");
   const [profit, setProfit] = useState("0.00");
@@ -4854,6 +4865,15 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
   // number — e.g. letters. The other two fields go blank ("--") and disabled
   // until it's fixed, since they can't be computed from garbage input.
   const [invalidPriceField, setInvalidPriceField] = useState(null); // "price" | "margin" | "profit" | null
+  // Keep the three pricing fields in sync with print cost whenever a material
+  // upcharge changes it — otherwise a stale profit/margin would sit alongside
+  // a print cost that no longer matches the materials chosen.
+  useEffect(() => {
+    setListingPrice(PRINT_COST.toFixed(2));
+    setProfitMargin("0.0");
+    setProfit("0.00");
+    setInvalidPriceField(null);
+  }, [PRINT_COST]);
   const round2 = n => Math.round(n * 100) / 100;
   const toNum = v => (v.trim() === "" ? NaN : Number(v.trim()));
   const updatePriceFromPrice = v => {
@@ -5167,15 +5187,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
             )}
           </SetupFieldRow>
           <SetupFieldRow label="About the author(s)">
-            {authorFilled ? (
-              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, height:150,
-                  overflowY:"auto", fontFamily:FONT_SANS, fontSize:16, color:T.textBold }}>{AUTHOR_BIO}</div>
-                <SetupHint>{AUTHOR_BIO.length}/1000</SetupHint>
-              </div>
-            ) : (
-              <SetupTextField placeholder="Share a short bio..." hint="0/1000" height={150} />
-            )}
+            <SetupTextField placeholder="Share a short bio..." value={authorBio} onChange={setAuthorBio} maxLen={1000} height={150} />
           </SetupFieldRow>
           <SetupFieldRow label="Social links">
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
