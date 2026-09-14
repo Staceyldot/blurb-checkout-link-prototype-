@@ -5221,15 +5221,15 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           <SwitchToggle on={sectionPreviewVisible} onToggle={() => setSectionPreviewVisible(v => !v)} />
           <span style={{ fontFamily:FONT_SANS, fontSize:18, fontWeight:700, color:T.textBold }}>
-            {sectionPreviewVisible ? "Visible to buyers" : "Hidden to buyers"}
+            {sectionPreviewVisible ? "Visible to buyers" : "Hidden from buyers"}
           </span>
         </div>
       }>
         <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
-          <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:18, fontWeight:600, color:T.textSubtle }}>
+          <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, fontWeight:400, color:T.textSubtle }}>
             {sectionPreviewVisible
-              ? "Shown on your checkout page unless you turn this off."
-              : "This section won't show on your checkout page."}
+              ? "Shown on your Instant Store unless you turn this off."
+              : "This section won't show on your Instant Store."}
           </p>
           {/* Grid-rows collapse (rather than a hard mount/unmount) so hiding the
               carousel eases the page height in instead of jumping instantly. */}
