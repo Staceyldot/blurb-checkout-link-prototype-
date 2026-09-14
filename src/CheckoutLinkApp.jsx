@@ -4309,7 +4309,7 @@ const ALL_PROJECTS = [
   { cover:BOOK_UPGRADED_SNACKS_MOCKUP, coverAspect:"square", coverFit:"contain", badge:"Selling", title:"Upgraded Snacks",
     desc:"Turn casual drink nights into extraordinary culinary events with chef-inspired small plates, savory bites, and gourmet pub fare explicitly crafted to complement modern cocktails. Designed for adventurous home hosts, this practical cookbook bridges the gap between craft mixology and restaurant-quality lounge food. Discover how rich cheeses, bold spices, cured meats, and crispy textures balance sweet, bitter, and botanical spirits to create perfect flavor harmony on your palate.",
     meta:[["Project type","Trade Book"],["Project option","8×10 in, 20×25 cm"],["# of pages","112"],["Created with","InDesign"],["Created","Apr 22, 2025"]],
-    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"storefront", label:"Manage Blurb Bookstore listing" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"download", label:"Download PDF" }],
+    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Blurb Bookstore listing" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"download", label:"Download PDF" }],
     share:true },
 ];
 
