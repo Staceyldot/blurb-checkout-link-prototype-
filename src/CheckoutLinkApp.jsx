@@ -4791,7 +4791,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
   const [copied, setCopied] = useState(false);
   const [preview, setPreview] = useState("sample");
   const [previewModalKind, setPreviewModalKind] = useState(null);   // null | "sample" | "full"
-  const [openMaterials, setOpenMaterials] = useState({ cover: true, linen: false, endsheet: false });
+  const [openMaterials, setOpenMaterials] = useState({ cover: false, linen: false, endsheet: false });
   const toggleMaterial = key => setOpenMaterials(m => ({ ...m, [key]: !m[key] }));
   const [finish, setFinish] = useState(null);
   const [linenColor, setLinenColor] = useState(LINEN_COLORS[0].name);
@@ -5023,7 +5023,8 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
       </SetupSection>
 
       {/* Materials */}
-      <SetupSection title="Materials">
+      <SetupSection title={<>Materials <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:400, color:T.textSubtle, marginLeft:8 }}>
+        {finish ? 3 : 0} of 3 selected</span></>}>
         <div style={{ maxWidth:685, borderBottom:`1px solid ${T.border}` }}>
           <MaterialsRow title="Cover finish" first open={openMaterials.cover} onToggle={() => toggleMaterial("cover")}>
             <div style={{ display:"flex", gap:8 }}>
