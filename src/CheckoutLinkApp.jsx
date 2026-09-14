@@ -1337,7 +1337,7 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
               <button onClick={() => setReadMore(r => !r)}
                 style={{ alignSelf:"flex-start", background:"none", border:"none", cursor:"pointer", padding:0,
                   color:T.textLink, fontWeight:600, fontSize:16, textDecoration:"underline" }}>
-                {readMore ? "Show less" : "Read more"}
+                {readMore ? "Read less" : "Read more"}
               </button>
             </div>
 
@@ -1444,7 +1444,7 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
               <button onClick={() => setAuthorReadMore(r => !r)}
                 style={{ alignSelf:"flex-start", background:"none", border:"none", cursor:"pointer", padding:0,
                   color:T.textLink, fontWeight:600, fontSize:16, textDecoration:"underline" }}>
-                {authorReadMore ? "Show less" : "Read more"}
+                {authorReadMore ? "Read less" : "Read more"}
               </button>
             </div>
           </div>
@@ -1575,7 +1575,7 @@ function EverydayMocktailsPdp({ onBack, onViewSnacks, cartCount, onCartClick }) 
               <button onClick={() => setReadMore(r => !r)}
                 style={{ alignSelf:"flex-start", background:"none", border:"none", cursor:"pointer", padding:0,
                   color:T.textLink, fontWeight:600, fontSize:16, textDecoration:"underline" }}>
-                {readMore ? "Show less" : "Read more"}
+                {readMore ? "Read less" : "Read more"}
               </button>
             </div>
 
@@ -1628,7 +1628,7 @@ function EverydayMocktailsPdp({ onBack, onViewSnacks, cartCount, onCartClick }) 
               <button onClick={() => setAuthorReadMore(r => !r)}
                 style={{ alignSelf:"flex-start", background:"none", border:"none", cursor:"pointer", padding:0,
                   color:T.textLink, fontWeight:600, fontSize:16, textDecoration:"underline" }}>
-                {authorReadMore ? "Show less" : "Read more"}
+                {authorReadMore ? "Read less" : "Read more"}
               </button>
             </div>
           </div>
@@ -1761,7 +1761,7 @@ function UpgradedSnacksPdp({ onBack, onViewMocktails, cartCount, onCartClick }) 
               <button onClick={() => setReadMore(r => !r)}
                 style={{ alignSelf:"flex-start", background:"none", border:"none", cursor:"pointer", padding:0,
                   color:T.textLink, fontWeight:600, fontSize:16, textDecoration:"underline" }}>
-                {readMore ? "Show less" : "Read more"}
+                {readMore ? "Read less" : "Read more"}
               </button>
             </div>
 
@@ -1814,7 +1814,7 @@ function UpgradedSnacksPdp({ onBack, onViewMocktails, cartCount, onCartClick }) 
               <button onClick={() => setAuthorReadMore(r => !r)}
                 style={{ alignSelf:"flex-start", background:"none", border:"none", cursor:"pointer", padding:0,
                   color:T.textLink, fontWeight:600, fontSize:16, textDecoration:"underline" }}>
-                {authorReadMore ? "Show less" : "Read more"}
+                {authorReadMore ? "Read less" : "Read more"}
               </button>
             </div>
           </div>
