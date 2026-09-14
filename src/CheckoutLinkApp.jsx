@@ -4808,8 +4808,6 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
   const [published, setPublished] = useState(false);
   const doPublish = () => { setPublished(true); setPublishOpen(true); };
   const [toast, setToast] = useState(false);
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [feedbackChoice, setFeedbackChoice] = useState(null);
   const [authorVisible, setAuthorVisible] = useState(true);
   const [copyFromStore, setCopyFromStore] = useState("");
   /* Choosing a store to copy from is its own trigger for the author profile's
@@ -4928,7 +4926,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
     }
     closeAiPanel();
     setToast(true);
-    setTimeout(() => { setToast(false); setShowFeedback(true); }, 3000);
+    setTimeout(() => setToast(false), 3000);
   };
 
   const slugify = title => title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -5011,30 +5009,6 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
           <SetupFieldRow label="Keywords" icon="Keywords help buyers find your book on Google. Use words shopper would search for.">
             <SetupKeywordsField keywords={keywords} setKeywords={setKeywords} />
           </SetupFieldRow>
-          {showFeedback && (
-            feedbackChoice ? (
-              <div style={{ background:"#f3f0fd", borderRadius:T.radius, padding:16 }}>
-                <span style={{ fontFamily:FONT_SANS, fontSize:16, color:T.textBold }}>Thanks for the feedback</span>
-              </div>
-            ) : (
-              <div style={{ background:"#F3F0FD", borderRadius:T.radius, padding:16, display:"flex",
-                alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
-                <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>Was this AI draft helpful?</span>
-                <div style={{ display:"flex", gap:20 }}>
-                  <button onClick={() => setFeedbackChoice("helpful")} style={{ display:"flex", alignItems:"center", gap:6,
-                    background:"none", border:"none", cursor:"pointer", fontFamily:FONT_SANS, fontSize:16, fontWeight:600,
-                    color:T.textBold }}>
-                    <Ms name="thumb_up" size={20} color={T.textBold} /> Helpful
-                  </button>
-                  <button onClick={() => setFeedbackChoice("not-helpful")} style={{ display:"flex", alignItems:"center", gap:6,
-                    background:"none", border:"none", cursor:"pointer", fontFamily:FONT_SANS, fontSize:16, fontWeight:600,
-                    color:T.textBold }}>
-                    <Ms name="thumb_down" size={20} color={T.textBold} /> Not helpful
-                  </button>
-                </div>
-              </div>
-            )
-          )}
         </div>
       </SetupSection>
 
@@ -5314,6 +5288,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
       onConfirm={() => { setDeleteStoreOpen(false); onGoAllProjects?.(); }} />
 
     <Toast show={toast}>Draft applied to your listing.</Toast>
+    <Toast show={copied}>Copied {linkUrl}</Toast>
     </>
   );
 }
