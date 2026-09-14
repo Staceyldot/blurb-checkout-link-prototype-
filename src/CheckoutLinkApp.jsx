@@ -4798,10 +4798,9 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
   const [endsheetColor, setEndsheetColor] = useState(ENDSHEET_COLORS[0].name);
   /* Picking a cover finish is the demo's stand-in for "enough required fields are
      filled to publish" — matches Figma's Unpublished/Filled state (node 4782:41534).
-     It also fills in the rest of the page (Listing content, Pricing, Author
-     profile, and expands the Linen/Endsheet color pickers) to match that same
-     Figma state, and flips the sticky bar's Publish button active. Not real
-     validation across every required field, just this one representative trigger. */
+     It expands the Linen/Endsheet color pickers and flips the sticky bar's
+     Publish button active. Not real validation across every required field,
+     just this one representative trigger. */
   const [canPublish, setCanPublish] = useState(false);
   const [publishOpen, setPublishOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -4885,9 +4884,6 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
     setFinish(f);
     setCanPublish(true);
     setOpenMaterials({ cover: true, linen: true, endsheet: true });
-    if (!listingTitle) setListingTitle(PRODUCT.title);
-    if (!aboutBook) setAboutBook(AI_DRAFT.description);
-    if (!keywords.length) setKeywords(AI_DRAFT.keywords);
   };
 
   // "Draft this for me" panel — prompt -> loading -> results.
