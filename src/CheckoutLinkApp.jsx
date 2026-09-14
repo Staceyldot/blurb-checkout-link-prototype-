@@ -3869,13 +3869,18 @@ function MaterialsRow({ title, first, open, onToggle, children }) {
    Cover finish buttons above them. */
 function RadioCardImage({ name, img, extra, selected, onSelect }) {
   return (
-    <button onClick={onSelect} style={{ width:88, display:"flex", flexDirection:"column", alignItems:"center",
+    <button onClick={onSelect} style={{ width:96, display:"flex", flexDirection:"column", alignItems:"center",
       gap:8, padding:4, borderRadius:T.radius, background:T.surface, cursor:"pointer",
       border: selected ? `1px solid ${T.borderActive}` : `1px solid ${T.border}`,
       boxShadow: selected ? `0 0 0 1px ${T.borderActive}` : "none" }}>
-      <img src={img} alt="" style={{ width:88, height:88, borderRadius:2, objectFit:"cover", display:"block" }} />
-      <span style={{ fontFamily:FONT_SANS, fontSize:14, fontWeight:selected ? 700 : 600, color:T.textBold, textAlign:"center" }}>
-        {name}{extra ? ` +US $${extra}.00` : ""}
+      <img src={img} alt="" style={{ width:"100%", aspectRatio:"1 / 1", borderRadius:2, objectFit:"cover", display:"block" }} />
+      <span style={{ display:"flex", flexDirection:"column", alignItems:"center" }}>
+        <span style={{ fontFamily:FONT_SANS, fontSize:14, fontWeight:selected ? 700 : 600, color:T.textBold, textAlign:"center" }}>
+          {name}
+        </span>
+        {extra && <span style={{ fontFamily:FONT_SANS, fontSize:14, fontWeight:400, color:T.textBold, textAlign:"center" }}>
+          +US ${extra}.00
+        </span>}
       </span>
     </button>
   );
@@ -4794,14 +4799,13 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
   const [openMaterials, setOpenMaterials] = useState({ cover: false, linen: false, endsheet: false });
   const toggleMaterial = key => setOpenMaterials(m => ({ ...m, [key]: !m[key] }));
   const [finish, setFinish] = useState(null);
-  const [linenColor, setLinenColor] = useState(LINEN_COLORS[0].name);
-  const [endsheetColor, setEndsheetColor] = useState(ENDSHEET_COLORS[0].name);
-  /* Picking a cover finish is the demo's stand-in for "enough required fields are
-     filled to publish" — matches Figma's Unpublished/Filled state (node 4782:41534).
-     It expands the Linen/Endsheet color pickers and flips the sticky bar's
-     Publish button active. Not real validation across every required field,
-     just this one representative trigger. */
-  const [canPublish, setCanPublish] = useState(false);
+  const [linenColor, setLinenColor] = useState(null);
+  const [endsheetColor, setEndsheetColor] = useState(null);
+  /* Materials is a step-by-step reveal, not a bulk prefill: picking a cover
+     finish opens the Linen row (still unselected — the seller has to pick a
+     color), picking a linen color opens the Endsheet row the same way.
+     Publish only goes active once all three are actually chosen. */
+  const canPublish = !!(finish && linenColor && endsheetColor);
   const [publishOpen, setPublishOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [published, setPublished] = useState(false);
@@ -4882,8 +4886,11 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
 
   const chooseFinish = f => {
     setFinish(f);
-    setCanPublish(true);
-    setOpenMaterials({ cover: true, linen: true, endsheet: true });
+    setOpenMaterials(m => ({ ...m, linen: true }));
+  };
+  const chooseLinenColor = c => {
+    setLinenColor(c);
+    setOpenMaterials(m => ({ ...m, endsheet: true }));
   };
 
   // "Draft this for me" panel — prompt -> loading -> results.
@@ -5024,7 +5031,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
 
       {/* Materials */}
       <SetupSection title={<>Materials <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:400, color:T.textSubtle, marginLeft:8 }}>
-        {finish ? 3 : 0} of 3 selected</span></>}>
+        {(finish ? 1 : 0) + (linenColor ? 1 : 0) + (endsheetColor ? 1 : 0)} of 3 selected</span></>}>
         <div style={{ maxWidth:685, borderBottom:`1px solid ${T.border}` }}>
           <MaterialsRow title="Cover finish" first open={openMaterials.cover} onToggle={() => toggleMaterial("cover")}>
             <div style={{ display:"flex", gap:8 }}>
@@ -5038,16 +5045,16 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
             </div>
           </MaterialsRow>
           <MaterialsRow title="Linen cover colors" open={openMaterials.linen} onToggle={() => toggleMaterial("linen")}>
-            {canPublish ? (
+            {finish ? (
               <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
                 {LINEN_COLORS.map(c => (
-                  <RadioCardImage key={c.name} {...c} selected={linenColor === c.name} onSelect={() => setLinenColor(c.name)} />
+                  <RadioCardImage key={c.name} {...c} selected={linenColor === c.name} onSelect={() => chooseLinenColor(c.name)} />
                 ))}
               </div>
             ) : <SetupHint>No linen cover selected yet.</SetupHint>}
           </MaterialsRow>
           <MaterialsRow title="Endsheet colors" open={openMaterials.endsheet} onToggle={() => toggleMaterial("endsheet")}>
-            {canPublish ? (
+            {linenColor ? (
               <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
                 {ENDSHEET_COLORS.map(c => (
                   <RadioCardImage key={c.name} {...c} selected={endsheetColor === c.name} onSelect={() => setEndsheetColor(c.name)} />
