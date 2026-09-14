@@ -4862,7 +4862,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
   const endsheetExtra = ENDSHEET_COLORS.find(c => c.name === endsheetColor)?.extra || 0;
   const PRINT_COST = BASE_PRINT_COST + linenExtra + endsheetExtra;
   const [listingPrice, setListingPrice] = useState(PRINT_COST.toFixed(2));
-  const [profitMargin, setProfitMargin] = useState("0.0");
+  const [profitMargin, setProfitMargin] = useState("0");
   const [profit, setProfit] = useState("0.00");
   // Which field (if any) currently holds text that can't be parsed as a valid
   // number — e.g. letters. The other two fields go blank ("--") and disabled
@@ -4873,7 +4873,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
   // a print cost that no longer matches the materials chosen.
   useEffect(() => {
     setListingPrice(PRINT_COST.toFixed(2));
-    setProfitMargin("0.0");
+    setProfitMargin("0");
     setProfit("0.00");
     setInvalidPriceField(null);
   }, [PRINT_COST]);
@@ -5137,7 +5137,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
             </div>
             {canPublish ? (
               <>
-                <PriceField label="Listing Price" hint="Buyers pay" prefix="$" value={listingPrice} onChange={updatePriceFromPrice}
+                <PriceField label="Listing price" hint="Buyers pay" prefix="$" value={listingPrice} onChange={updatePriceFromPrice}
                   error={invalidPriceField === "price" ? "Enter a valid price." : null}
                   disabled={invalidPriceField && invalidPriceField !== "price"} />
                 <PriceField label="Profit margin" hint="Percent you earn" suffix="%" value={profitMargin} onChange={updatePriceFromMargin}
@@ -5149,7 +5149,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
               </>
             ) : (
               [
-                { label:"Listing Price", value:"$ --", hint:"Buyers pay" },
+                { label:"Listing price", value:"$ --", hint:"Buyers pay" },
                 { label:"Profit margin", value:"-- %", hint:"Percent you earn" },
                 { label:"Profit", value:"$ --", hint:"What you earn" },
               ].map(f => (
