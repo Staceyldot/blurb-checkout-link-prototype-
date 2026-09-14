@@ -5119,6 +5119,9 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
         </div>
       }>
         <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
+          {!authorVisible && <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, fontWeight:400, color:T.textSubtle }}>
+            Still visible and editable here — buyers won't see it.
+          </p>}
           <SetupFieldRow label={<>Copy from<br />Instant Store</>} icon="Reuses details from another link.">
             <SetupDropdown value={copyFromStore} onChange={setCopyFromStore}
               options={["Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks", "Upgraded Snacks"]} />
