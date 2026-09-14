@@ -394,6 +394,7 @@ function Btn({ children, onClick, variant="primary", disabled, fullWidth }) {
   const variants = {
     primary:   { background:T.brand, color:"#fff" },
     secondary: { background:"transparent", color:T.brand, border:`1px solid ${T.brand}` },
+    neutral:   { background:"transparent", color:T.textBold, border:`1px solid ${T.textBold}` },
     danger:    { background:T.textError, color:"#fff" },
     disabled:  { background:T.disabled, color:T.textDisabled, border:`1px solid ${T.border}` },
   };
@@ -5452,7 +5453,7 @@ function DeleteStoreModal({ open, onClose, onConfirm }) {
           This can't be undone. Buyers will no longer be able to purchase through this link.
         </p>
         <div style={{ display:"flex", gap:12, justifyContent:"flex-end" }}>
-          <Btn variant="secondary" onClick={onClose}>Cancel</Btn>
+          <Btn variant="neutral" onClick={onClose}>Cancel</Btn>
           <Btn variant="danger" onClick={onConfirm}>Delete link</Btn>
         </div>
       </div>
