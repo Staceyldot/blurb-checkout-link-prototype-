@@ -4820,6 +4820,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
      auto-fills it. */
   const authorFilled = !!copyFromStore;
   const [deleteStoreOpen, setDeleteStoreOpen] = useState(false);
+  const [mainAuthor, setMainAuthor] = useState(PRODUCT.author);
   const [extraAuthors, setExtraAuthors] = useState([]);
   const MAX_AUTHORS = 3;   // PRODUCT.author counts as the first slot
   const addAuthorField = () => setExtraAuthors(prev => prev.length >= MAX_AUTHORS - 1 ? prev : [...prev, ""]);
@@ -5203,8 +5204,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
             </div>
           </SetupFieldRow>
           <SetupFieldRow label="Author(s)">
-            <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, fontFamily:FONT_SANS,
-              fontSize:16, color:T.textBold }}>{PRODUCT.author}</div>
+            <SetupTextField placeholder="Author name" value={mainAuthor} onChange={setMainAuthor} />
             {extraAuthors.map((a, i) => (
               <div key={i} style={{ display:"flex", gap:8, alignItems:"center" }}>
                 <div style={{ flex:1 }}>
