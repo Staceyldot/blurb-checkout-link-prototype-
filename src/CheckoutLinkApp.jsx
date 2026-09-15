@@ -5524,7 +5524,7 @@ function ShareSocialPanel({ open, onClose }) {
         transform: open ? "translateX(0)" : "translateX(100%)", transition:"transform .3s ease",
         display:"flex", flexDirection:"column", fontFamily:FONT_SANS }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:24, flexShrink:0 }}>
-          <span style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:500, color:T.textBold }}>Share your book on social</span>
+          <span style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:500, color:T.textBold }}>Share your title on social</span>
           <button onClick={onClose} aria-label="Close" style={{ background:"none", border:"none", cursor:"pointer", display:"flex" }}>
             <Ms name="close" size={24} color={T.textBold} />
           </button>
