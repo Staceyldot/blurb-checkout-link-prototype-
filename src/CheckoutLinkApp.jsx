@@ -859,7 +859,7 @@ function BookPreview() {
       <div style={{ display:"flex", alignItems: isMobile ? "flex-start" : "center", justifyContent:"space-between",
         gap:16, flexWrap:"wrap" }}>
         <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-          <h2 style={{ fontFamily:FONT_HEADING, fontSize: isMobile ? 32 : 44, fontWeight:500, lineHeight:1.2, color:T.textBold }}>Book preview</h2>
+          <h2 style={{ fontFamily:FONT_HEADING, fontSize: isMobile ? 32 : 44, fontWeight:500, lineHeight:1.2, color:T.textBold }}>Preview</h2>
           <p style={{ fontSize:18, color:T.textSubtle, lineHeight:1.4 }}>First {PREVIEW_LAST_PAGE} pages</p>
         </div>
         <button onClick={() => setFullscreen(true)}
@@ -1322,7 +1322,7 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
             <p style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:500, lineHeight:1.2, color:T.textBold }}>by <span style={{ color:T.textSubtle }}>{PRODUCT.author}</span></p>
 
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-              <p style={{ fontSize:16, fontWeight:600, color:T.textBold }}>About the book</p>
+              <p style={{ fontSize:16, fontWeight:600, color:T.textBold }}>Description</p>
               <p style={{ fontSize:16, color:T.textSubtle, lineHeight:1.5,
                 ...(!readMore && { display:"-webkit-box", WebkitLineClamp:3, WebkitBoxOrient:"vertical", overflow:"hidden" }) }}>
                 Liberal Libations empowers the cocktail enthusiast to craft bar-quality cocktails for a large
@@ -1486,7 +1486,7 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
                     style={{ background:"none", border:"none", cursor:"pointer", padding:"8px 24px 8px 0",
                     display:"flex", alignItems:"center", gap:8 }}>
                     <span style={{ fontSize:16, fontWeight:600, color:T.brand, lineHeight:"24px",
-                      borderBottom:`1px solid ${T.brand}`, paddingBottom:2 }}>View book</span>
+                      borderBottom:`1px solid ${T.brand}`, paddingBottom:2 }}>View title</span>
                     <Ms name="arrow_forward" size={24} color={T.brand} />
                   </button>
                 </div>
@@ -1502,7 +1502,7 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
 }
 
 /* Standalone PDP for the cross-sell title from "More from" — reachable only
-   via that carousel's "View book" CTA. Buy now/Add to cart match the main
+   via that carousel's "View title" CTA. Buy now/Add to cart match the main
    PDP's active styling but aren't wired to a real purchase, since this
    title isn't part of the buyable checkout-link the rest of the app is
    wired around. Reuses the same author (Kim Newton Arispe) bio/socials as
@@ -1554,7 +1554,7 @@ function EverydayMocktailsPdp({ onBack, onViewSnacks, cartCount, onCartClick }) 
             <p style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:500, lineHeight:1.2, color:T.textBold }}>by <span style={{ color:T.textSubtle }}>{book.author}</span></p>
 
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-              <p style={{ margin:0, fontSize:16, fontWeight:600, color:T.textBold }}>About the book</p>
+              <p style={{ margin:0, fontSize:16, fontWeight:600, color:T.textBold }}>Description</p>
               <p style={{ margin:0, fontSize:16, color:T.textSubtle, lineHeight:1.5,
                 ...(!readMore && { display:"-webkit-box", WebkitLineClamp:3, WebkitBoxOrient:"vertical", overflow:"hidden" }) }}>
                 {MOCKTAILS_ABOUT.intro}
@@ -1671,7 +1671,7 @@ function EverydayMocktailsPdp({ onBack, onViewSnacks, cartCount, onCartClick }) 
                   <button onClick={onView || (e => e.preventDefault())} style={{ background:"none", border:"none", cursor:"pointer",
                     padding:"8px 24px 8px 0", display:"flex", alignItems:"center", gap:8 }}>
                     <span style={{ fontSize:16, fontWeight:600, color:T.brand, lineHeight:"24px",
-                      borderBottom:`1px solid ${T.brand}`, paddingBottom:2 }}>View book</span>
+                      borderBottom:`1px solid ${T.brand}`, paddingBottom:2 }}>View title</span>
                     <Ms name="arrow_forward" size={24} color={T.brand} />
                   </button>
                 </div>
@@ -1689,7 +1689,7 @@ function EverydayMocktailsPdp({ onBack, onViewSnacks, cartCount, onCartClick }) 
 /* Standalone PDP for the other cross-sell title — same pattern as
    EverydayMocktailsPdp (Buy now/Add to cart styled active but not wired to
    a real purchase; not part of the buyable checkout-link flow). Reachable
-   only via "View book" on the Upgraded Snacks card in the More from
+   only via "View title" on the Upgraded Snacks card in the More from
    carousels on the Liberal Libations and Everyday Mocktails PDPs. */
 /* Structured "About the book" copy for Upgraded Snacks — same content as
    CROSS_SELL_BOOKS[1].blurb, broken back into paragraphs/bulleted
@@ -1739,7 +1739,7 @@ function UpgradedSnacksPdp({ onBack, onViewMocktails, cartCount, onCartClick }) 
             <p style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:500, lineHeight:1.2, color:T.textBold }}>by <span style={{ color:T.textSubtle }}>{book.author}</span></p>
 
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-              <p style={{ margin:0, fontSize:16, fontWeight:600, color:T.textBold }}>About the book</p>
+              <p style={{ margin:0, fontSize:16, fontWeight:600, color:T.textBold }}>Description</p>
               <p style={{ margin:0, fontSize:16, color:T.textSubtle, lineHeight:1.5,
                 ...(!readMore && { display:"-webkit-box", WebkitLineClamp:3, WebkitBoxOrient:"vertical", overflow:"hidden" }) }}>
                 {SNACKS_ABOUT.intro}
@@ -1855,7 +1855,7 @@ function UpgradedSnacksPdp({ onBack, onViewMocktails, cartCount, onCartClick }) 
                   <button onClick={onView || (e => e.preventDefault())} style={{ background:"none", border:"none", cursor:"pointer",
                     padding:"8px 24px 8px 0", display:"flex", alignItems:"center", gap:8 }}>
                     <span style={{ fontSize:16, fontWeight:600, color:T.brand, lineHeight:"24px",
-                      borderBottom:`1px solid ${T.brand}`, paddingBottom:2 }}>View book</span>
+                      borderBottom:`1px solid ${T.brand}`, paddingBottom:2 }}>View title</span>
                     <Ms name="arrow_forward" size={24} color={T.brand} />
                   </button>
                 </div>
@@ -4058,7 +4058,7 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
 
               <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:8 }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                  <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>About the book</span>
+                  <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>Description</span>
                   {phase === "results" && <UseThisCheckbox checked={descOn} onChange={() => setDescOn(v => !v)} />}
                 </div>
                 {phase === "results" ? (
@@ -5065,7 +5065,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
           <SetupFieldRow label="Listing title" icon="This is the title buyers see. It doesn't affect your book's printed title or ISBN.">
             <SetupTextField placeholder="e.g., Where Silence Speaks" value={listingTitle} onChange={setListingTitle} maxLen={70} />
           </SetupFieldRow>
-          <SetupFieldRow label="About the book">
+          <SetupFieldRow label="Description">
             <SetupTextField placeholder="e.g. A witty modern romance for readers who love a slow burn" value={aboutBook} onChange={setAboutBook} maxLen={1466} height={150} />
           </SetupFieldRow>
           <SetupFieldRow label="Keywords" icon="Keywords help buyers find your book on Google. Use words shopper would search for.">
@@ -5075,7 +5075,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
       </SetupSection>
 
       {/* Book preview settings */}
-      <SetupSection title="Book preview settings">
+      <SetupSection title="Preview settings">
         <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
           <PreviewCard icon="menu_book" title="Sample preview" sub="First 15 pages" showLink
             selected={preview === "sample"} onSelect={() => setPreview("sample")}
@@ -5422,7 +5422,7 @@ function BookPreviewModal({ open, kind, onClose }) {
         padding:24, boxShadow:"0px 8px 16px rgba(0,0,0,.16)", display:"flex", flexDirection:"column", gap:16,
         fontFamily:FONT_SANS }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-          <span style={{ fontFamily:FONT_HEADING, fontSize:32, fontWeight:500, lineHeight:1.2, color:T.textBold }}>Book preview</span>
+          <span style={{ fontFamily:FONT_HEADING, fontSize:32, fontWeight:500, lineHeight:1.2, color:T.textBold }}>Preview</span>
           <button onClick={onClose} aria-label="Close" style={{ background:"none", border:"none", cursor:"pointer", display:"flex", flexShrink:0 }}>
             <Ms name="close" size={24} color={T.textBold} />
           </button>
