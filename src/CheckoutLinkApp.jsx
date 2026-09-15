@@ -4002,16 +4002,16 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
               <div style={{ textAlign:"left", display:"flex", flexDirection:"column", gap:8 }}>
                 <span style={{ fontWeight:700, fontSize:16, color:T.textSubtle }}>Draft a listing title, description, and keywords</span>
                 <span style={{ fontSize:16, color:T.textSubtle }}>
-                  Tell us about your book. We'll draft the rest.<br />
+                  Tell us about your title. We'll draft the rest.<br />
                   The more detail, the better.
                 </span>
               </div>
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 <textarea value={input} onChange={e => setInput(e.target.value)}
-                  placeholder="e.g. A travel photo book of two weeks backpacking through Patagonia"
+                  placeholder="e.g. A travel photo essay of two weeks backpacking through Patagonia"
                   style={{ width:"100%", height:193, minHeight:193, border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
                     fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface, resize:"vertical" }} />
-                <SetupHint>We don't read your book. Don't include sensitive information here.</SetupHint>
+                <SetupHint>We don't read your title. Don't include sensitive information here.</SetupHint>
               </div>
               <div>
                 <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:8 }}>
@@ -4081,7 +4081,7 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
 
               <div>
                 <div style={{ fontSize:16, fontWeight:600, color:T.textBold }}>Keywords</div>
-                <SetupHint>Remove any that don't apply to your book.</SetupHint>
+                <SetupHint>Remove any that don't apply to your title.</SetupHint>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginTop:8 }}>
                   {phase === "results" && keywords.map((k, i) => <Chip key={k} label={k} onRemove={() => onRemoveKeyword(i)} />)}
                   {phase === "loading" && [190, 146, 134].map((w, i) => (
@@ -5025,7 +5025,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
         </div>
         {published && (
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap",
-            width:"100%", borderTop:`1px solid ${T.borderSubtle}`, paddingTop:16 }}>
+            width:"100%", marginTop:16, borderTop:`1px solid ${T.borderSubtle}`, paddingTop:16 }}>
             <button onClick={onContinue} style={{ background:"none", border:"none", cursor:"pointer",
               display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:16,
               fontFamily:FONT_SANS, padding:0 }}>
@@ -5062,13 +5062,13 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
         </button>
       }>
         <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-          <SetupFieldRow label="Listing title" icon="This is the title buyers see. It doesn't affect your book's printed title or ISBN.">
+          <SetupFieldRow label="Listing title" icon="This is the title buyers see. It doesn't affect your printed title or ISBN.">
             <SetupTextField placeholder="e.g., Where Silence Speaks" value={listingTitle} onChange={setListingTitle} maxLen={70} />
           </SetupFieldRow>
           <SetupFieldRow label="Description">
             <SetupTextField placeholder="e.g. A witty modern romance for readers who love a slow burn" value={aboutBook} onChange={setAboutBook} maxLen={1466} height={150} />
           </SetupFieldRow>
-          <SetupFieldRow label="Keywords" icon="Keywords help buyers find your book on Google. Use words a shopper would search for.">
+          <SetupFieldRow label="Keywords" icon="Keywords help buyers find your title on Google. Use words a shopper would search for.">
             <SetupKeywordsField keywords={keywords} setKeywords={setKeywords} />
           </SetupFieldRow>
         </div>
