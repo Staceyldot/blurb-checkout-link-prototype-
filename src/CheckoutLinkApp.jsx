@@ -1411,7 +1411,7 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
               <button onClick={() => setDetailsOpen(o => !o)}
                 style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between",
                   background:"none", border:"none", cursor:"pointer", padding:"12px 0" }}>
-                <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>Book details</span>
+                <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>Details</span>
                 <Ms name={detailsOpen ? "expand_less" : "expand_more"} />
               </button>
               <Collapse open={detailsOpen}>
@@ -3732,7 +3732,7 @@ function SetupKeywordsField({ keywords, setKeywords }) {
         </>
       )}
       {keywords.length === 0 && (
-        <SetupHint>Press Enter to add each keyword. Up to 7 keywords.</SetupHint>
+        <SetupHint>Press Enter to add up to 7 keywords.</SetupHint>
       )}
       {keywords.length >= 7 && (
         <SetupHint>Maximum keywords reached. Remove one to add another.</SetupHint>
@@ -5047,8 +5047,8 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
         )}
       </div>
 
-      {/* Book details */}
-      <SetupSection title="Book details">
+      {/* Project details */}
+      <SetupSection title="Project details">
         <BookDetailsRow showCover onViewProject={onGoAllProjects} />
       </SetupSection>
 
@@ -5068,7 +5068,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
           <SetupFieldRow label="Description">
             <SetupTextField placeholder="e.g. A witty modern romance for readers who love a slow burn" value={aboutBook} onChange={setAboutBook} maxLen={1466} height={150} />
           </SetupFieldRow>
-          <SetupFieldRow label="Keywords" icon="Keywords help buyers find your book on Google. Use words shopper would search for.">
+          <SetupFieldRow label="Keywords" icon="Keywords help buyers find your book on Google. Use words a shopper would search for.">
             <SetupKeywordsField keywords={keywords} setKeywords={setKeywords} />
           </SetupFieldRow>
         </div>
@@ -5140,18 +5140,18 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
                 <PriceField label="Listing price" hint="Buyers pay" prefix="$" value={listingPrice} onChange={updatePriceFromPrice}
                   error={invalidPriceField === "price" ? "Enter a valid price." : null}
                   disabled={invalidPriceField && invalidPriceField !== "price"} />
-                <PriceField label="Profit margin" hint="Percent you earn" suffix="%" value={profitMargin} onChange={updatePriceFromMargin}
+                <PriceField label="Profit margin" hint="Percent of listing price" suffix="%" value={profitMargin} onChange={updatePriceFromMargin}
                   error={invalidPriceField === "margin" ? "Enter a valid percentage." : null}
                   disabled={invalidPriceField && invalidPriceField !== "margin"} />
-                <PriceField label="Profit" hint="What you earn" prefix="$" value={profit} onChange={updatePriceFromProfit}
+                <PriceField label="Profit" hint="You earn" prefix="$" value={profit} onChange={updatePriceFromProfit}
                   error={invalidPriceField === "profit" ? "Enter a valid amount." : null}
                   disabled={invalidPriceField && invalidPriceField !== "profit"} />
               </>
             ) : (
               [
                 { label:"Listing price", value:"$ --", hint:"Buyers pay" },
-                { label:"Profit margin", value:"-- %", hint:"Percent you earn" },
-                { label:"Profit", value:"$ --", hint:"What you earn" },
+                { label:"Profit margin", value:"-- %", hint:"Percent of listing price" },
+                { label:"Profit", value:"$ --", hint:"You earn" },
               ].map(f => (
                 <div key={f.label} style={{ flex:"1 1 140px", minWidth:140, display:"flex", flexDirection:"column", gap:8 }}>
                   <div style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>{f.label}</div>
@@ -5267,10 +5267,10 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
         </div>
       </SetupSection>
 
-      {/* Other books preview — the buyer-facing cross-sell carousel shown below
+      {/* Other titles preview — the buyer-facing cross-sell carousel shown below
           the listing (Figma 5203:102590). Sellers can hide it with the same
           toggle pattern as Author profile above. */}
-      <SetupSection title="Other books preview" action={
+      <SetupSection title="Other titles preview" action={
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           <SwitchToggle on={sectionPreviewVisible} onToggle={() => setSectionPreviewVisible(v => !v)} />
           <span style={{ fontFamily:FONT_SANS, fontSize:18, fontWeight:700, color:T.textBold }}>
