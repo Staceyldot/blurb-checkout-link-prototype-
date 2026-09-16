@@ -4792,7 +4792,7 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
   );
 }
 
-function LinkSetupPage({ onContinue, onGoAllProjects }) {
+function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
   const { isMobile } = useViewport();
   const [copied, setCopied] = useState(false);
   const [preview, setPreview] = useState("sample");
@@ -4970,12 +4970,15 @@ function LinkSetupPage({ onContinue, onGoAllProjects }) {
     <>
     <DashboardTopNav />
     <div style={{ display:"flex", alignItems:"flex-start", width:"100%", maxWidth:1180, margin:"0 auto" }}>
-    <SideNav activeItem="Instant Stores" onNavigate={item => { if (item === "All projects") onGoAllProjects?.(); }} />
+    <SideNav activeItem="Instant Stores" onNavigate={item => {
+      if (item === "All projects") onGoAllProjects?.();
+      else if (item === "Instant Stores") onGoInstantStores?.();
+    }} />
     <div style={{ flex:1, minWidth:0, minHeight:"100vh", background:T.bg, fontFamily:FONT_SANS }}>
       {/* Header: breadcrumb, title, and the auto-generated link field */}
       <div style={{ background:T.surface, padding: isMobile ? "16px 20px 24px" : "32px 16px 24px" }}>
         <div style={{ display:"flex", alignItems:"center", gap:4, fontFamily:FONT_SANS, fontSize:14, marginBottom:16 }}>
-          <a href="#" onClick={e => e.preventDefault()} style={{ color:T.textLink }}>Instant Stores</a>
+          <a href="#" onClick={e => { e.preventDefault(); onGoInstantStores?.(); }} style={{ color:T.textLink }}>Instant Stores</a>
           <Ms name="chevron_right" size={16} color={T.textSubtle} />
           <span style={{ color:T.textSubtle }}>{PRODUCT.title}</span>
         </div>
@@ -5724,7 +5727,8 @@ function CheckoutLinkApp({ onSwitchFlow }) {
 
       {view === "setup" && (
         <LinkSetupPage onContinue={() => jump("pdp")}
-          onGoAllProjects={() => { setDashboardSubPage("all-projects"); jump("dashboard"); }} />
+          onGoAllProjects={() => { setDashboardSubPage("all-projects"); jump("dashboard"); }}
+          onGoInstantStores={() => { setDashboardSubPage("instant-stores"); jump("dashboard"); }} />
       )}
 
       {view === "pdp" && (
