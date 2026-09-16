@@ -5531,7 +5531,7 @@ function ShareSocialPanel({ open, onClose }) {
         </div>
 
         <div style={{ flex:1, overflowY:"auto", padding:"0 24px 24px", display:"flex", flexDirection:"column", gap:24 }}>
-          <p style={{ margin:0, fontSize:16, color:T.textSubtle }}>Here's a ready-to-post message about your book.</p>
+          <p style={{ margin:0, fontSize:16, color:T.textSubtle }}>Here's a ready-to-post message.</p>
 
           <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
