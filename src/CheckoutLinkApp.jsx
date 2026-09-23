@@ -3613,7 +3613,7 @@ function SetupFieldRow({ label, icon, children }) {
   return (
     <div style={{ display:"flex", gap:16, alignItems:"flex-start", width:"100%",
       flexDirection: isMobile ? "column" : "row" }}>
-      <div style={{ width: isMobile ? "auto" : 154, flexShrink:0, paddingTop:8, display:"flex", gap:4, alignItems:"flex-end",
+      <div style={{ width: isMobile ? "auto" : 154, flexShrink:0, paddingTop:8, display:"flex", gap:4, alignItems:"center",
         fontFamily:FONT_SANS, fontSize:18, fontWeight:600, color:T.textSubtle }}>
         {label}
         {icon && (typeof icon === "string"
@@ -5165,7 +5165,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
           {!authorVisible && <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, fontWeight:400, color:T.textSubtle }}>
             Still visible and editable here — buyers won't see it.
           </p>}
-          <SetupFieldRow label="Copy from" icon="Reuses details from another link.">
+          <SetupFieldRow label="Copy from" icon="Reuses an author profile you’ve already made.">
             <SetupDropdown value={copyFromStore} onChange={setCopyFromStore}
               options={["Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks", "Upgraded Snacks"]} />
           </SetupFieldRow>
