@@ -3662,7 +3662,7 @@ function SetupTextField({ placeholder, hint, height, value, onChange, maxLen }) 
 /* When `options` is passed, renders a real (native) select styled to match the
    static placeholder look used elsewhere — e.g. the "Copy from"
    field, which needs actual book choices rather than a decorative box. */
-function SetupDropdown({ value = "Select..", options, onChange }) {
+function SetupDropdown({ value = "Select..", options, onChange, placeholder = "Select.." }) {
   if (options) {
     return (
       <div style={{ position:"relative" }}>
@@ -3670,7 +3670,7 @@ function SetupDropdown({ value = "Select..", options, onChange }) {
           style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:"8px 36px 8px 8px", height:40,
             width:"100%", appearance:"none", background:T.surface, fontFamily:FONT_SANS, fontSize:16,
             color: value ? T.textBold : T.textDisabled }}>
-          <option value="" disabled>Select..</option>
+          <option value="" disabled>{placeholder}</option>
           {options.map(o => <option key={o} value={o}>{o}</option>)}
         </select>
         <Ms name="expand_more" size={20} color={T.textBold}
@@ -5166,7 +5166,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
             Still visible and editable here — buyers won't see it.
           </p>}
           <SetupFieldRow label="Copy from" icon="Reuses an author profile you’ve already made.">
-            <SetupDropdown value={copyFromStore} onChange={setCopyFromStore}
+            <SetupDropdown value={copyFromStore} onChange={setCopyFromStore} placeholder="Choose an Instant Store"
               options={["Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks", "Upgraded Snacks"]} />
           </SetupFieldRow>
           <SetupFieldRow label="Author">
