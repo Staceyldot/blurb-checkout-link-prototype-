@@ -4001,7 +4001,7 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
               </div>
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 <textarea value={input} onChange={e => setInput(e.target.value)}
-                  placeholder="e.g. A travel photo essay of two weeks backpacking through Patagonia"
+                  placeholder="e.g. keep it playful, mention it’s a gift edition"
                   style={{ width:"100%", height:193, minHeight:193, border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
                     fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface, resize:"vertical" }} />
                 <SetupHint>We don't read your title. Don't include sensitive information here.</SetupHint>
@@ -5062,7 +5062,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
             <SetupTextField placeholder="e.g., Where Silence Speaks" value={listingTitle} onChange={setListingTitle} maxLen={70} />
           </SetupFieldRow>
           <SetupFieldRow label="Description">
-            <SetupTextField placeholder="e.g. A witty modern romance for readers who love a slow burn" value={aboutBook} onChange={setAboutBook} maxLen={1466} height={150} />
+            <SetupTextField placeholder="e.g. A single choice sends two strangers on a journey that changes both their lives forever." value={aboutBook} onChange={setAboutBook} maxLen={1466} height={150} />
           </SetupFieldRow>
           <SetupFieldRow label="Keywords" icon="Keywords help buyers find your title on Google. Use words a shopper would search for.">
             <SetupKeywordsField keywords={keywords} setKeywords={setKeywords} />
@@ -5181,7 +5181,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
             <SetupDropdown value={copyFromStore} onChange={setCopyFromStore}
               options={["Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks", "Upgraded Snacks"]} />
           </SetupFieldRow>
-          <SetupFieldRow label="Author(s)">
+          <SetupFieldRow label="Author">
             <SetupTextField placeholder="Author name" value={mainAuthor} onChange={setMainAuthor} />
             {extraAuthors.map((a, i) => (
               <div key={i} style={{ display:"flex", gap:8, alignItems:"center" }}>
