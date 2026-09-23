@@ -5163,7 +5163,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
       }>
         <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
           {!authorVisible && <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, fontWeight:400, color:T.textSubtle }}>
-            Still visible and editable here — buyers won't see it.
+            Buyers won’t see your author profile. We’ll keep your details if you want to turn it back on.
           </p>}
           <SetupFieldRow label="Copy from" icon="Reuses an author profile you’ve already made.">
             <SetupDropdown value={copyFromStore} onChange={setCopyFromStore} placeholder="Choose an Instant Store"
@@ -5248,8 +5248,8 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
         <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
           <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, fontWeight:400, color:T.textSubtle }}>
             {sectionPreviewVisible
-              ? "Shown on your Instant Store unless you turn this off."
-              : "This section won't show on your Instant Store."}
+              ? "Buyers will see your other titles on your Instant Store."
+              : "Buyers won’t see your other titles on your Instant Store."}
           </p>
         </div>
       </SetupSection>
