@@ -5211,7 +5211,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
               </button>
             )}
           </SetupFieldRow>
-          <SetupFieldRow label="About the author(s)">
+          <SetupFieldRow label="About the author">
             <SetupTextField placeholder="Share a short bio..." value={authorBio} onChange={setAuthorBio} maxLen={1000} height={150} />
           </SetupFieldRow>
           <SetupFieldRow label="Social links">
