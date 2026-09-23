@@ -5254,25 +5254,22 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
         </div>
       </SetupSection>
 
-      {/* Delete Instant Store — last section on the page (Figma 5572:75042).
-          Bordered on top rather than wrapped in SetupSection, since this block
-          has no title row to divide from. The divider sits inside the padded
-          content (not on the outer full-bleed div) so it spans the same width
-          as every other section's header divider. */}
-      <div style={{ background:T.surface, width:"100%", padding: isMobile ? "24px 20px" : "32px 16px" }}>
-        <div style={{ borderTop:`1px solid ${T.borderSubtle}`, marginBottom:24 }} />
+      {/* Delete Instant Store — last section on the page, titled like every
+          other section above it. Only once published, like the header's store
+          visibility toggle its copy points to — before that there's nothing to delete. */}
+      {published && <SetupSection title="Delete Instant Store">
         <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
           <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, color:T.textBold, lineHeight:1.4 }}>
-            Buyers will no longer be able to purchase through this link.
+            Buyers won't be able to purchase through this link. To pause sales without deleting, use the toggle above.
           </p>
           <button onClick={() => setDeleteStoreOpen(true)} style={{ alignSelf:"flex-start", background:"none", border:"none",
             cursor:"pointer", padding:"8px 24px 8px 0", display:"flex", alignItems:"center", gap:8 }}>
             <Ms name="delete" size={24} color={T.textError} />
             <span style={{ fontSize:16, fontWeight:600, color:T.textError, lineHeight:"24px",
-              borderBottom:`1px solid ${T.textError}`, paddingBottom:2 }}>Delete Instant Store</span>
+              borderBottom:`1px solid ${T.textError}`, paddingBottom:2 }}>Delete</span>
           </button>
         </div>
-      </div>
+      </SetupSection>}
 
       {/* Spacer so the last section isn't hidden behind the fixed sticky bar below */}
       <div style={{ height:72 }} />
