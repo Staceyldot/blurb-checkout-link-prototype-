@@ -5327,7 +5327,7 @@ function StickyCtaBar({ onPreview, canPublish, onPublish, panelOpen }) {
   );
 }
 
-/* "Your link is live" success modal (Figma node 5285:83721), shown after
+/* "Your Instant Store is published" success modal (Figma node 5285:83721), shown after
    Publish. Same overlay pattern as CartDrawer/DraftPanel, centered instead of
    a side drawer since this is a one-off confirmation, not a form. */
 /* Confirms the AI draft actually landed in the real fields once the panel closes
@@ -5400,11 +5400,11 @@ function DeleteStoreModal({ open, onClose, onConfirm }) {
           Delete this Instant Store?
         </p>
         <p style={{ margin:0, fontSize:16, color:T.textBold, lineHeight:1.4 }}>
-          This can't be undone. Buyers will no longer be able to purchase through this link.
+          This can't be undone, and buyers will lose access to this link permanently.
         </p>
         <div style={{ display:"flex", gap:12, justifyContent:"flex-end" }}>
           <Btn variant="neutral" onClick={onClose}>Cancel</Btn>
-          <Btn variant="danger" onClick={onConfirm}>Delete link</Btn>
+          <Btn variant="danger" onClick={onConfirm}>Delete</Btn>
         </div>
       </div>
     </>
@@ -5428,12 +5428,9 @@ function PublishModal({ open, onClose, onViewLive, copied, onCopyLink, onShareSo
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16 }}>
           <img src={PUBLISH_CELEBRATION} alt="" style={{ width:216, height:177, maxWidth:"100%" }} />
           <p style={{ margin:0, fontFamily:FONT_HEADING, fontSize:24, fontWeight:400, lineHeight:1.2, color:T.textBold, textAlign:"center" }}>
-            Your link is live
+            Your Instant Store is published
           </p>
         </div>
-        <p style={{ margin:0, fontSize:16, color:T.textSubtle, textAlign:"center" }}>
-          Buyers can now order {PRODUCT.title}.
-        </p>
         <button onClick={onCopyLink} style={{ background:"none", border:"none", cursor:"pointer",
           display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:18 }}>
           <Ms name={copied ? "check" : "link"} color={copied ? T.success : T.textLink} />
