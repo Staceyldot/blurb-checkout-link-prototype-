@@ -63,18 +63,16 @@ const US_FLAG = "/assets/us-flag.png";  // Codex dashboard nav region flag (node
 /* Book-mockup renders (Figma 5722:89683 / 5727:89746) — the book shown as a
    physical object with real depth and its own soft drop shadow, on a
    transparent ground. Used everywhere these two titles show a cover: the
-   PDP's "More from author" carousel, Setup's "Other books preview"
-   carousel, the Instant Stores table, and the Dashboard's All Projects
-   list. Each spot fits the whole mockup into its own box with
+   PDP's "More from author" carousel, the Instant Stores table, and the
+   Dashboard's All Projects list. Each spot fits the whole mockup into its own box with
    objectFit:"contain" (see `coverFit` below) rather than cropping into it
    like a flat trim photo. */
 const BOOK_EVERYDAY_MOCKTAILS_MOCKUP = "/assets/book-everyday-mocktails-mockup.png";
 const BOOK_UPGRADED_SNACKS_MOCKUP = "/assets/book-upgraded-snacks-mockup.png";
 const PUBLISH_CELEBRATION = "/assets/publish-celebration.png";
 
-/* Other titles on the seller's Instant Store — the "Other books preview"
-   carousel on Setup (Figma 5203:102590) shows what a buyer sees below this
-   listing. Copy and covers match the PDP's own carousel (Figma 3709:18021). */
+/* Other titles on the seller's Instant Store — the cross-sell cards a buyer
+   sees below this listing in the PDP's "More from" carousel (Figma 3709:18021). */
 const CROSS_SELL_BOOKS = [
   { title:"Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks", author:"Kim Newton Arispe",
     blurb:"Craft artfully balanced recipes that apply authentic cocktail craft, complex botanicals, and sophisticated flavor pairings to every glass. Author Kim Newton Arispe elevates non-alcoholic mixology into a refined culinary art, giving zero-proof drinks the prestige, care, and attention they deserve. Designed for intentional drinkers and elevated hosts, this vibrant guide demonstrates how house-infused teas, artisanal syrups, and precise technique turn every pour into an extraordinary experience. Inside you'll find: Chef-Level Craft — artfully balanced flavor profiles featuring artisanal syrups, fresh garden botanicals, and layered aromatic bitters; Bar-Quality Presentation — professional techniques for selecting glassware, carving ice, and finishing drinks with modern garnishes; Elevated Sips — rich, complex drinks engineered for quiet lounge evenings, high-energy celebrations, and memorable dinner pairings; and Precision Balance — straightforward methods that master acidity, sweetness, texture, and body in every glass. Transform your home bar into a world-class lounge and savor the refined art of high-end mixology.",
@@ -3662,7 +3660,7 @@ function SetupTextField({ placeholder, hint, height, value, onChange, maxLen }) 
 }
 
 /* When `options` is passed, renders a real (native) select styled to match the
-   static placeholder look used elsewhere — e.g. the "Copy from Instant Store"
+   static placeholder look used elsewhere — e.g. the "Copy from"
    field, which needs actual book choices rather than a decorative box. */
 function SetupDropdown({ value = "Select..", options, onChange }) {
   if (options) {
@@ -3837,25 +3835,6 @@ function PreviewCard({ icon, title, sub, selected, onSelect, showLink, onSeePage
         </div>
       )}
     </button>
-  );
-}
-
-/* One tile in the "Other books preview" carousel (Figma 5203:102590, "Card - Product"). */
-function ProductCarouselCard({ title, blurb, price, img }) {
-  return (
-    <div style={{ display:"flex", flexDirection:"column", gap:16, width:410.67, flexShrink:0 }}>
-      <div style={{ position:"relative", width:"100%", aspectRatio:"1 / 1", borderRadius:8, overflow:"hidden" }}>
-        <img src={img} alt="" style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"contain", display:"block" }} />
-      </div>
-      <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-        <span style={{ fontFamily:FONT_HEADING, fontSize:24, fontWeight:500, color:T.textBold }}>{title}</span>
-        <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, color:T.textSubtle, lineHeight:1.4,
-          display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{blurb}</p>
-        <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:700, color:T.textSubtle }}>
-          Starting at ${price.toFixed(2)}
-        </span>
-      </div>
-    </div>
   );
 }
 
@@ -5186,7 +5165,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
           {!authorVisible && <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, fontWeight:400, color:T.textSubtle }}>
             Still visible and editable here — buyers won't see it.
           </p>}
-          <SetupFieldRow label={<>Copy from<br />Instant Store</>} icon="Reuses details from another link.">
+          <SetupFieldRow label="Copy from" icon="Reuses details from another link.">
             <SetupDropdown value={copyFromStore} onChange={setCopyFromStore}
               options={["Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks", "Upgraded Snacks"]} />
           </SetupFieldRow>
@@ -5254,9 +5233,10 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
         </div>
       </SetupSection>
 
-      {/* Other titles preview — the buyer-facing cross-sell carousel shown below
-          the listing (Figma 5203:102590). Sellers can hide it with the same
-          toggle pattern as Author profile above. */}
+      {/* Other titles preview — controls the buyer-facing cross-sell carousel shown
+          below the listing (Figma 5203:102590). Sellers can hide it with the same
+          toggle pattern as Author profile above; the carousel itself only renders
+          on the PDP, not here. */}
       <SetupSection title="Other titles preview" action={
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           <SwitchToggle on={sectionPreviewVisible} onToggle={() => setSectionPreviewVisible(v => !v)} />
@@ -5271,20 +5251,6 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
               ? "Shown on your Instant Store unless you turn this off."
               : "This section won't show on your Instant Store."}
           </p>
-          {/* Grid-rows collapse (rather than a hard mount/unmount) so hiding the
-              carousel eases the page height in instead of jumping instantly. */}
-          <div style={{ display:"grid", gridTemplateRows: sectionPreviewVisible ? "1fr" : "0fr",
-            transition:"grid-template-rows .25s ease", overflow:"hidden" }}>
-            <div style={{ minHeight:0, overflow:"hidden", opacity: sectionPreviewVisible ? 1 : 0,
-              transition:"opacity .2s ease" }}>
-              <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:"24px 24px 8px",
-                display:"flex", flexDirection:"column", gap:24 }}>
-                <div className="other-books-scroll" style={{ display:"flex", gap:24, alignItems:"flex-start", overflowX:"auto", overflowY:"hidden", paddingBottom:24 }}>
-                  {CROSS_SELL_BOOKS.map(b => <ProductCarouselCard key={b.title} {...b} />)}
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </SetupSection>
 
