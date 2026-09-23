@@ -732,6 +732,9 @@ function PreviewPage({ n, maxPage = PREVIEW_LAST_PAGE }) {
   );
 }
 
+/* Clearance around the spread for its 0 10px 30px drop shadow. */
+const SPREAD_PAD_X = 60, SPREAD_PAD_TOP = 60, SPREAD_PAD_BOTTOM = 60;
+
 /* Two-page book spread with a CSS 3D page-turn (animation reference only —
    Blurb's live flipbook). Matches Figma 4401:3307's static look. */
 function Flipbook({ maxWidth = 900, pageBadge = false, totalLabel = PREVIEW_LAST_PAGE, maxPage = PREVIEW_LAST_PAGE,
@@ -799,7 +802,11 @@ function Flipbook({ maxWidth = 900, pageBadge = false, totalLabel = PREVIEW_LAST
   const face = { position:"absolute", inset:0, backfaceVisibility:"hidden", overflow:"hidden", background:"#fff", containerType:"inline-size" };
 
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:40, alignItems:"center", width:"100%" }}>
+    <div style={{ display:"flex", flexDirection:"column", gap:SPREAD_PAD_BOTTOM > 40 ? 0 : 40 - SPREAD_PAD_BOTTOM, alignItems:"center", width:"100%" }}>
+      {/* Padding gives the spread's drop shadow room, so a scroll container
+          (e.g. the preview modal) never clips it; maxWidth stays the spread's own width. */}
+      <div style={{ width:"100%", maxWidth: maxWidth + SPREAD_PAD_X * 2, boxSizing:"border-box",
+        padding:`${SPREAD_PAD_TOP}px ${SPREAD_PAD_X}px ${SPREAD_PAD_BOTTOM}px` }}>
       <div style={{ position:"relative", width:"100%", maxWidth, aspectRatio:"900 / 573", perspective:2000, margin:"0 auto" }}>
         {/* Static spread underneath the leaf */}
         <div style={{ position:"absolute", inset:0, display:"flex", borderRadius:8, overflow:"hidden",
@@ -822,6 +829,7 @@ function Flipbook({ maxWidth = 900, pageBadge = false, totalLabel = PREVIEW_LAST
             <div style={{ ...face, transform:"rotateY(180deg)" }}><PreviewPage n={leafBack} maxPage={maxPage} /></div>
           </div>
         )}
+      </div>
       </div>
       {/* Counter */}
       <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
@@ -870,7 +878,7 @@ function BookPreview() {
           <Ms name="fullscreen" size={24} color={T.textBold} /> View fullscreen
         </button>
       </div>
-      <Flipbook maxWidth={573} />
+      <Flipbook maxWidth={900} />
 
       {/* True viewport takeover (Figma node 3709:18023) — white background,
           no scrim, since there's nothing behind it to dim. Real title/page
