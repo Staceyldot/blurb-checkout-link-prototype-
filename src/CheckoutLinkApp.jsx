@@ -732,8 +732,10 @@ function PreviewPage({ n, maxPage = PREVIEW_LAST_PAGE }) {
   );
 }
 
-/* Clearance around the spread for its 0 10px 30px drop shadow. */
-const SPREAD_PAD_X = 60, SPREAD_PAD_TOP = 60, SPREAD_PAD_BOTTOM = 60;
+/* Horizontal clearance inside the 900×573 frame for the spread's drop shadow —
+   50px at full size, easing down on small screens so the book isn't squeezed.
+   The spread keeps its ratio, so the vertical space is whatever's left over. */
+const SPREAD_PAD_X = "min(50px, 4vw)";
 
 /* Two-page book spread with a CSS 3D page-turn (animation reference only —
    Blurb's live flipbook). Matches Figma 4401:3307's static look. */
@@ -802,12 +804,13 @@ function Flipbook({ maxWidth = 900, pageBadge = false, totalLabel = PREVIEW_LAST
   const face = { position:"absolute", inset:0, backfaceVisibility:"hidden", overflow:"hidden", background:"#fff", containerType:"inline-size" };
 
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:SPREAD_PAD_BOTTOM > 40 ? 0 : 40 - SPREAD_PAD_BOTTOM, alignItems:"center", width:"100%" }}>
-      {/* Padding gives the spread's drop shadow room, so a scroll container
-          (e.g. the preview modal) never clips it; maxWidth stays the spread's own width. */}
-      <div style={{ width:"100%", maxWidth: maxWidth + SPREAD_PAD_X * 2, boxSizing:"border-box",
-        padding:`${SPREAD_PAD_TOP}px ${SPREAD_PAD_X}px ${SPREAD_PAD_BOTTOM}px` }}>
-      <div style={{ position:"relative", width:"100%", maxWidth, aspectRatio:"900 / 573", perspective:2000, margin:"0 auto" }}>
+    <div style={{ display:"flex", flexDirection:"column", gap:0, alignItems:"center", width:"100%" }}>
+      {/* Frame is maxWidth × (900:573); the spread fits inside its padding at the
+          same ratio, so the drop shadow has room and a scroll container (e.g. the
+          preview modal) never clips it. */}
+      <div style={{ width:"100%", maxWidth, aspectRatio:"900 / 573", boxSizing:"border-box", padding:`0 ${SPREAD_PAD_X}`,
+        display:"flex", alignItems:"center", justifyContent:"center" }}>
+      <div style={{ position:"relative", width:"100%", aspectRatio:"900 / 573", perspective:2000 }}>
         {/* Static spread underneath the leaf */}
         <div style={{ position:"absolute", inset:0, display:"flex", borderRadius:8, overflow:"hidden",
           boxShadow:"0 10px 30px rgba(0,0,0,.15)", background:"#fff" }}>
@@ -3904,7 +3907,7 @@ function SwitchToggle({ on, onToggle }) {
   );
 }
 
-/* Generated content is fixed rather than templated from the prompt/tone — this is a
+/* Generated content is fixed rather than templated from the prompt — this is a
    prototype demoing the review-and-apply interaction (Figma node 5423:93216), not a
    real drafting model, so the "result" is always the same copy the design specs. */
 const AI_DRAFT = {
@@ -3912,12 +3915,6 @@ const AI_DRAFT = {
   description: "Hosting shouldn't mean spending the whole party behind the bar.\nLiberal Libations shows you how to transform your favorite single-serving cocktails into make-ahead batches, so you can prep once and mingle all night. Over 85 recipes cover everything from bright, citrusy sippers to rich, spirit-forward classics — each one scaled and tested for a crowd.\nEvery recipe includes make-ahead instructions, garnish ideas, and tips for keeping batches balanced as they sit, so nothing gets watered down or too strong between the first pour and the last.\nWhether you're planning an intimate dinner for four or a backyard bash for forty, Liberal Libations turns bar-quality drinks into effortless entertaining — because the best host is the one who actually gets to enjoy their own party.",
   keywords: ["batch cocktails", "cocktail recipes", "party drinks", "make-ahead cocktails", "mixology", "entertaining", "cocktail cookbook"],
 };
-const AI_TONES = [
-  { label: "Playful", icon: "sentiment_very_satisfied" },
-  { label: "Warm", icon: "favorite" },
-  { label: "Literary", icon: "history_edu" },
-  { label: "Bold", icon: "local_fire_department" },
-];
 const AI_SHIMMER = "linear-gradient(94deg, rgb(211,196,245) 0%, rgba(179,152,237,.88) 55%, rgb(204,189,245) 100%)";
 
 /* Author profile "filled" copy — matches Figma's Unpublished/Filled state
@@ -3935,7 +3932,7 @@ const SOCIAL_PLATFORM_OPTIONS = ["Facebook", "Instagram", "X", "TikTok", "Websit
    same overlay/slide pattern as CartDrawer, with three phases: prompt, loading
    (shimmer placeholders over the same layout the results will fill), and
    results (generated fields, each with its own on/off toggle, plus removable
-   keyword chips). Fixed content, not templated from the prompt/tone — this
+   keyword chips). Fixed content, not templated from the prompt — this
    demos the review-and-apply interaction, not a real model. */
 /* The AI panel's own CTA style — outlined rather than the app's solid-fill
    primary Btn, so it reads as a distinct affordance: white with a colored
@@ -3979,7 +3976,7 @@ function UseThisCheckbox({ checked, onChange }) {
    participates in layout; the inner div is pinned to a fixed 400px and stuck to
    the viewport top so it stays in view while the (much taller) main column
    scrolls past it. */
-function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setTitleOn, descOn, setDescOn,
+function DraftPanel({ open, phase, input, setInput, titleOn, setTitleOn, descOn, setDescOn,
   keywords, onRemoveKeyword, titleText, setTitleText, descText, setDescText, onClose, onStartDraft, onApply, onBack }) {
   return (
     <div style={{ position:"sticky", top:0, height:"100vh", flexShrink:0,
@@ -4016,24 +4013,6 @@ function DraftPanel({ open, phase, input, setInput, tone, setTone, titleOn, setT
                   style={{ width:"100%", height:193, minHeight:193, border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
                     fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface, resize:"vertical" }} />
                 <SetupHint>We don't read your title. Don't include sensitive information here.</SetupHint>
-              </div>
-              <div>
-                <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:8 }}>
-                  <span style={{ fontSize:12, color:T.textSubtle }}>Tone (optional)</span>
-                  <Tooltip width={260} align="left" text="Playful: light, fun, and a little cheeky. Warm: friendly and inviting, like talking to a friend. Literary: descriptive and evocative, with polished prose. Bold: confident and direct, straight to the point.">
-                    <Ms name="info" size={16} color={T.textSubtle} />
-                  </Tooltip>
-                </div>
-                <div style={{ display:"flex", flexWrap:"wrap", gap:12 }}>
-                  {AI_TONES.map(t => (
-                    <button key={t.label} onClick={() => setTone(t.label)} style={{ flex:"1 1 calc(50% - 6px)", padding:8, borderRadius:T.radius,
-                      border: tone === t.label ? `2px solid ${T.borderActive}` : `1px solid ${T.border}`,
-                      background:T.surface, display:"flex", flexDirection:"column", alignItems:"center", gap:8, cursor:"pointer" }}>
-                      <Ms name={t.icon} size={20} color={T.textBold} />
-                      <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>{t.label}</span>
-                    </button>
-                  ))}
-                </div>
               </div>
             </>
           )}
@@ -4924,7 +4903,6 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
   const [aiOpen, setAiOpen] = useState(false);
   const [aiPhase, setAiPhase] = useState("prompt");
   const [aiInput, setAiInput] = useState("");
-  const [aiTone, setAiTone] = useState("Literary");
   const [aiTitleOn, setAiTitleOn] = useState(true);
   const [aiDescOn, setAiDescOn] = useState(true);
   const [aiKeywords, setAiKeywords] = useState([]);
@@ -5315,7 +5293,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
     </div>
 
     <DraftPanel open={aiOpen} phase={aiPhase} input={aiInput} setInput={setAiInput}
-      tone={aiTone} setTone={setAiTone} titleOn={aiTitleOn} setTitleOn={setAiTitleOn}
+      titleOn={aiTitleOn} setTitleOn={setAiTitleOn}
       descOn={aiDescOn} setDescOn={setAiDescOn} keywords={aiKeywords} onRemoveKeyword={removeAiKeyword}
       titleText={aiTitleText} setTitleText={setAiTitleText} descText={aiDescText} setDescText={setAiDescText}
       onClose={closeAiPanel} onStartDraft={startDraft} onApply={applyDraft} onBack={backToAiPrompt} />
