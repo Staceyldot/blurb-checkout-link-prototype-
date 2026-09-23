@@ -3915,7 +3915,53 @@ const AI_DRAFT = {
   description: "Hosting shouldn't mean spending the whole party behind the bar.\nLiberal Libations shows you how to transform your favorite single-serving cocktails into make-ahead batches, so you can prep once and mingle all night. Over 85 recipes cover everything from bright, citrusy sippers to rich, spirit-forward classics — each one scaled and tested for a crowd.\nEvery recipe includes make-ahead instructions, garnish ideas, and tips for keeping batches balanced as they sit, so nothing gets watered down or too strong between the first pour and the last.\nWhether you're planning an intimate dinner for four or a backyard bash for forty, Liberal Libations turns bar-quality drinks into effortless entertaining — because the best host is the one who actually gets to enjoy their own party.",
   keywords: ["batch cocktails", "cocktail recipes", "party drinks", "make-ahead cocktails", "mixology", "entertaining", "cocktail cookbook"],
 };
-const AI_SHIMMER = "linear-gradient(94deg, rgb(211,196,245) 0%, rgba(179,152,237,.88) 55%, rgb(204,189,245) 100%)";
+/* "Thinking…" loading state for the AI panel — three gradient sparkles that pop
+   in and out in sequence, with trailing dots (claude.ai/design "Thinking State -
+   Selected"). Replaces the whole results view while the draft is generating. */
+const SPARKLE_PATH = "M50 6 C55 40 60 45 94 50 C60 55 55 60 50 94 C45 60 40 55 6 50 C40 45 45 40 50 6 Z";
+const THINKING_SPARKLES = [
+  { size:58, pos:{ left:2, top:16 },   delay:0 },
+  { size:34, pos:{ right:6, top:0 },   delay:0.4 },
+  { size:22, pos:{ right:0, bottom:4 }, delay:0.8 },
+];
+function ThinkingState() {
+  return (
+    <>
+    <style>{`
+      @keyframes ts-appear { 0% { opacity:0; transform:scale(.3); } 12% { opacity:1; transform:scale(1.1); }
+        18%, 62% { opacity:1; transform:scale(1); } 74%, 100% { opacity:0; transform:scale(.3); } }
+      @keyframes ts-dots { 0%, 20% { opacity:0; } 50%, 100% { opacity:1; } }
+    `}</style>
+    <div role="status" aria-live="polite"
+      style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:28 }}>
+      <div aria-hidden="true" style={{ position:"relative", width:96, height:88 }}>
+        <svg viewBox="0 0 100 100" width="0" height="0" style={{ position:"absolute" }}>
+          <defs>
+            <radialGradient id="ts-sparkle" cx="35%" cy="35%" r="75%">
+              <stop offset="25%" stopColor="#7A3DC4" />
+              <stop offset="55%" stopColor="#0D5A84" />
+              <stop offset="95%" stopColor="#107EB1" />
+            </radialGradient>
+          </defs>
+        </svg>
+        {THINKING_SPARKLES.map(({ size, pos, delay }) => (
+          <svg key={size} viewBox="0 0 100 100" width={size} height={size}
+            style={{ position:"absolute", ...pos, transformOrigin:"center", overflow:"visible",
+              animation:`ts-appear 4.2s ease-in-out ${delay}s infinite` }}>
+            <path d={SPARKLE_PATH} fill="url(#ts-sparkle)" stroke="url(#ts-sparkle)" strokeWidth={8} strokeLinejoin="round" />
+          </svg>
+        ))}
+      </div>
+      <div style={{ display:"flex", alignItems:"baseline", gap:2, fontSize:16, fontWeight:500, color:T.textBold }}>
+        <span>Thinking</span>
+        {[0, 0.2, 0.4].map(d => (
+          <span key={d} aria-hidden="true" style={{ animation:`ts-dots 1.4s ${d}s infinite` }}>.</span>
+        ))}
+      </div>
+    </div>
+    </>
+  );
+}
 
 /* Author profile "filled" copy — matches Figma's Unpublished/Filled state
    (node 4782:41541). Distinct from the shorter bio App.jsx/the PDP use for
@@ -4017,59 +4063,40 @@ function DraftPanel({ open, phase, input, setInput, titleOn, setTitleOn, descOn,
             </>
           )}
 
-          {(phase === "loading" || phase === "results") && (
+          {phase === "loading" && <ThinkingState />}
+
+          {phase === "results" && (
             <>
               <p style={{ margin:0, fontSize:16, color:T.textBold }}>Here's what we came up with. Check what you'd like to use.</p>
 
               <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:8 }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
                   <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>Listing title</span>
-                  {phase === "results" && <UseThisCheckbox checked={titleOn} onChange={() => setTitleOn(v => !v)} />}
+                  <UseThisCheckbox checked={titleOn} onChange={() => setTitleOn(v => !v)} />
                 </div>
-                {phase === "results" ? (
-                  <input value={titleText} onChange={e => setTitleText(e.target.value.slice(0, 70))}
-                    style={{ width:"100%", border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
-                      fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface, minHeight:40, boxSizing:"border-box" }} />
-                ) : (
-                  <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface,
-                    fontSize:16, color:T.textBold, minHeight:40, display:"flex", alignItems:"center" }}>
-                    <div style={{ height:16, width:"70%", borderRadius:4, backgroundImage:AI_SHIMMER }} />
-                  </div>
-                )}
-                {phase === "results" && <SetupHint>{titleText.length}/70</SetupHint>}
+                <input value={titleText} onChange={e => setTitleText(e.target.value.slice(0, 70))}
+                  style={{ width:"100%", border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
+                    fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface, minHeight:40, boxSizing:"border-box" }} />
+                <SetupHint>{titleText.length}/70</SetupHint>
               </div>
 
               <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:8 }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
                   <span style={{ fontSize:16, fontWeight:600, color:T.textBold }}>Description</span>
-                  {phase === "results" && <UseThisCheckbox checked={descOn} onChange={() => setDescOn(v => !v)} />}
+                  <UseThisCheckbox checked={descOn} onChange={() => setDescOn(v => !v)} />
                 </div>
-                {phase === "results" ? (
-                  <textarea value={descText} onChange={e => setDescText(e.target.value.slice(0, 1466))}
-                    style={{ width:"100%", height:150, minHeight:150, border:`1px solid ${T.border}`, borderRadius:T.radius,
-                      padding:8, fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface,
-                      resize:"vertical", boxSizing:"border-box" }} />
-                ) : (
-                  <div style={{ border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8, background:T.surface,
-                    fontSize:16, color:T.textBold, height:150, minHeight:150, overflowY:"auto", whiteSpace:"pre-wrap" }}>
-                    <div style={{ display:"flex", flexDirection:"column", gap:8, paddingTop:4 }}>
-                      {[100, 100, 80].map((w, i) => (
-                        <div key={i} style={{ height:16, width:`${w}%`, borderRadius:4, backgroundImage:AI_SHIMMER }} />
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {phase === "results" && <SetupHint>{descText.length}/1466</SetupHint>}
+                <textarea value={descText} onChange={e => setDescText(e.target.value.slice(0, 1466))}
+                  style={{ width:"100%", height:150, minHeight:150, border:`1px solid ${T.border}`, borderRadius:T.radius,
+                    padding:8, fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface,
+                    resize:"vertical", boxSizing:"border-box" }} />
+                <SetupHint>{descText.length}/1466</SetupHint>
               </div>
 
               <div>
                 <div style={{ fontSize:16, fontWeight:600, color:T.textBold }}>Keywords</div>
                 <SetupHint>Remove any that don't apply to your title.</SetupHint>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginTop:8 }}>
-                  {phase === "results" && keywords.map((k, i) => <Chip key={k} label={k} onRemove={() => onRemoveKeyword(i)} />)}
-                  {phase === "loading" && [190, 146, 134].map((w, i) => (
-                    <div key={i} style={{ height:32, width:w, borderRadius:36, backgroundImage:AI_SHIMMER }} />
-                  ))}
+                  {keywords.map((k, i) => <Chip key={k} label={k} onRemove={() => onRemoveKeyword(i)} />)}
                 </div>
               </div>
             </>
