@@ -271,23 +271,6 @@ function FacebookGlyph({ size=20 }) {
     </svg>
   );
 }
-/* Plain white marks — for brand-colored share buttons (X/Facebook), where the
-   colored badge versions above (FacebookGlyph) would clash with the button's
-   own background. */
-function FacebookMarkWhite({ size=18 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" style={{ display:"block", flexShrink:0 }}>
-      <path fill="#fff" d="M15.12 8.29h1.98V5.11C16.79 5.05 15.49 4.94 14 4.94c-3.05 0-5.14 1.92-5.14 5.44v2.74H5.6v3.56h3.26V22h3.56v-5.32h3.13l.5-3.56h-3.63V10.8c0-1.03.28-1.73 1.7-1.73z"/>
-    </svg>
-  );
-}
-function XMarkWhite({ size=16 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" style={{ display:"block", flexShrink:0 }}>
-      <path fill="#fff" d="M16.1625 5.5H18.3688L13.55 11.0062L19.2188 18.5H14.7813L11.3031 13.9563L7.32812 18.5H5.11875L10.2719 12.6094L4.8375 5.5H9.3875L12.5281 9.65312L16.1625 5.5ZM15.3875 17.1812H16.6094L8.72188 6.75H7.40938L15.3875 17.1812Z"/>
-    </svg>
-  );
-}
 
 /* ═══════════════════════════ Primitives ═══════════════════════════ */
 function Divider() { return <div style={{ height:1, background:"#e0e0e0", width:"100%", flexShrink:0 }} />; }
@@ -5458,10 +5441,13 @@ function ShareSocialPanel({ open, onClose }) {
     setMsgCopied(true);
     setTimeout(() => setMsgCopied(false), 1500);
   };
+  // One dark button per platform (Figma 5624:71621), each with its white mark.
   const platforms = [
-    { label: "X", bg: "#000", icon: <XMarkWhite size={16} /> },
-    { label: "Substack", bg: "#FF6719", icon: <Ms name="reorder" size={18} color="#fff" /> },
-    { label: "Facebook", bg: "#1877F2", icon: <FacebookMarkWhite size={18} /> },
+    { label: "X",         icon: "/assets/social/x-white.svg" },
+    { label: "Substack",  icon: "/assets/social/substack-mark-white.svg" },
+    { label: "Instagram", icon: "/assets/social/instagram-white.svg" },
+    { label: "TikTok",    icon: "/assets/social/tiktok-white.svg" },
+    { label: "Facebook",  icon: "/assets/social/facebook-white.svg" },
   ];
   return (
     <>
@@ -5477,8 +5463,8 @@ function ShareSocialPanel({ open, onClose }) {
           </button>
         </div>
 
-        <div style={{ flex:1, overflowY:"auto", padding:"0 24px 24px", display:"flex", flexDirection:"column", gap:24 }}>
-          <p style={{ margin:0, fontSize:16, color:T.textSubtle }}>Here's a ready-to-post message.</p>
+        <div style={{ flex:1, overflowY:"auto", padding:24, display:"flex", flexDirection:"column", gap:24 }}>
+          <p style={{ margin:0, fontSize:16, lineHeight:1.4, color:T.textBold }}>Here's a ready-to-post message.</p>
 
           <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
@@ -5490,27 +5476,28 @@ function ShareSocialPanel({ open, onClose }) {
               </button>
             </div>
             <textarea value={message} onChange={e => setMessage(e.target.value.slice(0, 280))}
-              style={{ width:"100%", height:100, minHeight:100, border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
-                fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface, resize:"vertical" }} />
+              style={{ width:"100%", height:100, minHeight:100, maxHeight:200, border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
+                fontFamily:FONT_SANS, fontSize:16, lineHeight:"24px", color:T.textSubtle, background:T.surface, resize:"vertical" }} />
             <SetupHint>{message.length}/280</SetupHint>
           </div>
 
-          <Divider />
+          <div style={{ height:1, background:"#dcdcdc", flexShrink:0 }} />
 
           <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-            <span style={{ fontSize:14, fontWeight:600, color:T.textSubtle }}>Ready to post</span>
+            <span style={{ fontSize:16, fontWeight:600, lineHeight:"24px", color:T.textSubtle }}>Ready to post</span>
             {platforms.map(p => (
               <button key={p.label} onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center",
-                justifyContent:"center", gap:8, background:p.bg, border:"none", borderRadius:T.radius,
-                padding:"10px 16px", cursor:"pointer" }}>
-                {p.icon}
-                <span style={{ color:"#fff", fontWeight:600, fontSize:16, fontFamily:FONT_SANS }}>{p.label}</span>
+                justifyContent:"center", gap:8, background:T.textBold, border:"none", borderRadius:T.radius,
+                padding:"8px 24px", cursor:"pointer" }}>
+                <img src={p.icon} alt="" width={24} height={24} style={{ display:"block", flexShrink:0 }} />
+                <span style={{ color:"#fff", fontWeight:600, fontSize:16, lineHeight:"24px", fontFamily:FONT_SANS }}>{p.label}</span>
               </button>
             ))}
           </div>
+        </div>
 
-          <Divider />
-
+        {/* Pinned footer, split off by its own divider */}
+        <div style={{ borderTop:"1px solid #dcdcdc", padding:24, flexShrink:0 }}>
           <Btn variant="secondary" onClick={onClose} fullWidth>Back to editing</Btn>
         </div>
       </div>
