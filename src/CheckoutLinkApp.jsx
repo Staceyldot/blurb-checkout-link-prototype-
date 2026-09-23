@@ -4079,10 +4079,7 @@ function DraftPanel({ open, phase, input, setInput, titleOn, setTitleOn, descOn,
         <div style={{ borderTop:`1px solid ${T.borderSubtle}`, padding:24, display:"flex", flexDirection:"column",
           alignItems:"flex-start", gap:8, flexShrink:0 }}>
           {phase === "prompt" ? (
-            <>
-              <span style={{ fontSize:12, color:T.textSubtle }}>3 of 5 uses left today</span>
-              <AiOutlineButton onClick={onStartDraft} disabled={!input.trim()} icon="auto_awesome">Draft content</AiOutlineButton>
-            </>
+            <AiOutlineButton onClick={onStartDraft} disabled={!input.trim()} icon="auto_awesome">Draft content</AiOutlineButton>
           ) : (
             <AiOutlineButton onClick={onApply} disabled={phase !== "results"} color={T.brand} textColor={T.brand}>Apply selected</AiOutlineButton>
           )}
