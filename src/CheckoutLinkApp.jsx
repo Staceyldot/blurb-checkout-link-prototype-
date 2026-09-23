@@ -58,7 +58,6 @@ const AMEX        = "/assets/amex.svg";
 const DISCOVER    = "/assets/discover.svg";
 const BOOK_COVER  = "/assets/book-liberal-libations.png";
 const BLURB_MARK  = "/assets/blurb-mark.svg";
-const AUTHOR_PHOTO = "/assets/author-kim.png";
 const BLURB_LOGO_EMAIL = "/assets/blurb-logo-email.png";  // full-color logo for the email header
 const US_FLAG = "/assets/us-flag.png";  // Codex dashboard nav region flag (node 4248:8889) — flat icon, not the emoji glyph
 /* Book-mockup renders (Figma 5722:89683 / 5727:89746) — the book shown as a
@@ -1387,12 +1386,12 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
                 {/* Filled "Buy now" leads, outlined "Add to cart" follows — same
                     stack, same height, no "or" divider (Figma 3709:17913). */}
                 <button onClick={() => { onAddToCart(hasPrint(format) ? qty : 1); onCheckout(); }}
-                  style={{ width:"100%", height:BTN_H, background:T.brand, color:"#fff", border:"none",
+                  style={{ width:"100%", height:BTN_H, background:"#000000", color:"#fff", border:"none",
                     borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
-                    display:"flex", alignItems:"center", justifyContent:"center" }}
+                    display:"flex", alignItems:"center", justifyContent:"center", gap:4 }}
                   onMouseEnter={e => e.currentTarget.style.opacity=".85"}
                   onMouseLeave={e => e.currentTarget.style.opacity="1"}>
-                  Buy now
+                  Buy with<WalletMark src={APPLE_PAY_W} />
                 </button>
                 <button onClick={() => onAddToCart(hasPrint(format) ? qty : 1)}
                   style={{ width:"100%", height:BTN_H, background:T.surface, color:T.brand, border:`1px solid ${T.brand}`,
@@ -1432,8 +1431,6 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
         <div style={{ maxWidth:1280, margin:"0 auto", display:"flex", gap:24, flexWrap:"wrap" }}>
           <div style={{ flex:"1 1 500px", maxWidth:845, display:"flex", flexDirection:"column", gap:16 }}>
             <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-              <img src={AUTHOR_PHOTO} alt={PRODUCT.author}
-                style={{ width:40, height:40, borderRadius:"50%", objectFit:"cover", flexShrink:0 }} />
               <h2 style={{ fontFamily:FONT_HEADING, fontSize: isDesktop ? 44 : 28, fontWeight:500, lineHeight:1.2, color:T.textBold, margin:0 }}>About the author</h2>
             </div>
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
@@ -1590,12 +1587,12 @@ function EverydayMocktailsPdp({ onBack, onViewSnacks, cartCount, onCartClick }) 
                 the buyable checkout-link the rest of the app is wired around. */}
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-                <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:T.brand, color:"#fff",
+                <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:"#000000", color:"#fff",
                   border:"none", borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
-                  display:"flex", alignItems:"center", justifyContent:"center" }}
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:4 }}
                   onMouseEnter={e => e.currentTarget.style.opacity=".85"}
                   onMouseLeave={e => e.currentTarget.style.opacity="1"}>
-                  Buy now
+                  Buy with<WalletMark src={APPLE_PAY_W} />
                 </button>
                 <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:T.surface, color:T.brand,
                   border:`1px solid ${T.brand}`, borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
@@ -1616,8 +1613,6 @@ function EverydayMocktailsPdp({ onBack, onViewSnacks, cartCount, onCartClick }) 
         <div style={{ maxWidth:1280, margin:"0 auto", display:"flex", gap:24, flexWrap:"wrap" }}>
           <div style={{ flex:"1 1 500px", maxWidth:845, display:"flex", flexDirection:"column", gap:16 }}>
             <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-              <img src={AUTHOR_PHOTO} alt={book.author}
-                style={{ width:40, height:40, borderRadius:"50%", objectFit:"cover", flexShrink:0 }} />
               <h2 style={{ fontFamily:FONT_HEADING, fontSize: isDesktop ? 44 : 28, fontWeight:500, lineHeight:1.2, color:T.textBold, margin:0 }}>About the author</h2>
             </div>
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
@@ -1776,12 +1771,12 @@ function UpgradedSnacksPdp({ onBack, onViewMocktails, cartCount, onCartClick }) 
                 the buyable checkout-link the rest of the app is wired around. */}
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-                <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:T.brand, color:"#fff",
+                <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:"#000000", color:"#fff",
                   border:"none", borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
-                  display:"flex", alignItems:"center", justifyContent:"center" }}
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:4 }}
                   onMouseEnter={e => e.currentTarget.style.opacity=".85"}
                   onMouseLeave={e => e.currentTarget.style.opacity="1"}>
-                  Buy now
+                  Buy with<WalletMark src={APPLE_PAY_W} />
                 </button>
                 <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:T.surface, color:T.brand,
                   border:`1px solid ${T.brand}`, borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
@@ -1802,8 +1797,6 @@ function UpgradedSnacksPdp({ onBack, onViewMocktails, cartCount, onCartClick }) 
         <div style={{ maxWidth:1280, margin:"0 auto", display:"flex", gap:24, flexWrap:"wrap" }}>
           <div style={{ flex:"1 1 500px", maxWidth:845, display:"flex", flexDirection:"column", gap:16 }}>
             <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-              <img src={AUTHOR_PHOTO} alt={book.author}
-                style={{ width:40, height:40, borderRadius:"50%", objectFit:"cover", flexShrink:0 }} />
               <h2 style={{ fontFamily:FONT_HEADING, fontSize: isDesktop ? 44 : 28, fontWeight:500, lineHeight:1.2, color:T.textBold, margin:0 }}>About the author</h2>
             </div>
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
@@ -5187,24 +5180,6 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
           <SetupFieldRow label={<>Copy from<br />Instant Store</>} icon="Reuses details from another link.">
             <SetupDropdown value={copyFromStore} onChange={setCopyFromStore}
               options={["Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks", "Upgraded Snacks"]} />
-          </SetupFieldRow>
-          <SetupFieldRow label="Profile photo">
-            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-              <div style={{ position:"relative", width:80, height:80 }}>
-                <div style={{ width:80, height:80, borderRadius:"50%", background:"#f5f0ea", position:"relative", overflow:"hidden" }}>
-                  {authorFilled
-                    ? <img src={AUTHOR_PHOTO} alt={PRODUCT.author} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-                    : <img src="/assets/avatar-placeholder.png" alt="" style={{ position:"absolute", top:"-5.25%", left:"-9.37%",
-                        width:"118.96%", height:"117.01%", maxWidth:"none", opacity:0.4 }} />}
-                </div>
-                <button onClick={e => e.preventDefault()} style={{ position:"absolute", bottom:-4, right:2, width:28, height:28,
-                  borderRadius:"50%", background:T.brand, border:"2px solid #f5f5f5", display:"flex", alignItems:"center",
-                  justifyContent:"center", cursor:"pointer" }}>
-                  <Ms name="photo_camera" size={14} color="#f5f5f5" />
-                </button>
-              </div>
-              <SetupHint>Accepts JPG, PNG, GIF, or BMP, up to 1MB.</SetupHint>
-            </div>
           </SetupFieldRow>
           <SetupFieldRow label="Author(s)">
             <SetupTextField placeholder="Author name" value={mainAuthor} onChange={setMainAuthor} />
