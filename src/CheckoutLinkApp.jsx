@@ -120,6 +120,9 @@ const BLURB_FONT_FACES = [
 ).join("\n");
 const FONT_SANS    = "'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif";
 const FONT_HEADING = "'Futura PT', 'Futura', 'Century Gothic', -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif";
+/* Apple Pay "Buy with" label — SF Pro Semibold per Figma 3795:26067; system stack
+   resolves to SF on Apple devices. */
+const FONT_APPLE_PAY = "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif";
 
 /* ── The single, coherent order that runs through every screen ── */
 /* Same book as App.jsx's BOOK_SEED, kept in step by hand — the two files don't
@@ -1387,11 +1390,11 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
                     stack, same height, no "or" divider (Figma 3709:17913). */}
                 <button onClick={() => { onAddToCart(hasPrint(format) ? qty : 1); onCheckout(); }}
                   style={{ width:"100%", height:BTN_H, background:"#000000", color:"#fff", border:"none",
-                    borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
-                    display:"flex", alignItems:"center", justifyContent:"center", gap:4 }}
+                    borderRadius:T.radius, fontFamily:FONT_APPLE_PAY, fontSize:19, fontWeight:590, cursor:"pointer",
+                    display:"flex", alignItems:"center", justifyContent:"center", gap:3 }}
                   onMouseEnter={e => e.currentTarget.style.opacity=".85"}
                   onMouseLeave={e => e.currentTarget.style.opacity="1"}>
-                  Buy with<WalletMark src={APPLE_PAY_W} />
+                  Buy with<WalletMark src={APPLE_PAY_W} height={22} />
                 </button>
                 <button onClick={() => onAddToCart(hasPrint(format) ? qty : 1)}
                   style={{ width:"100%", height:BTN_H, background:T.surface, color:T.brand, border:`1px solid ${T.brand}`,
@@ -1588,11 +1591,11 @@ function EverydayMocktailsPdp({ onBack, onViewSnacks, cartCount, onCartClick }) 
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                 <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:"#000000", color:"#fff",
-                  border:"none", borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
-                  display:"flex", alignItems:"center", justifyContent:"center", gap:4 }}
+                  border:"none", borderRadius:T.radius, fontFamily:FONT_APPLE_PAY, fontSize:19, fontWeight:590, cursor:"pointer",
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:3 }}
                   onMouseEnter={e => e.currentTarget.style.opacity=".85"}
                   onMouseLeave={e => e.currentTarget.style.opacity="1"}>
-                  Buy with<WalletMark src={APPLE_PAY_W} />
+                  Buy with<WalletMark src={APPLE_PAY_W} height={22} />
                 </button>
                 <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:T.surface, color:T.brand,
                   border:`1px solid ${T.brand}`, borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
@@ -1772,11 +1775,11 @@ function UpgradedSnacksPdp({ onBack, onViewMocktails, cartCount, onCartClick }) 
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                 <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:"#000000", color:"#fff",
-                  border:"none", borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
-                  display:"flex", alignItems:"center", justifyContent:"center", gap:4 }}
+                  border:"none", borderRadius:T.radius, fontFamily:FONT_APPLE_PAY, fontSize:19, fontWeight:590, cursor:"pointer",
+                  display:"flex", alignItems:"center", justifyContent:"center", gap:3 }}
                   onMouseEnter={e => e.currentTarget.style.opacity=".85"}
                   onMouseLeave={e => e.currentTarget.style.opacity="1"}>
-                  Buy with<WalletMark src={APPLE_PAY_W} />
+                  Buy with<WalletMark src={APPLE_PAY_W} height={22} />
                 </button>
                 <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:T.surface, color:T.brand,
                   border:`1px solid ${T.brand}`, borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
