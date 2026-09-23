@@ -4809,10 +4809,10 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
   const [finish, setFinish] = useState(null);
   const [linenColor, setLinenColor] = useState(null);
   const [endsheetColor, setEndsheetColor] = useState(null);
-  /* Materials is a step-by-step reveal, not a bulk prefill: picking a cover
-     finish opens the Linen row (still unselected — the seller has to pick a
-     color), picking a linen color opens the Endsheet row the same way.
-     Publish only goes active once all three are actually chosen. */
+  /* Every Materials option is always choosable (Figma 5270:93546); picking a
+     cover finish still opens the Linen row and picking a linen color opens the
+     Endsheet row, to lead the seller through. Publish only goes active once
+     all three are actually chosen. */
   const canPublish = !!(finish && linenColor && endsheetColor);
   const [publishOpen, setPublishOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -4946,7 +4946,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
       setAiTitleText(AI_DRAFT.title);
       setAiDescText(AI_DRAFT.description);
       setAiPhase("results");
-    }, 1600);
+    }, 3000);
   };
   const removeAiKeyword = i => setAiKeywords(aiKeywords.filter((_, idx) => idx !== i));
   const backToAiPrompt = () => setAiPhase("prompt");
@@ -5113,22 +5113,18 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
             </div>
           </MaterialsRow>
           <MaterialsRow title="Linen cover colors" open={openMaterials.linen} onToggle={() => toggleMaterial("linen")}>
-            {finish ? (
-              <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-                {LINEN_COLORS.map(c => (
-                  <RadioCardImage key={c.name} {...c} selected={linenColor === c.name} onSelect={() => chooseLinenColor(c.name)} />
-                ))}
-              </div>
-            ) : <SetupHint>No linen cover selected yet.</SetupHint>}
+            <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+              {LINEN_COLORS.map(c => (
+                <RadioCardImage key={c.name} {...c} selected={linenColor === c.name} onSelect={() => chooseLinenColor(c.name)} />
+              ))}
+            </div>
           </MaterialsRow>
           <MaterialsRow title="Endsheet colors" open={openMaterials.endsheet} onToggle={() => toggleMaterial("endsheet")}>
-            {linenColor ? (
-              <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-                {ENDSHEET_COLORS.map(c => (
-                  <RadioCardImage key={c.name} {...c} selected={endsheetColor === c.name} onSelect={() => setEndsheetColor(c.name)} />
-                ))}
-              </div>
-            ) : <SetupHint>No endsheet color selected yet.</SetupHint>}
+            <div style={{ display:"flex", flexWrap:"wrap", gap:"16px 8px" }}>
+              {ENDSHEET_COLORS.map(c => (
+                <RadioCardImage key={c.name} {...c} selected={endsheetColor === c.name} onSelect={() => setEndsheetColor(c.name)} />
+              ))}
+            </div>
           </MaterialsRow>
         </div>
       </SetupSection>
