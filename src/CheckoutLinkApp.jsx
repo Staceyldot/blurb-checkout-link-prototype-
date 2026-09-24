@@ -368,9 +368,9 @@ function Combobox({ label, required, value, onChange, options, placeholder="Star
   );
 }
 
-function Btn({ children, onClick, variant="primary", disabled, fullWidth }) {
+function Btn({ children, onClick, variant="primary", disabled, fullWidth, fontSize=15 }) {
   const base = {
-    borderRadius:T.radius, fontSize:15, fontWeight:600, cursor:disabled ? "not-allowed" : "pointer",
+    borderRadius:T.radius, fontSize, fontWeight:600, cursor:disabled ? "not-allowed" : "pointer",
     width:fullWidth ? "100%" : undefined, padding:"10px 24px", transition:"opacity .15s", border:"none",
     display:"inline-flex", alignItems:"center", justifyContent:"center", gap:6,
   };
@@ -2019,7 +2019,7 @@ function CartDrawer({ open, empty, qty, setQty, variant, format, setFormat, expr
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
                 <ExpressBuySection wallets={wallets} format={format} note={false} showMore={false}
                   style={expressStyle} onPress={w => onExpressBuy(qty, w)} />
-                <Btn onClick={onCheckout} fullWidth>Checkout</Btn>
+                <Btn onClick={onCheckout} fullWidth fontSize={16}>Checkout</Btn>
               </div>
               <button onClick={onClose} style={{ background:"none", border:"none", cursor:"pointer",
                 color:T.textLink, fontWeight:600, fontSize:14, textDecoration:"underline" }}>Continue shopping</button>
