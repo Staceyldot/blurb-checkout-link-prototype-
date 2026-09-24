@@ -1152,16 +1152,23 @@ const BTN_H = 40;
    of it — the collapsed row would carry 16px of dead space. */
 function WalletButton({ wallet, compact, hidden, first, onPress }) {
   const s = WALLET_STYLE[wallet];
+  /* Apple Pay copies Figma 3795:26067: "Buy with" in SF Pro Semibold 19px, one space (a non-breaking one, so the
+     flex item doesn't trim it),
+     then the Apple logo + "Pay" set as SF text at 19px to match the label (U+F8FF is the Apple logo in
+     Apple's system fonts — Apple Pay is only offered on Apple platforms, so it always
+     renders). The other wallets keep "Buy now with" and their SVG marks. */
+  const apple = wallet === "Apple Pay";
   return (
     /* The mark is aria-hidden, so this label is the button's only accessible name */
-    <button onClick={() => onPress(wallet)} aria-label={`Buy now with ${wallet}`}
+    <button onClick={() => onPress(wallet)} aria-label={apple ? "Buy with Apple Pay" : `Buy now with ${wallet}`}
       aria-hidden={hidden} tabIndex={hidden ? -1 : 0}
       style={{ flexGrow: hidden ? 0 : 1, flexBasis:0, minWidth:0, overflow:"hidden",
         marginLeft: first || hidden ? 0 : 8, opacity: hidden ? 0 : 1,
         pointerEvents: hidden ? "none" : "auto",
         height:BTN_H, padding: hidden ? 0 : `0 ${WALLET_CLEAR}px`,
         borderRadius:T.radius, border:"none", cursor:"pointer",
-        background:s.bg, color:s.fg, fontSize:16, fontWeight:600,
+        background:s.bg, color:s.fg,
+        ...(apple ? { fontFamily:FONT_APPLE_PAY, fontSize:19, fontWeight:590 } : { fontSize:16, fontWeight:600 }),
         display:"flex", alignItems:"center", justifyContent:"center", gap:0,
         transition:"flex-grow .3s ease, margin-left .3s ease, opacity .25s ease" }}
       onMouseEnter={e => e.currentTarget.style.opacity=".85"}
@@ -1173,12 +1180,14 @@ function WalletButton({ wallet, compact, hidden, first, onPress }) {
           the mark slides over it and reads as a rendering fault. */}
       <span style={{ maxWidth: compact ? 0 : 140, opacity: compact ? 0 : 1,
         overflow:"hidden", whiteSpace:"nowrap",
-        transition:"max-width .3s ease, opacity .1s ease" }}>Buy now with</span>
+        transition:"max-width .3s ease, opacity .1s ease" }}>{apple ? "Buy with\u00A0" : "Buy now with"}</span>
       {/* No width transition any more — the mark is one size in both states, so only
           the label's collapse moves it. */}
-      <span style={{ display:"flex", marginLeft: compact ? 0 : 8, flexShrink:0,
+      <span style={{ display:"flex", marginLeft: compact || apple ? 0 : 8, flexShrink:0,
         transition:"margin-left .3s ease" }}>
-        <WalletMark src={s.img} />
+        {apple
+          ? <span style={{ fontSize:19, lineHeight:1, whiteSpace:"nowrap" }}>{"\uF8FF"}Pay</span>
+          : <WalletMark src={s.img} />}
       </span>
     </button>
   );
@@ -1381,12 +1390,12 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
                 {/* Filled "Buy now" leads, outlined "Add to cart" follows — same
                     stack, same height, no "or" divider (Figma 3709:17913). */}
                 <button onClick={() => { onAddToCart(hasPrint(format) ? qty : 1); onCheckout(); }}
-                  style={{ width:"100%", height:BTN_H, background:"#000000", color:"#fff", border:"none",
-                    borderRadius:T.radius, fontFamily:FONT_APPLE_PAY, fontSize:19, fontWeight:590, cursor:"pointer",
-                    display:"flex", alignItems:"center", justifyContent:"center", gap:3 }}
+                  style={{ width:"100%", height:BTN_H, background:T.brand, color:"#fff", border:"none",
+                    borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
+                    display:"flex", alignItems:"center", justifyContent:"center" }}
                   onMouseEnter={e => e.currentTarget.style.opacity=".85"}
                   onMouseLeave={e => e.currentTarget.style.opacity="1"}>
-                  Buy with<WalletMark src={APPLE_PAY_W} height={22} />
+                  Buy now
                 </button>
                 <button onClick={() => onAddToCart(hasPrint(format) ? qty : 1)}
                   style={{ width:"100%", height:BTN_H, background:T.surface, color:T.brand, border:`1px solid ${T.brand}`,
@@ -1582,12 +1591,12 @@ function EverydayMocktailsPdp({ onBack, onViewSnacks, cartCount, onCartClick }) 
                 the buyable checkout-link the rest of the app is wired around. */}
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-                <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:"#000000", color:"#fff",
-                  border:"none", borderRadius:T.radius, fontFamily:FONT_APPLE_PAY, fontSize:19, fontWeight:590, cursor:"pointer",
-                  display:"flex", alignItems:"center", justifyContent:"center", gap:3 }}
+                <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:T.brand, color:"#fff",
+                  border:"none", borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
+                  display:"flex", alignItems:"center", justifyContent:"center" }}
                   onMouseEnter={e => e.currentTarget.style.opacity=".85"}
                   onMouseLeave={e => e.currentTarget.style.opacity="1"}>
-                  Buy with<WalletMark src={APPLE_PAY_W} height={22} />
+                  Buy now
                 </button>
                 <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:T.surface, color:T.brand,
                   border:`1px solid ${T.brand}`, borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
@@ -1766,12 +1775,12 @@ function UpgradedSnacksPdp({ onBack, onViewMocktails, cartCount, onCartClick }) 
                 the buyable checkout-link the rest of the app is wired around. */}
             <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
               <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-                <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:"#000000", color:"#fff",
-                  border:"none", borderRadius:T.radius, fontFamily:FONT_APPLE_PAY, fontSize:19, fontWeight:590, cursor:"pointer",
-                  display:"flex", alignItems:"center", justifyContent:"center", gap:3 }}
+                <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:T.brand, color:"#fff",
+                  border:"none", borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
+                  display:"flex", alignItems:"center", justifyContent:"center" }}
                   onMouseEnter={e => e.currentTarget.style.opacity=".85"}
                   onMouseLeave={e => e.currentTarget.style.opacity="1"}>
-                  Buy with<WalletMark src={APPLE_PAY_W} height={22} />
+                  Buy now
                 </button>
                 <button onClick={e => e.preventDefault()} style={{ width:"100%", height:BTN_H, background:T.surface, color:T.brand,
                   border:`1px solid ${T.brand}`, borderRadius:T.radius, fontSize:16, fontWeight:600, cursor:"pointer",
