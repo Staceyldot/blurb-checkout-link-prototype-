@@ -58,7 +58,6 @@ const AMEX        = "/assets/amex.svg";
 const DISCOVER    = "/assets/discover.svg";
 const BOOK_COVER  = "/assets/book-liberal-libations.png";
 const BLURB_MARK  = "/assets/blurb-mark.svg";
-const BLURB_LOGO_EMAIL = "/assets/blurb-logo-email.png";  // full-color logo for the email header
 const US_FLAG = "/assets/us-flag.png";  // Codex dashboard nav region flag (node 4248:8889) — flat icon, not the emoji glyph
 /* Book-mockup renders (Figma 5722:89683 / 5727:89746) — the book shown as a
    physical object with real depth and its own soft drop shadow, on a
@@ -2022,7 +2021,7 @@ function CartDrawer({ open, empty, qty, setQty, variant, format, setFormat, expr
                 <Btn onClick={onCheckout} fullWidth fontSize={16}>Checkout</Btn>
               </div>
               <button onClick={onClose} style={{ background:"none", border:"none", cursor:"pointer",
-                color:T.textLink, fontWeight:600, fontSize:14, textDecoration:"underline" }}>Continue shopping</button>
+                color:T.textLink, fontWeight:600, fontSize:16, textDecoration:"underline" }}>Continue shopping</button>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, fontSize:12, color:T.textSubtle }}>
                 <Ms name="lock" size={14} color={T.textSubtle} /> Secure &amp; encrypted checkout by Blurb, Inc.
               </div>
@@ -3025,28 +3024,48 @@ function OrderConfirmation({ order }) {
 }
 
 /* ═══════════════════════════ CONFIRMATION EMAIL ═══════════════════════════ */
+/* Matches the Trigger Email Refresh order confirmation (Figma 6Eq2oOBZfQ4pDnSIOPkdx6,
+   node 6100:3054): 650px wide, Archivo for body copy and Arial Bold for labels,
+   Ink hero over a Cyan tracker. Assets are the Figma exports in /assets/email.
+   The order data is still the real order, not the Figma's placeholder copy. */
+const EMAIL = {
+  ink:"#134a67", cyan:"#107eb1", charcoal:"#292929", foam:"#f9f6f3", cardBorder:"#e7e7e7",
+  archivo:"'Archivo', Arial, Helvetica, sans-serif",
+  arial:"Arial, Helvetica, sans-serif",
+  helvetica:"Helvetica, Arial, sans-serif",
+};
+const EMAIL_ASSET = name => `/assets/email/${name}`;
+const eBody  = { fontFamily:EMAIL.archivo, fontSize:16, lineHeight:"26px", color:EMAIL.charcoal };
+const eLabel = { fontFamily:EMAIL.arial, fontWeight:700, fontSize:16, lineHeight:"22px", color:EMAIL.charcoal };
+
+/* Dot centres sit 125px apart across a 560px track, first at 30px (Figma 6100:3064).
+   Positions are percentages of that track so it still lines up when the email
+   narrows on a phone. */
 function EmailStepper() {
   const steps = ["Ordered", "Shipped", "In transit", "Out for delivery", "Delivered"];
+  const at = px => `${(px / 560) * 100}%`;
   return (
-    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:"#0a5a80", padding:"14px 20px" }}>
-      {steps.map((s, i) => (
-        <React.Fragment key={s}>
-          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:6, flexShrink:0 }}>
-            <div style={{ width:18, height:18, borderRadius:"50%", background: i===0 ? "#fff" : "rgba(255,255,255,.35)",
+    <div style={{ background:EMAIL.cyan, padding:"20px 50px", display:"flex", justifyContent:"center" }}>
+      <div style={{ position:"relative", width:"100%", maxWidth:560, height:49 }}>
+        <div style={{ position:"absolute", top:9, left:at(30), width:at(500), height:1, background:"#fff" }} />
+        <div style={{ position:"absolute", top:9, left:at(30), width:at(71), height:1, background:EMAIL.ink }} />
+        {steps.map((s, i) => (
+          <div key={s} style={{ position:"absolute", top:0, left:at(30 + 125 * i), transform:"translateX(-50%)",
+            display:"flex", flexDirection:"column", alignItems:"center", gap:12 }}>
+            <div style={{ width:18, height:18, borderRadius:"50%", background: i === 0 ? EMAIL.ink : "#fff",
               display:"flex", alignItems:"center", justifyContent:"center" }}>
-              {i===0 && <Ms name="check" size={12} color="#0a5a80" fill={1} />}
+              {i === 0 && <img src={EMAIL_ASSET("check.svg")} alt="" style={{ width:16, height:16, display:"block" }} />}
             </div>
-            <span style={{ fontSize:9, color: i===0 ? "#fff" : "rgba(255,255,255,.7)", whiteSpace:"nowrap" }}>{s}</span>
+            <span style={{ fontSize:13, lineHeight:"19px", color:"#fff", whiteSpace:"nowrap",
+              fontFamily: i === 0 ? EMAIL.arial : EMAIL.archivo, fontWeight: i === 0 ? 700 : 400 }}>{s}</span>
           </div>
-          {i < steps.length-1 && <div style={{ flex:1, height:2, background:"rgba(255,255,255,.3)", margin:"0 4px", marginBottom:16 }} />}
-        </React.Fragment>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
 
 function ConfirmationEmail({ order, onBack }) {
-  const method = SHIPPING_OPTS.find(o => o.id === order.shippingMethod) || SHIPPING_OPTS[0];
   const a = order.shippingAddr || {};
   const ships    = hasPrint(order.format);
   const digital  = hasDigital(order.format);
@@ -3056,156 +3075,206 @@ function ConfirmationEmail({ order, onBack }) {
   const disc = order.appliedCode ? PROMO_CODES[order.appliedCode] : 0;
   const tax = Math.round((subtotal - saving) * 0.08 * 100) / 100;
   const total = subtotal - saving - disc + (order.shippingCost || 0) + tax;
-  const row = (label, val, bold) => (
-    <div style={{ display:"flex", justifyContent:"space-between", fontSize:13, color:T.textBold, fontWeight: bold ? 700 : 400, padding:"3px 0" }}>
-      <span>{label}</span><span>{val}</span>
-    </div>
-  );
-  const cell = { padding:"8px 6px", fontSize:12, color:T.textBold, borderBottom:"1px solid #eee", verticalAlign:"top" };
+  /* Figma's "00 Mon 20XX" */
+  const orderDate = new Date(ORDER_DATE).toLocaleDateString("en-GB", { day:"2-digit", month:"short", year:"numeric" });
+
+  const totals = [
+    ["Subtotal:", money(subtotal)],
+    saving > 0 && ["Bundle saving:", `-${money(saving)}`],
+    disc > 0 && ["Discount:", `-${money(disc)}`],
+    ["Tax:", money(tax)],
+    ships && ["Shipping:", money(order.shippingCost || 0)],
+  ].filter(Boolean);
+
+  const cards = [
+    ["icon-book.svg",     "True bookstore-grade quality",   "Versatile formats, luxe paper options, and three cover types."],
+    ["icon-verified.svg", "Backed by 20 years of expertise", "With consistent quality from start to finish."],
+    ["icon-leaf.svg",     "Sustainable papers & practices",  "Made in the US with Forest Stewardship Council-certified papers."],
+  ];
+  const social = [["facebook.svg","Facebook"], ["instagram.svg","Instagram"], ["youtube.svg","YouTube"]];
+  const footLabel = { fontFamily:EMAIL.helvetica, fontSize:12, lineHeight:"15px", color:"#fff", whiteSpace:"nowrap" };
 
   return (
     <div style={{ minHeight:"100vh", background:T.bg, display:"flex", flexDirection:"column" }}>
       <Header />
       <div style={{ flex:1, padding:"20px", display:"flex", flexDirection:"column", alignItems:"center", gap:14 }}>
         {/* email-client chrome */}
-        <div style={{ width:"100%", maxWidth:640, display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap" }}>
+        <div style={{ width:"100%", maxWidth:650, display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap" }}>
           <button onClick={onBack} style={{ background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:14 }}>
             <Ms name="arrow_back" size={18} color={T.textLink} /> Back to confirmation
           </button>
           <span style={{ fontSize:12, color:T.textSubtle }}>Transactional email preview</span>
         </div>
 
-        <div style={{ width:"100%", maxWidth:640, background:T.surface, borderRadius:8, overflow:"hidden", boxShadow:"0 6px 24px rgba(0,0,0,.12)" }}>
+        <div style={{ width:"100%", maxWidth:650, background:"#fff", borderRadius:8, overflow:"hidden", boxShadow:"0 6px 24px rgba(0,0,0,.12)" }}>
           {/* subject bar */}
           <div style={{ padding:"14px 20px", borderBottom:"1px solid #eee" }}>
             <div style={{ fontSize:14, fontWeight:700, color:T.textBold }}>Your Blurb order is confirmed — #{ORDER_NUMBER}</div>
             <div style={{ fontSize:12, color:T.textSubtle, marginTop:2 }}>Blurb &lt;orders@blurb.com&gt; · to {order.email || DEMO_BUYER_EMAIL}</div>
           </div>
 
-          {/* header */}
-          <div style={{ background:"#107eb1", padding:"26px 20px", textAlign:"center" }}>
-            <img src={BLURB_LOGO_EMAIL} alt="Blurb" style={{ height:44, width:"auto", marginBottom:12, display:"inline-block" }} />
-            <div style={{ fontSize:24, fontWeight:700, color:"#fff" }}>Thank you for your order!</div>
-            <div style={{ fontSize:13, color:"rgba(255,255,255,.85)", marginTop:6 }}>
-              {ships ? "We'll send a confirmation once your book has shipped." : "Your PDF is ready to download."}
+          {/* ── Transactional ── */}
+          <div style={{ background:EMAIL.ink, padding:50, display:"flex", flexDirection:"column", alignItems:"center", gap:30 }}>
+            <img src={EMAIL_ASSET("logo.png")} alt="Blurb" style={{ width:60, height:60, display:"block" }} />
+            <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:23, textAlign:"center", color:"#fff", fontFamily:EMAIL.archivo }}>
+              <p style={{ fontSize:36, lineHeight:"40px", maxWidth:560 }}>Thank you for your order!</p>
+              <p style={{ fontSize:16, lineHeight:"26px" }}>
+                {ships ? "We’ll send a confirmation once your book has shipped." : "Your PDF is ready to download."}
+              </p>
             </div>
           </div>
           {/* A shipment tracker on a download-only order tracks nothing */}
           {ships && <EmailStepper />}
 
-          <div style={{ padding:"22px 24px" }}>
-            <p style={{ fontSize:13, color:T.textBold, marginBottom:14 }}>Order number: <strong>{ORDER_NUMBER}</strong></p>
-            <p style={{ fontSize:15, fontWeight:700, color:T.textBold, marginBottom:8 }}>Order summary</p>
-            <table style={{ width:"100%", borderCollapse:"collapse", marginBottom:16 }}>
-              <thead>
-                <tr>
-                  <th style={{ ...cell, textAlign:"left", fontWeight:700, color:T.textSubtle }}>Title</th>
-                  <th style={{ ...cell, textAlign:"center", fontWeight:700, color:T.textSubtle, width:50 }}>Qty</th>
-                  <th style={{ ...cell, textAlign:"right", fontWeight:700, color:T.textSubtle, width:80 }}>Price</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map(item => (
-                  <tr key={item.id}>
-                    <td style={cell}><strong>{item.title}</strong><br />
-                      <span style={{ color:T.textSubtle }}>{item.kind} · {item.lines.join(" · ")}</span></td>
-                    <td style={{ ...cell, textAlign:"center" }}>{item.qty}</td>
-                    <td style={{ ...cell, textAlign:"right" }}>{money(item.unit)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <div style={{ maxWidth:280, marginLeft:"auto" }}>
-              {row("Subtotal", money(subtotal))}
-              {saving > 0 && row("Bundle saving", `-${money(saving)}`)}
-              {disc > 0 && row("Discount", `-${money(disc)}`)}
-              {ships && row("Shipping", money(order.shippingCost || 0))}
-              {row("Tax", money(tax))}
-              <div style={{ borderTop:"1px solid #ddd", marginTop:4 }}>{row("Total", money(total), true)}</div>
-            </div>
-
-            {/* The download link lives in the email too — it's the guest's durable
-                copy, so it never waits on the printed book. */}
-            {digital && (
-              <div style={{ marginTop:20, border:`1px solid ${T.border}`, borderRadius:6, background:T.panel, padding:"14px 16px", textAlign:"center" }}>
-                <p style={{ fontSize:14, fontWeight:700, color:T.textBold }}>Your PDF is ready</p>
-                <p style={{ fontSize:12, color:T.textSubtle, margin:"4px 0 10px" }}>{PDF_FILE.name} · {PDF_FILE.size}</p>
-                <a href="#" style={{ display:"inline-block", background:T.brand, color:"#fff", borderRadius:T.radius,
-                  padding:"9px 22px", fontSize:13, fontWeight:600, textDecoration:"none" }}>Download PDF</a>
-              </div>
-            )}
-
-            <div style={{ display:"flex", gap:24, marginTop:20, flexWrap:"wrap" }}>
-              <div style={{ flex:1, minWidth:180 }}>
-                <p style={{ fontSize:13, fontWeight:700, color:T.textBold, marginBottom:4 }}>Delivery details</p>
-                <div style={{ fontSize:12, color:T.textSubtle, lineHeight:1.6 }}>
-                  {ships ? (
-                    <>
-                      <div>{a.firstName} {a.lastName}</div>
-                      {a.address && <div>{a.address}</div>}
-                      <div>{[a.city, a.state, a.zip].filter(Boolean).join(", ")}</div>
-                      <div>{a.country}</div>
-                      <div style={{ marginTop:6 }}><strong>{method.label}</strong> · Arrives by {method.arrive}</div>
-                    </>
-                  ) : (
-                    <>
-                      <div>Delivered to {order.email || DEMO_BUYER_EMAIL}</div>
-                      <div style={{ marginTop:6 }}><strong>Instant download</strong> · nothing to ship</div>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div style={{ flex:1, minWidth:150 }}>
-                <p style={{ fontSize:13, fontWeight:700, color:T.textBold, marginBottom:4 }}>Order date</p>
-                <div style={{ fontSize:12, color:T.textSubtle }}>{ORDER_DATE}</div>
-                <p style={{ fontSize:13, fontWeight:700, color:T.textBold, margin:"10px 0 4px" }}>Payment type</p>
-                <div style={{ fontSize:12, color:T.textSubtle }}>•••• •••• •••• 4242</div>
-              </div>
-            </div>
+          <div style={{ padding:"15px 30px 15px 50px" }}>
+            <p style={{ ...eLabel, lineHeight:"36px" }}>Order Number: {ORDER_NUMBER}</p>
+          </div>
+          <div style={{ minHeight:76, padding:"0 30px 0 50px", display:"flex", alignItems:"center" }}>
+            <p style={{ ...eLabel, fontSize:20, lineHeight:"26px" }}>Order Summary</p>
           </div>
 
-          {/* "How your book gets made" only belongs on an order that gets printed */}
-          {ships && (
-            <>
-              <div style={{ position:"relative", background:"linear-gradient(120deg,#2b2b2b,#555)", height:180, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                <div style={{ width:54, height:54, borderRadius:"50%", background:"rgba(255,255,255,.9)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                  <Ms name="play_arrow" size={34} color="#2b2b2b" fill={1} />
-                </div>
+          {items.map(item => (
+            <div key={item.id} style={{ display:"flex", paddingBottom:30 }}>
+              <div style={{ flex:"332 1 0", minWidth:0, padding:"0 30px 0 50px" }}>
+                <p style={eLabel}>Title</p>
+                <p style={eBody}>{item.title}</p>
+                <p style={{ fontFamily:EMAIL.arial, fontSize:13, lineHeight:"26px", color:EMAIL.charcoal }}>{item.kind}</p>
               </div>
-              <div style={{ padding:"18px 24px", textAlign:"center", borderBottom:"1px solid #eee" }}>
-                <p style={{ fontSize:16, fontWeight:700, color:T.textBold }}>How your book gets made</p>
-                <p style={{ fontSize:12, color:T.textSubtle, margin:"4px 0 10px" }}>Go behind the scenes at one of the world's best book-printing facilities.</p>
-                <button style={{ background:"none", border:`1px solid ${T.brand}`, color:T.brand, borderRadius:T.radius, padding:"7px 18px", fontSize:13, fontWeight:600, cursor:"pointer" }}>Watch now</button>
+              <div style={{ flex:"101 1 0", minWidth:0, paddingRight:30, textAlign:"center" }}>
+                <p style={eLabel}>Qty</p>
+                <p style={eBody}>{item.qty}</p>
               </div>
-            </>
+              <div style={{ flex:"211 1 0", minWidth:0, paddingRight:50, textAlign:"right" }}>
+                <p style={eLabel}>Price</p>
+                <p style={eBody}>{money(item.unit)}</p>
+              </div>
+            </div>
+          ))}
+
+          <div style={{ display:"flex", padding:"30px 0" }}>
+            <div style={{ flex:"377 1 0", padding:"0 30px 0 50px" }}>
+              {totals.map(([l]) => <p key={l} style={eBody}>{l}</p>)}
+            </div>
+            <div style={{ flex:"273 1 0", padding:"0 50px", textAlign:"right" }}>
+              {totals.map(([l, v]) => <p key={l} style={eBody}>{v}</p>)}
+            </div>
+          </div>
+          <div style={{ display:"flex", padding:"30px 0" }}>
+            <p style={{ ...eLabel, flex:"377 1 0", padding:"0 30px 0 50px" }}>Total:</p>
+            <p style={{ ...eLabel, flex:"273 1 0", padding:"0 50px", textAlign:"right" }}>{money(total)}</p>
+          </div>
+
+          {/* The download link lives in the email too — it's the guest's durable
+              copy, so it never waits on the printed book. Not in the Figma (which
+              is a print order); styled with the email's own button. */}
+          {digital && (
+            <div style={{ padding:"0 50px 30px" }}>
+              <div style={{ border:`1px solid ${EMAIL.cardBorder}`, borderRadius:16, padding:20, textAlign:"center" }}>
+                <p style={eLabel}>Your PDF is ready</p>
+                <p style={{ ...eBody, fontSize:14, lineHeight:"22px", margin:"4px 0 16px" }}>{PDF_FILE.name} · {PDF_FILE.size}</p>
+                <a href="#" style={{ display:"inline-block", background:EMAIL.charcoal, color:"#fff", borderRadius:4,
+                  padding:"8px 40px", fontFamily:EMAIL.arial, fontSize:15, lineHeight:"24px", fontWeight:700, textDecoration:"none" }}>Download PDF</a>
+              </div>
+            </div>
           )}
 
-          {/* Blurb difference */}
-          <div style={{ padding:"22px 24px" }}>
-            <p style={{ fontSize:16, fontWeight:700, color:T.textBold, textAlign:"center", marginBottom:16 }}>The Blurb difference</p>
-            <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
-              {[["menu_book","True bookstore-grade quality","Rich formats, true color, and a genuine bookstore feel."],
-                ["verified","Backed by 20 years of expertise","Consistent quality from cover to finish, every time."],
-                ["eco","Sustainable papers & practices","Made in the US with Forest Stewardship Council–certified papers."]].map(([ic,t,d]) => (
-                <div key={t} style={{ flex:1, minWidth:150, textAlign:"center" }}>
-                  <Ms name={ic} size={26} color={T.brand} />
-                  <p style={{ fontSize:13, fontWeight:700, color:T.textBold, margin:"8px 0 4px" }}>{t}</p>
-                  <p style={{ fontSize:11, color:T.textSubtle, lineHeight:1.5 }}>{d}</p>
+          <div style={{ display:"flex", flexWrap:"wrap" }}>
+            <div style={{ flex:"1 1 260px", padding:"30px 30px 30px 50px" }}>
+              <p style={eLabel}>Delivery Details</p>
+              {ships ? (
+                <>
+                  <p style={eBody}>{a.firstName} {a.lastName}</p>
+                  {a.address && <p style={eBody}>{a.address}</p>}
+                  {a.address2 && <p style={eBody}>{a.address2}</p>}
+                  <p style={eBody}>{[a.city, a.state].filter(Boolean).join(", ")}</p>
+                  <p style={eBody}>{[a.zip, a.country].filter(Boolean).join(", ")}</p>
+                </>
+              ) : (
+                <p style={eBody}>Instant download to {order.email || DEMO_BUYER_EMAIL}</p>
+              )}
+            </div>
+            <div style={{ flex:"1 1 260px", padding:"30px 30px 30px 50px" }}>
+              <p style={eLabel}>Order Date</p>
+              <p style={{ ...eBody, marginBottom:26 }}>{orderDate}</p>
+              <p style={eLabel}>Payment Type</p>
+              <p style={eBody}>XXXXXXXXXXXX4242</p>
+            </div>
+          </div>
+
+          <div style={{ padding:"30px 50px", display:"flex", justifyContent:"center" }}>
+            <p style={{ fontFamily:EMAIL.arial, fontStyle:"italic", fontSize:13, lineHeight:"19px", color:EMAIL.charcoal, maxWidth:565 }}>
+              You may cancel an order up to approximately three hours after placing it by visiting your order details page. After three hours have passed it is not possible to cancel your order.{" "}
+              <a href="#" style={{ color:"inherit", textDecoration:"underline" }}>Visit this FAQ</a>{" "}
+              for details. Please note that Blurb does not offer returns or refunds for ebook or PDF orders.
+            </p>
+          </div>
+
+          {/* ── Marketing ── "How your book gets made" only belongs on an order that gets printed */}
+          {ships && (
+            <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:40, paddingBottom:40 }}>
+              <div style={{ position:"relative", width:"100%", aspectRatio:"650 / 400" }}>
+                <img src={EMAIL_ASSET("video.jpg")} alt="" style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+                <img src={EMAIL_ASSET("play.svg")} alt="Play video"
+                  style={{ position:"absolute", left:"50%", top:"50%", width:94, height:94, transform:"translate(-50%,-50%)" }} />
+              </div>
+              <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:30, padding:"0 50px", textAlign:"center" }}>
+                <div>
+                  <p style={{ ...eLabel, fontSize:20, lineHeight:"26px" }}>How your book gets made</p>
+                  <p style={eBody}>Go behind-the-scenes and see every step of the Blurb bookmaking process.</p>
+                </div>
+                <a href="#" style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", minWidth:100, height:40,
+                  padding:"8px 40px", background:EMAIL.charcoal, color:"#fff", borderRadius:4,
+                  fontFamily:EMAIL.arial, fontWeight:700, fontSize:15, lineHeight:"24px", textDecoration:"none" }}>Watch now</a>
+              </div>
+            </div>
+          )}
+
+          {/* 40px sides, not 50: Figma's three-card row is 557px, wider than the 550 a
+              50px inset leaves, so at 50 the third card wraps */}
+          <div style={{ background:EMAIL.foam, padding:"30px 40px", display:"flex", flexDirection:"column", alignItems:"center", gap:30 }}>
+            <p style={{ fontFamily:EMAIL.arial, fontWeight:700, fontSize:26, lineHeight:"30px", color:"#000", textAlign:"center" }}>The Blurb difference</p>
+            <div style={{ display:"flex", gap:16, justifyContent:"center", flexWrap:"wrap" }}>
+              {cards.map(([icon, t, d], i) => (
+                <div key={t} style={{ width:175, height:235, background:"#fff", border:`1px solid ${EMAIL.cardBorder}`, borderRadius:16,
+                  padding: i === 2 ? "10px 20px 20px" : 20, display:"flex", flexDirection:"column", alignItems:"center", gap:10, overflow:"hidden" }}>
+                  <img src={EMAIL_ASSET(icon)} alt="" style={{ width:48, height:48, display:"block" }} />
+                  <div style={{ display:"flex", flexDirection:"column", gap:12, alignItems:"center", textAlign:"center", width:144 }}>
+                    <p style={eLabel}>{t}</p>
+                    <p style={{ ...eBody, fontSize:14, lineHeight:"22px" }}>{d}</p>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div style={{ background:"#1c1c1c", padding:"20px 24px", textAlign:"center" }}>
-            <div style={{ display:"flex", gap:14, justifyContent:"center", marginBottom:10 }}>
-              {["public","thumb_up","photo_camera","music_note"].map(ic => (
-                <span key={ic} style={{ width:30, height:30, borderRadius:"50%", background:"rgba(255,255,255,.12)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                  <Ms name={ic} size={16} color="#fff" />
-                </span>
-              ))}
+          <div style={{ background:EMAIL.charcoal, padding:"50px 0", display:"flex", flexDirection:"column", alignItems:"center" }}>
+            <div style={{ width:"100%", maxWidth:650, padding:"0 40px", display:"flex", flexDirection:"column", alignItems:"center", gap:40 }}>
+              <div style={{ display:"flex", gap:40, justifyContent:"center", alignItems:"flex-start", flexWrap:"wrap" }}>
+                <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:15 }}>
+                  <span style={footLabel}>Visit the Blog</span>
+                  <img src={EMAIL_ASSET("rss.svg")} alt="Blog" style={{ width:30, height:30, display:"block" }} />
+                </div>
+                <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:15 }}>
+                  <span style={footLabel}>Follow Us</span>
+                  <div style={{ display:"flex", gap:20 }}>
+                    {social.map(([f, alt]) => <img key={f} src={EMAIL_ASSET(f)} alt={alt} style={{ width:30, height:30, display:"block" }} />)}
+                  </div>
+                </div>
+                <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:15 }}>
+                  <span style={footLabel}>Help Center</span>
+                  <img src={EMAIL_ASSET("help.svg")} alt="Help Center" style={{ width:30, height:30, display:"block" }} />
+                </div>
+              </div>
+              <div style={{ width:"100%", maxWidth:550, height:1, background:"#fff" }} />
             </div>
-            <p style={{ fontSize:11, color:"#bbb" }}>©2015–2026 RPI Print, Inc. · Privacy · Unsubscribe</p>
+            <div style={{ paddingTop:40, maxWidth:536, padding:"40px 10px 0", fontFamily:EMAIL.arial, fontSize:12, lineHeight:"15px", color:"#fff", textAlign:"center" }}>
+              <p>Privacy | Pricing | Unsubscribe</p>
+              <p style={{ marginTop:15 }}>
+                Blurb ®, a division of RPI Print, Inc.<br />
+                3325 S 116th Street, Tukwila, WA 98168, USA<br />
+                © 2026 RPI Print, Inc., All Rights Reserved
+              </p>
+            </div>
           </div>
         </div>
 
@@ -3238,10 +3307,7 @@ const STAGES = [
   { key:"email",    short:"Email",    label:"Email" },
 ];
 
-const DEMO_SELECT = { fontSize:12, fontWeight:600, color:T.textBold, background:T.surface,
-  border:`1px solid ${T.border}`, borderRadius:T.radius, padding:"4px 8px", cursor:"pointer" };
-
-/* 28px square, matching the height of the selects beside it */
+/* 28px square */
 const demoIconBtn = on => ({ display:"inline-flex", alignItems:"center", justifyContent:"center",
   position:"relative", width:28, height:28, padding:0, flexShrink:0, cursor:"pointer",
   background: on ? T.brand : T.surface, borderRadius:T.radius,
@@ -3337,149 +3403,7 @@ function StageStepper({ view, onJump, skippedStages }) {
   );
 }
 
-function SettingRow({ label, hint, children }) {
-  return (
-    <label style={{ display:"block" }}>
-      <span style={{ display:"block", marginBottom:4, fontSize:12, fontWeight:700, color:T.textBold }}>{label}</span>
-      {children}
-      {hint && <span style={{ display:"block", marginTop:4, fontSize:11, lineHeight:1.4, color:T.textDisabled }}>{hint}</span>}
-    </label>
-  );
-}
-
-/* SETTINGS ZONE — the three scenario controls describe the *situation* being
-   demoed, not the screen being viewed, so they're grouped behind one button
-   instead of interleaved with navigation. The gear carries a dot whenever any of
-   them is off its default, because otherwise a screenshot of a non-default
-   scenario looks identical to the default one. */
-const PANEL_W = 248;
-
-function DemoSettings({ variant, onVariantChange, format, onFormatChange, expressStyle, onExpressStyleChange }) {
-  const [open, setOpen] = useState(false);
-  /* One variant means the seller has no choice to make, so the control describes a
-     fixed fact rather than offering a switch. */
-  const oneVariant = Object.keys(LINK_VARIANTS).length === 1;
-  /* Placed against the viewport rather than anchored `right:0` to the button. When
-     the zones stack at phone width this button wraps to the left edge, and a panel
-     hung off its right corner opened straight off the side of the screen. */
-  const [pos, setPos] = useState({ top:0, left:0 });
-  const ref = useRef(null);
-  const btnRef = useRef(null);
-
-  const place = () => {
-    const r = btnRef.current?.getBoundingClientRect();
-    if (!r) return;
-    setPos({ top: r.bottom + 6,
-      left: Math.max(8, Math.min(r.right - PANEL_W, window.innerWidth - PANEL_W - 8)) });
-  };
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = e => { if (!ref.current?.contains(e.target)) setOpen(false); };
-    const onKey  = e => { if (e.key === "Escape") setOpen(false); };
-    /* Fixed positioning would leave the panel behind if the page moved under it */
-    const onScroll = () => setOpen(false);
-    document.addEventListener("mousedown", onDown);
-    document.addEventListener("keydown", onKey);
-    window.addEventListener("scroll", onScroll, true);
-    window.addEventListener("resize", place);
-    return () => { document.removeEventListener("mousedown", onDown); document.removeEventListener("keydown", onKey);
-      window.removeEventListener("scroll", onScroll, true); window.removeEventListener("resize", place); };
-  }, [open]);
-
-  const modified = variant !== "print" || expressStyle !== "single" || format !== defaultFormat(variant);
-
-  return (
-    <span ref={ref} style={{ display:"inline-flex" }}>
-      <button ref={btnRef} onClick={() => { if (!open) place(); setOpen(o => !o); }}
-        aria-expanded={open} aria-label="Demo settings"
-        title="Demo settings — what this link offers, what was ordered, express treatment"
-        style={demoIconBtn(open)}>
-        <Ms name="tune" size={16} color={open ? "#fff" : T.textSubtle} />
-        {modified && !open && (
-          <span style={{ position:"absolute", top:-2, right:-2, width:8, height:8, borderRadius:"50%",
-            background:T.brand, border:"1px solid #f0f0f0" }} />
-        )}
-      </button>
-      {open && (
-        /* Above the page's sticky header (20) but below the cart drawer (120),
-           which covers the bar anyway while it's open. */
-        <div style={{ position:"fixed", top:pos.top, left:pos.left, zIndex:110, width:PANEL_W,
-          background:T.surface, border:`1px solid ${T.borderSubtle}`, borderRadius:T.radius,
-          boxShadow:"0 4px 14px rgba(20,20,20,.18)", padding:12, textAlign:"left",
-          display:"flex", flexDirection:"column", gap:12 }}>
-          {/* Disabled with a reason rather than hidden while a link can only sell
-              print — hiding it would drop a control out of the middle of the list,
-              and "why can't I change this?" is the question the hint answers. */}
-          <SettingRow label="This link offers"
-            hint={oneVariant
-              ? "An Instant Store sells the printed book. The PDF is bought from the regular Blurb flow."
-              : "What the seller enabled. Changing it restarts the demo."}>
-            <select value={variant} onChange={e => onVariantChange(e.target.value)}
-              disabled={oneVariant}
-              aria-label="Formats offered on this Instant Store"
-              style={{ ...DEMO_SELECT, width:"100%",
-                ...(oneVariant && { color:T.textDisabled, background:T.bg, cursor:"not-allowed" }) }}>
-              {Object.values(LINK_VARIANTS).map(v => <option key={v.id} value={v.id}>{v.label}</option>)}
-            </select>
-          </SettingRow>
-          {/* Shown disabled rather than hidden on single-format links. Hiding it was
-              what made the old row insert a control mid-sequence; disabled, it also
-              explains why there's nothing to choose. */}
-          <SettingRow label="The buyer ordered"
-            hint={variant === "both"
-              ? "The only way to reach a mixed order from a post-order stage without walking the PDP first."
-              : "A single-format link leaves the buyer nothing to choose."}>
-            <select value={format} onChange={e => onFormatChange(e.target.value)}
-              disabled={variant !== "both"} aria-label="What the buyer ordered"
-              style={{ ...DEMO_SELECT, width:"100%",
-                ...(variant !== "both" && { color:T.textDisabled, background:T.bg, cursor:"not-allowed" }) }}>
-              {LINK_VARIANTS[variant].choices.map(id => <option key={id} value={id}>{FORMATS[id].label}</option>)}
-            </select>
-          </SettingRow>
-          <SettingRow label="Express treatment"
-            hint="Compare the two on the product page and cart drawer.">
-            <select value={expressStyle} onChange={e => onExpressStyleChange(e.target.value)}
-              aria-label="Express checkout button treatment" style={{ ...DEMO_SELECT, width:"100%" }}>
-              {Object.entries(EXPRESS_STYLES).map(([id, label]) => <option key={id} value={id}>{label}</option>)}
-            </select>
-          </SettingRow>
-          <p style={{ margin:0, paddingTop:10, borderTop:`1px solid ${T.borderSubtle}`,
-            fontSize:11, lineHeight:1.5, color:T.textDisabled }}>
-            Click any form field to auto-fill it with sample data.
-          </p>
-        </div>
-      )}
-    </span>
-  );
-}
-
-/* IDENTITY ZONE — which prototype, not which screen; the stepper handles screens.
-   It used to list the regular flow's four screens here, which put two different
-   jobs in one control and made this switcher the only place in the build where a
-   screen could be chosen from a dropdown instead of the stepper.
-
-   The switcher's own value also names where you are, so the old "Checkout Link
-   demo" caption beside it was saying it twice. The auto-fill hint that caption
-   carried moves into the settings panel: clicking a field discovers it in one
-   second, and it was costing a permanent line of chrome on a bar that lands in
-   every screenshot.
-
-   Mirrors FlowSwitcher in App.jsx — keep the options in step. */
-function FlowSwitcher({ onSwitchFlow }) {
-  if (!onSwitchFlow)
-    return <strong style={{ fontSize:12, color:T.textBold }}>Instant Store demo</strong>;
-  return (
-    <select value="checkout-link" onChange={e => onSwitchFlow(e.target.value)} aria-label="Switch prototype"
-      title="Switch to another prototype in this build" style={DEMO_SELECT}>
-      <option value="regular">Regular flow</option>
-      <option value="checkout-link">Instant Store demo</option>
-    </select>
-  );
-}
-
-function DemoBar({ view, onJump, onSwitchFlow, variant, onVariantChange, expressStyle, onExpressStyleChange,
-  format, onFormatChange, skippedStages = [] }) {
+function DemoBar({ view, onJump, skippedStages = [] }) {
   /* Collapsing hides the controls but never the WIP chip — the marker has to be on
      every screen, and "clean screenshot" can't be allowed to mean "screenshot with
      no sign it's unapproved". On `main` there's no chip, so all that's left is the
@@ -3506,13 +3430,9 @@ function DemoBar({ view, onJump, onSwitchFlow, variant, onVariantChange, express
           wrap. The stepper and the icon buttons hold their size instead. */}
       <div style={{ display:"flex", alignItems:"center", gap:8, flexWrap:"wrap", minWidth:0 }}>
         <WipChip />
-        <FlowSwitcher onSwitchFlow={onSwitchFlow} />
       </div>
       <StageStepper view={view} onJump={onJump} skippedStages={skippedStages} />
       <div style={{ display:"flex", alignItems:"center", gap:4, flexShrink:0 }}>
-        <DemoSettings variant={variant} onVariantChange={onVariantChange}
-          format={format} onFormatChange={onFormatChange}
-          expressStyle={expressStyle} onExpressStyleChange={onExpressStyleChange} />
         <button onClick={() => setHidden(true)} aria-label="Hide demo controls"
           title="Hide demo controls — for screenshots" style={demoIconBtn(false)}>
           <Ms name="visibility_off" size={16} color={T.textSubtle} />
@@ -5295,7 +5215,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
 /* Matches Figma "Sticky CTA Bar" (node 4411:46727), annotated "visible in empty
    state" — Publish stays disabled until the required fields (Listing title,
    Payment & tax info, etc.) are filled in, which this empty-state prototype never
-   reaches. "Preview listing" is also the demo's bridge into the PDP: previewing
+   reaches. "Preview" is also the demo's bridge into the PDP: previewing
    the listing IS what a shopper does next, so it doubles as forward navigation
    here rather than needing a separate, Figma-less "continue" control. */
 function StickyCtaBar({ onPreview, canPublish, onPublish, panelOpen }) {
@@ -5309,7 +5229,7 @@ function StickyCtaBar({ onPreview, canPublish, onPublish, panelOpen }) {
       <button onClick={onPreview} style={{ background:"none", border:"none", cursor:"pointer",
         display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:16,
         fontFamily:FONT_SANS, padding:0 }}>
-        <span style={{ textDecoration:"underline" }}>Preview listing</span> <Ms name="open_in_new" color={T.textLink} />
+        <span style={{ textDecoration:"underline" }}>Preview</span> <Ms name="open_in_new" color={T.textLink} />
       </button>
       <div style={{ display:"flex", gap:8, flexShrink:0 }}>
         <Btn variant="secondary" onClick={() => {}}>Save draft</Btn>
@@ -5514,7 +5434,7 @@ function ShareSocialPanel({ open, onClose }) {
   );
 }
 
-function CheckoutLinkApp({ onSwitchFlow }) {
+function CheckoutLinkApp() {
   const [view, setView] = useState(initialStage);  // pdp | checkout | confirm | email
   const [cartOpen, setCartOpen] = useState(false);
   const [inCart, setInCart] = useState(false);
@@ -5526,7 +5446,7 @@ function CheckoutLinkApp({ onSwitchFlow }) {
 
   /* What the seller put on the link (print | digital | both) and what the buyer
      ended up with. Single-format links pin `format` to the only choice. */
-  const [variant, setVariant] = useState("print");
+  const [variant] = useState("print");
   const [format, setFormat]   = useState(defaultFormat("print"));
 
   // Shared order state, threaded through every screen
@@ -5544,7 +5464,7 @@ function CheckoutLinkApp({ onSwitchFlow }) {
   const [checkoutSkipped, setCheckoutSkipped] = useState(false);
   /* Which express treatment to show — switchable from the demo banner so the
      options can be compared rather than argued about. */
-  const [expressStyle, setExpressStyle] = useState("single");
+  const [expressStyle] = useState("single");
 
   const order = {
     variant, format, setFormat,
@@ -5552,17 +5472,6 @@ function CheckoutLinkApp({ onSwitchFlow }) {
     shippingAddr, setShippingAddr, shippingMethod, setShippingMethod,
     shippingCost, setShippingCost, billingAddr, setBillingAddr,
     paymentDone, setPaymentDone,
-  };
-
-  /* Switching the link variant restarts the demo — a different link is a
-     different product on sale, so carrying cart/order state across would lie. */
-  const switchVariant = v => {
-    setVariant(v); setFormat(defaultFormat(v));
-    setView("pdp"); setCartOpen(false); setInCart(false);
-    setQty(1); setEmail(""); setAppliedCode(null);
-    setShippingAddr(null); setShippingMethod(null); setShippingCost(null);
-    setBillingAddr(EMPTY_ADDRESS); setPaymentDone(false); setPdpExpress(null);
-    setCheckoutSkipped(false);
   };
 
   /* Inject Blurb's brand @font-face rules only while the fork is mounted, so
@@ -5603,13 +5512,8 @@ function CheckoutLinkApp({ onSwitchFlow }) {
     if (!shippingMethod) { setShippingMethod("economy"); setShippingCost(9.99); }
   };
 
-  /* Switching what was ordered from the demo bar. On a post-order stage the new
-     format may need shipping data the old one didn't, so backfill for it. */
+  /* Post-order stages need a complete order behind them, so jumping to one backfills */
   const POST_ORDER = ["confirm", "email"];
-  const changeFormat = f => {
-    setFormat(f);
-    if (POST_ORDER.includes(view)) backfillOrder(f);
-  };
   const placeOrder = () => { backfillOrder(); setView("confirm"); };
 
   /* A stage opened straight from the URL has none of the state the screens before
@@ -5655,9 +5559,7 @@ function CheckoutLinkApp({ onSwitchFlow }) {
 
   return (
     <div style={{ fontFamily: FONT_SANS }}>
-      <DemoBar view={view} onJump={jump} onSwitchFlow={onSwitchFlow} variant={variant} onVariantChange={switchVariant}
-        expressStyle={expressStyle} onExpressStyleChange={setExpressStyle}
-        format={format} onFormatChange={changeFormat}
+      <DemoBar view={view} onJump={jump}
         skippedStages={checkoutSkipped ? ["checkout"] : []} />
 
       {view === "dashboard" && (

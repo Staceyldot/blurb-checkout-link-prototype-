@@ -3857,7 +3857,7 @@ function App() {
      else, so reaching Add to cart meant a detour through a screen you weren't
      going to. Every screen in the build now reaches every other one directly. */
   if (experience === "checkout-link")
-    return <CheckoutLinkApp onSwitchFlow={switchUserType} />;
+    return <CheckoutLinkApp />;
 
   /* ── Regular flow: Add to Cart → Cart → single-page checkout ── */
   if (experience === "addtocart") return (
