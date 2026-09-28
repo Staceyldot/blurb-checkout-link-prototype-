@@ -4871,7 +4871,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
       if (item === "All projects") onGoAllProjects?.();
       else if (item === "Instant Stores") onGoInstantStores?.();
     }} />
-    <div style={{ flex:1, minWidth:0, minHeight:"100vh", background:T.bg, fontFamily:FONT_SANS }}>
+    <div style={{ flex:1, minWidth:0, minHeight:"100vh", background:T.surface, fontFamily:FONT_SANS }}>
       {/* Header: breadcrumb, title, and the auto-generated link field */}
       <div style={{ background:T.surface, padding: isMobile ? "16px 20px 24px" : "32px 16px 24px" }}>
         <div style={{ display:"flex", alignItems:"center", gap:4, fontFamily:FONT_SANS, fontSize:14, marginBottom:16 }}>
