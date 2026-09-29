@@ -1276,6 +1276,15 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
   const [detailsOpen, setDetailsOpen] = useState(false);   // "Book details" accordion
   const [detailsModal, setDetailsModal] = useState(false); // Print vs PDF comparison
   const [readMore, setReadMore] = useState(false);
+  /* Share copies the book's link and confirms with the same Toast Setup uses —
+     same URL shape as Setup's link field, seeded from the title. */
+  const [linkCopied, setLinkCopied] = useState(false);
+  const shareLink = () => {
+    const slug = PRODUCT.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    if (navigator.clipboard) navigator.clipboard.writeText(`https://blurb.com/hub/482910/${slug}`).catch(() => {});
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 3000);
+  };
 
   const bio = "Kim Newton Arispe has appreciated the power of a good cocktail from an early age when she watched her grandparents gather with friends to sip margaritas and share stories. Years later, her passion for bringing people together over cocktails led her to create the website, Random Acts of Comfort, where she makes bar-quality beverages accessible to the home bartender. When she's not crafting cocktails for a party or a charity fundraiser, you'll find her on video teaching Instagram and Facebook followers how to create seasonal drinks for easy entertaining. As a native Texan living in Seattle, she enjoys mixing up margaritas and hunting for good Tex-Mex with her husband of 20 years.";
   const [authorReadMore, setAuthorReadMore] = useState(false);
@@ -1297,6 +1306,7 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
   return (
     <div style={{ minHeight:"100vh", background:T.surface, display:"flex", flexDirection:"column" }}>
       <PdpNav cartCount={cartCount} onCartClick={onCartClick} />
+      <Toast show={linkCopied}>Link copied</Toast>
 
       <div style={{ maxWidth:1280, margin:"0 auto", width:"100%", padding: isDesktop ? "40px 40px 0" : "24px 20px 0" }}>
         {/* Hero */}
@@ -1309,7 +1319,7 @@ function ProductPage({ variant, format, setFormat, onAddToCart, onCartClick, car
               <img src={BOOK_COVER} alt={PRODUCT.title}
                 style={{ maxWidth:"100%", maxHeight:"100%", objectFit:"contain", display:"block" }} />
             </div>
-            <button style={{ background:"none", border:"none", cursor:"pointer", padding:0,
+            <button onClick={shareLink} style={{ background:"none", border:"none", cursor:"pointer", padding:0,
               display:"flex", alignItems:"center", gap:4, color:T.textLink }}>
               <span style={{ fontSize:16, fontWeight:600, textDecoration:"underline" }}>Share</span>
               <Ms name="share" size={24} color={T.textLink} />
