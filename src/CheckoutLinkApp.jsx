@@ -5267,7 +5267,7 @@ function StickyCtaBar({ onPreview, canPublish, onPublish, panelOpen }) {
 function Toast({ show, children }) {
   return (
     <div style={{ position:"fixed", top:20, left:"50%", transform: show ? "translate(-50%,0)" : "translate(-50%,-12px)",
-      zIndex:160, background:T.successBg, border:`1px solid ${T.success}`, borderRadius:8,
+      zIndex:160, background:T.successBg, borderRadius:8,
       padding:"12px 20px", display:"flex", alignItems:"center", gap:10,
       opacity: show ? 1 : 0, pointerEvents:"none", transition:"opacity .25s ease, transform .25s ease" }}>
       <Ms name="check_circle" size={20} color={T.success} />
