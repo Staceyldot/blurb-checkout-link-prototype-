@@ -5204,7 +5204,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
       </SetupSection>}
 
       {/* Spacer so the last section isn't hidden behind the fixed sticky bar below */}
-      <div style={{ height:72 }} />
+      {!published && <div style={{ height:72 }} />}
     </div>
 
     <DraftPanel open={aiOpen} phase={aiPhase} input={aiInput} setInput={setAiInput}
@@ -5214,7 +5214,9 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
       onClose={closeAiPanel} onStartDraft={startDraft} onApply={applyDraft} onBack={backToAiPrompt} />
     </div>
 
-    <StickyCtaBar onPreview={onContinue} canPublish={canPublish} onPublish={doPublish} panelOpen={aiOpen} />
+    {/* Preview / Save draft / Publish only apply to a draft — once the store is
+        live, the header's "View live page" and visibility toggle take over. */}
+    {!published && <StickyCtaBar onPreview={onContinue} canPublish={canPublish} onPublish={doPublish} panelOpen={aiOpen} />}
 
     <PublishModal open={publishOpen} onClose={() => setPublishOpen(false)} onViewLive={onContinue}
       copied={copied} onCopyLink={copyLink} onShareSocial={() => { setPublishOpen(false); setShareOpen(true); }} />
@@ -5368,7 +5370,7 @@ function PublishModal({ open, onClose, onViewLive, copied, onCopyLink, onShareSo
           <Ms name={copied ? "check" : "link"} color={copied ? T.success : T.textLink} />
           <span style={{ textDecoration:"underline" }}>{copied ? "Copied!" : "Copy link"}</span>
         </button>
-        <div style={{ display:"flex", gap:12, justifyContent:"flex-end", width:"100%" }}>
+        <div style={{ display:"flex", gap:12, justifyContent:"center", width:"100%" }}>
           <Btn variant="secondary" onClick={onViewLive}>View live page</Btn>
           <Btn onClick={onShareSocial}><Ms name="share" size={20} color="#fff" style={{ marginRight:4 }} />Share on social</Btn>
         </div>
