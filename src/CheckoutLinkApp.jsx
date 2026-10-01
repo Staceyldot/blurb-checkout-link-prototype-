@@ -3884,7 +3884,7 @@ const SOCIAL_PLATFORM_OPTIONS = ["Facebook", "Instagram", "X", "TikTok", "Websit
 /* The AI panel's own CTA style — outlined rather than the app's solid-fill
    primary Btn, so it reads as a distinct affordance: white with a colored
    border when enabled, gray with a gray outline when disabled. Defaults to
-   the "AI action" purple (Draft content); Apply selected passes the app's
+   the "AI action" purple (Draft my listing); Apply selected passes the app's
    standard brand blue instead, since applying isn't itself an AI action. */
 function AiOutlineButton({ children, onClick, disabled, icon, color = "#7a3dc4", textColor }) {
   return (
@@ -3948,18 +3948,17 @@ function DraftPanel({ open, phase, input, setInput, titleOn, setTitleOn, descOn,
           {phase === "prompt" && (
             <>
               <div style={{ textAlign:"left", display:"flex", flexDirection:"column", gap:8 }}>
-                <span style={{ fontWeight:700, fontSize:16, color:T.textSubtle }}>Draft a listing title, description, and keywords</span>
+                <span style={{ fontWeight:700, fontSize:16, color:T.textSubtle }}>Draft your listing</span>
                 <span style={{ fontSize:16, color:T.textSubtle }}>
-                  Tell us about your title. We'll draft the rest.<br />
-                  The more detail, the better.
+                  Tell us about your project and we’ll draft the listing title, description and keywords.
                 </span>
               </div>
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 <textarea value={input} onChange={e => setInput(e.target.value)}
-                  placeholder="e.g. keep it playful, mention it’s a gift edition"
+                  placeholder="e.g. A cookbook of family recipes from my grandmother. Mention it’s a gift edition and keep the tone warm and playful."
                   style={{ width:"100%", height:193, minHeight:193, border:`1px solid ${T.border}`, borderRadius:T.radius, padding:8,
                     fontFamily:FONT_SANS, fontSize:16, color:T.textBold, background:T.surface, resize:"vertical" }} />
-                <SetupHint>We don't read your title. Don't include sensitive information here.</SetupHint>
+                <SetupHint>We only use what you type here, not your project’s content. Don’t include personal or sensitive information.</SetupHint>
               </div>
             </>
           )}
@@ -4007,14 +4006,12 @@ function DraftPanel({ open, phase, input, setInput, titleOn, setTitleOn, descOn,
         <div style={{ borderTop:`1px solid ${T.borderSubtle}`, padding:24, display:"flex", flexDirection:"column",
           alignItems:"flex-start", gap:8, flexShrink:0 }}>
           {phase === "prompt" ? (
-            <AiOutlineButton onClick={onStartDraft} disabled={!input.trim()} icon="auto_awesome">Draft content</AiOutlineButton>
+            <AiOutlineButton onClick={onStartDraft} disabled={!input.trim()} icon="auto_awesome">Draft my listing</AiOutlineButton>
           ) : (
             <AiOutlineButton onClick={onApply} disabled={phase !== "results"} color={T.brand} textColor={T.brand}>Apply selected</AiOutlineButton>
           )}
           <p style={{ margin:0, fontSize:12, color:T.textSubtle }}>
-            {phase === "prompt"
-              ? "Generated with AI. It may make mistakes. Review before using."
-              : "AI can make mistakes. Double-check the content for issues."}
+            Written with AI. It may make mistakes, so check it before you use it.
           </p>
         </div>
       </div>
