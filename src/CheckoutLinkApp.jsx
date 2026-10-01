@@ -4757,7 +4757,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
   const [sectionPreviewVisible, setSectionPreviewVisible] = useState(true);
 
   // Listing content fields — plain state so the AI draft panel has something to write into.
-  const [listingTitle, setListingTitle] = useState("");
+  const [listingTitle, setListingTitle] = useState(PRODUCT.title);
   const [aboutBook, setAboutBook] = useState("");
   const [keywords, setKeywords] = useState([]);
 
