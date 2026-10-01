@@ -4758,6 +4758,9 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
   const BASE_PRINT_COST = 12.50;
   const endsheetExtra = ENDSHEET_COLORS.find(c => c.name === endsheetColor)?.extra || 0;
   const PRINT_COST = BASE_PRINT_COST + endsheetExtra;
+  /* Cover finish doesn't change the price, so pricing is known as soon as an
+     endsheet is chosen (preselected) — no need to wait on the finish. */
+  const pricingReady = !!endsheetColor;
   const [listingPrice, setListingPrice] = useState(PRINT_COST.toFixed(2));
   const [profitMargin, setProfitMargin] = useState("0");
   const [profit, setProfit] = useState("0.00");
@@ -5010,18 +5013,18 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
         </div>
       </SetupSection>
 
-      {/* Pricing — empty state */}
+      {/* Pricing */}
       <SetupSection title="Pricing">
         <div style={{ maxWidth:685, display:"flex", flexDirection:"column", gap:16 }}>
           <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
             <div style={{ flex:"1 1 140px", minWidth:140 }}>
               <div style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>Print cost</div>
               <div style={{ fontFamily:FONT_HEADING, fontSize:32, fontWeight:600, color:T.textSubtle, margin:"4px 0" }}>
-                {canPublish ? `$${PRINT_COST.toFixed(2)}` : "$ --"}
+                {pricingReady ? `$${PRINT_COST.toFixed(2)}` : "$ --"}
               </div>
               <SetupHint>Set by format, size, and materials</SetupHint>
             </div>
-            {canPublish ? (
+            {pricingReady ? (
               <>
                 <PriceField label="Listing price" hint="Buyers pay" prefix="$" value={listingPrice} onChange={updatePriceFromPrice}
                   error={invalidPriceField === "price" ? "Enter a valid price." : null}
