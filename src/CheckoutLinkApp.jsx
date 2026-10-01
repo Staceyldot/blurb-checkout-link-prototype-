@@ -4210,12 +4210,12 @@ const ALL_PROJECTS = [
   { cover:PRODUCT.img, coverAspect:"square", coverFit:"contain", title:"Liberal Libations",
     desc:"Liberal Libations empowers the cocktail enthusiast to craft bar-quality cocktails for a large crowd or for an intimate gathering. Make-ahead batch recipes mean less time mixing drinks and more time enjoying each sip with friends. Over 85 recipes",
     meta:[["Project type","Trade Book"],["Project option","8×10 in, 20×25 cm"],["# of pages","160"],["ISBN","9781733372800"],["Created with","BookWright"],["Created","March 14, 2019"]],
-    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }, { icon:"local_shipping", label:"Set up retail distribution" }],
+    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }, { icon:"storefront", label:"Set up retail distribution" }],
     share:true },
   { cover:BOOK_EVERYDAY_MOCKTAILS_MOCKUP, coverAspect:"square", coverFit:"contain", badge:"Selling", title:"Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks",
     desc:"Craft artfully balanced recipes that apply authentic cocktail craft, complex botanicals, and sophisticated flavor pairings to every glass. Author Kim Newton Arispe elevates non-alcoholic mixology into a refined culinary art, giving zero-proof drinks the prestige, care, and attention they deserve. Designed for intentional drinkers and elevated hosts, this vibrant guide demonstrates how house-infused teas, artisanal syrups, and precise technique turn every pour into an extraordinary experience. Inside you'll find: Chef-Level Craft — artfully balanced flavor profiles featuring artisanal syrups, fresh garden botanicals, and layered aromatic bitters; Bar-Quality Presentation — professional techniques for selecting glassware, carving ice, and finishing drinks with modern garnishes; Elevated Sips — rich, complex drinks engineered for quiet lounge evenings, high-energy celebrations, and memorable dinner pairings; and Precision Balance — straightforward methods that master acidity, sweetness, texture, and body in every glass. Transform your home bar into a world-class lounge and savor the refined art of high-end mixology.",
     meta:[["Project type","Photo Book"],["Project option","10×10 in, 25×25 cm"],["# of pages","96"],["Created with","BookWright"],["Created","Jan 9, 2025"]],
-    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"local_shipping", label:"Set up retail distribution" }, { icon:"download", label:"Download PDF" }],
+    actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"settings", label:"Manage Instant Store" }, { icon:"storefront", label:"Set up retail distribution" }, { icon:"download", label:"Download PDF" }],
     share:true },
   { cover:BOOK_UPGRADED_SNACKS_MOCKUP, coverAspect:"square", coverFit:"contain", badge:"Selling", title:"Upgraded Snacks",
     desc:"Turn casual drink nights into extraordinary culinary events with chef-inspired small plates, savory bites, and gourmet pub fare explicitly crafted to complement modern cocktails. Designed for adventurous home hosts, this practical cookbook bridges the gap between craft mixology and restaurant-quality lounge food. Discover how rich cheeses, bold spices, cured meats, and crispy textures balance sweet, bitter, and botanical spirits to create perfect flavor harmony on your palate.",
@@ -4240,7 +4240,7 @@ function AllProjectsRow({ project, onManageInstantStore }) {
         ) : (
           <div style={{ width:130, height:168, background:WF.cover, border:`1px solid ${WF.borderLight}` }} />
         )}
-        <a href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", gap:4, marginTop:8,
+        <a href="#" onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:4, marginTop:8,
           fontFamily:WF.font, fontSize:12, color:WF.body, textDecoration:"none" }}>
           Preview <Ms name="open_in_new" size={13} color={WF.body} />
         </a>
@@ -4274,7 +4274,7 @@ function AllProjectsRow({ project, onManageInstantStore }) {
         {project.share && (
           <a href="#" onClick={e => e.preventDefault()} style={{ display:"inline-flex", alignItems:"center", gap:4,
             alignSelf:"flex-start", fontFamily:WF.font, fontSize:13, color:WF.subtle, textDecoration:"none" }}>
-            <Ms name="ios_share" size={14} color={WF.subtle} /> Share private link
+            <Ms name="share" size={14} color={WF.subtle} /> Share private link
           </a>
         )}
       </div>
