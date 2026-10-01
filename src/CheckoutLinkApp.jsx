@@ -4924,9 +4924,8 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
           {/* Store-level visibility toggle only shows up once the link is actually
               live (Figma "Header", publish="On", node 3403:20356) — before that,
               there's nothing yet for a buyer to see or not see. */}
-          {/* No Preview link on the link row while unpublished — the sticky CTA
-              bar's Preview covers the draft; once published, "View live page"
-              below takes over. */}
+          {/* No Preview link on the link row while unpublished; once published,
+              "View live page" below opens the PDP. */}
           {published && (
             <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
               <SwitchToggle on={storeVisible} onToggle={() => setStoreVisible(v => !v)} />
@@ -5209,7 +5208,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
 
     {/* Preview / Save draft / Publish only apply to a draft — once the store is
         live, the header's "View live page" and visibility toggle take over. */}
-    {!published && <StickyCtaBar onPreview={onContinue} canPublish={canPublish} onPublish={doPublish} panelOpen={aiOpen} />}
+    {!published && <StickyCtaBar canPublish={canPublish} onPublish={doPublish} panelOpen={aiOpen} />}
 
     <PublishModal open={publishOpen} onClose={() => setPublishOpen(false)} onViewLive={onContinue}
       copied={copied} onCopyLink={copyLink} onShareSocial={() => { setPublishOpen(false); setShareOpen(true); }} />
@@ -5230,22 +5229,16 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
 /* Matches Figma "Sticky CTA Bar" (node 4411:46727), annotated "visible in empty
    state" — Publish stays disabled until the required fields (Listing title,
    Payment & tax info, etc.) are filled in, which this empty-state prototype never
-   reaches. "Preview" is also the demo's bridge into the PDP: previewing
-   the listing IS what a shopper does next, so it doubles as forward navigation
-   here rather than needing a separate, Figma-less "continue" control. */
-function StickyCtaBar({ onPreview, canPublish, onPublish, panelOpen }) {
+   reaches. No Preview link here — the draft has no preview before publish;
+   "View live page" after publishing is the way into the PDP. */
+function StickyCtaBar({ canPublish, onPublish, panelOpen }) {
   const { isMobile } = useViewport();
   if (panelOpen) return null;
   return (
     <div style={{ position:"fixed", left:0, right:0, bottom:0, zIndex:30, background:T.surface,
       borderTop:`1px solid ${T.borderSubtle}`, boxShadow:"0 -4px 16px rgba(0,0,0,0.08)",
-      display:"flex", alignItems:"center", justifyContent:"space-between", gap:16,
+      display:"flex", alignItems:"center", justifyContent:"flex-end", gap:16,
       padding: isMobile ? "16px 20px" : "16px 80px", transition:"right .3s ease" }}>
-      <button onClick={onPreview} style={{ background:"none", border:"none", cursor:"pointer",
-        display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:16,
-        fontFamily:FONT_SANS, padding:0 }}>
-        <span style={{ textDecoration:"underline" }}>Preview</span> <Ms name="open_in_new" color={T.textLink} />
-      </button>
       <div style={{ display:"flex", gap:8, flexShrink:0 }}>
         <Btn variant="secondary" onClick={() => {}}>Save draft</Btn>
         <Btn disabled={!canPublish} onClick={onPublish}>Publish</Btn>
