@@ -5371,7 +5371,7 @@ function PublishModal({ open, onClose, onViewLive, copied, onCopyLink, onShareSo
    these don't actually post anything in this prototype. */
 function ShareSocialPanel({ open, onClose }) {
   const [message, setMessage] = useState(
-    `${PRODUCT.title} just launched. Grab a copy straight from me. Link below if you want one. 🎉`);
+    `${PRODUCT.title} is out now 🎉 Get your copy straight from me: blurb.com/hub/482910/liberal-libations`);
   const [msgCopied, setMsgCopied] = useState(false);
   const copyMessage = () => {
     navigator.clipboard?.writeText(message).catch(() => {});
@@ -5394,14 +5394,14 @@ function ShareSocialPanel({ open, onClose }) {
         transform: open ? "translateX(0)" : "translateX(100%)", transition:"transform .3s ease",
         display:"flex", flexDirection:"column", fontFamily:FONT_SANS }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:24, flexShrink:0 }}>
-          <span style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:500, color:T.textBold }}>Share your title on social</span>
+          <span style={{ fontFamily:FONT_HEADING, fontSize:20, fontWeight:500, color:T.textBold }}>Share your Instant Store on social</span>
           <button onClick={onClose} aria-label="Close" style={{ background:"none", border:"none", cursor:"pointer", display:"flex" }}>
             <Ms name="close" size={24} color={T.textBold} />
           </button>
         </div>
 
         <div style={{ flex:1, overflowY:"auto", padding:24, display:"flex", flexDirection:"column", gap:24 }}>
-          <p style={{ margin:0, fontSize:16, lineHeight:1.4, color:T.textBold }}>Here's a ready-to-post message.</p>
+          <p style={{ margin:0, fontSize:16, lineHeight:1.4, color:T.textBold }}>Here's a post to get you started.</p>
 
           <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
             <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
@@ -5421,7 +5421,7 @@ function ShareSocialPanel({ open, onClose }) {
           <div style={{ height:1, background:"#dcdcdc", flexShrink:0 }} />
 
           <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-            <span style={{ fontSize:16, fontWeight:600, lineHeight:"24px", color:T.textSubtle }}>Ready to post</span>
+            <span style={{ fontSize:16, fontWeight:600, lineHeight:"24px", color:T.textSubtle }}>Post to</span>
             {platforms.map(p => (
               <button key={p.label} onClick={e => e.preventDefault()} style={{ display:"flex", alignItems:"center",
                 justifyContent:"center", gap:8, background:T.textBold, border:"none", borderRadius:T.radius,
@@ -5435,7 +5435,7 @@ function ShareSocialPanel({ open, onClose }) {
 
         {/* Pinned footer, split off by its own divider */}
         <div style={{ borderTop:"1px solid #dcdcdc", padding:24, flexShrink:0 }}>
-          <Btn variant="secondary" onClick={onClose} fullWidth>Back to editing</Btn>
+          <Btn variant="secondary" onClick={onClose} fullWidth>Done</Btn>
         </div>
       </div>
     </>
