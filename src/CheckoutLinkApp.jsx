@@ -3729,7 +3729,7 @@ function BookDetailsRow({ showCover, onViewProject }) {
 /* Matches the "Radio Card / Icon States" spec: Default (gray outline, gray
    icon), Hover (gray outline + light gray fill), Focus (blue ring, gray
    icon — keyboard focus, independent of selection), Selected (dark border,
-   filled blue radio icon, reveals the "See pages" link). */
+   filled blue radio icon, reveals the "See preview" link). */
 function PreviewCard({ icon, title, sub, selected, onSelect, showLink, onSeePages }) {
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -3753,7 +3753,7 @@ function PreviewCard({ icon, title, sub, selected, onSelect, showLink, onSeePage
       {showLink && selected && (
         <div style={{ flex:1, display:"flex", alignItems:"flex-end" }}>
           <span onClick={e => { e.stopPropagation(); onSeePages(); }}
-            style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textLink, textDecoration:"underline" }}>See pages</span>
+            style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textLink, textDecoration:"underline" }}>See preview</span>
         </div>
       )}
     </button>
@@ -5273,7 +5273,7 @@ function Toast({ show, children }) {
 const FULL_BOOK_PAGE_COUNT = parseInt(PRODUCT.pages, 10);
 
 /* "Book preview" modal (Figma "Modal / Large", node 4480:61779) — shown from
-   Setup's "See pages" link on the Sample/Full preview cards. Reuses the same
+   Setup's "See preview" link on the Sample/Full preview cards. Reuses the same
    Flipbook the PDP's fullscreen viewer uses (page-turn, prev/next circles,
    "Page X of N" badge) instead of a static Figma export, since it's already
    a faithful match to the design's flipbook + counter. Centered overlay like
