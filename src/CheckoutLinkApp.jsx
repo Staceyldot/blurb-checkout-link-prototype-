@@ -4924,16 +4924,9 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
           {/* Store-level visibility toggle only shows up once the link is actually
               live (Figma "Header", publish="On", node 3403:20356) — before that,
               there's nothing yet for a buyer to see or not see. */}
-          {/* Preview link (Figma 6388:46429, "Link L"): right-aligned on the link
-              row while the store is unpublished. Opens the PDP in a new tab in its
-              current draft state — once published, "View live page" below takes over. */}
-          {!published && (
-            <a href={`${window.location.pathname}?stage=pdp`} target="_blank" rel="noopener noreferrer"
-              style={{ display:"flex", alignItems:"center", gap:4, flexShrink:0, height:24,
-                color:T.textLink, fontFamily:FONT_SANS, fontSize:16, fontWeight:600, textDecoration:"none" }}>
-              <span style={{ textDecoration:"underline" }}>Preview</span> <Ms name="open_in_new" size={24} color={T.textLink} />
-            </a>
-          )}
+          {/* No Preview link on the link row while unpublished — the sticky CTA
+              bar's Preview covers the draft; once published, "View live page"
+              below takes over. */}
           {published && (
             <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
               <SwitchToggle on={storeVisible} onToggle={() => setStoreVisible(v => !v)} />
