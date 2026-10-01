@@ -5180,8 +5180,8 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
         <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
           <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, fontWeight:400, color:T.textSubtle }}>
             {sectionPreviewVisible
-              ? "Buyers will see your other titles on your Instant Store."
-              : "Buyers won’t see your other titles on your Instant Store."}
+              ? "Show your other Instant Store titles."
+              : "Hide your other Instant Store titles."}
           </p>
         </div>
       </SetupSection>
