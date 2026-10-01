@@ -2994,8 +2994,8 @@ function AddToCartPage({ onAdded, config, demoNav }) {
   const c = config || ATC_DEFAULTS;
   const { isDesktop } = useViewport();
   const [qty, setQty]   = useState(c.qty);
-  const [paper, setPaper]   = useState(c.paper);
-  const [endsheet, setEnd]  = useState(c.endsheet);
+  const paper = c.paper;
+  const endsheet = c.endsheet;
   const [finish, setFinish] = useState(c.finish);
   const [logoPage, setLogoPage] = useState(c.logoPage);
   const [gift, setGift]     = useState(c.gift);
@@ -3094,10 +3094,10 @@ function AddToCartPage({ onAdded, config, demoNav }) {
               {/* ImageWrap prints the cover image straight onto the board, so there
                   is no cover linen to pick — that option belongs to the dust-jacket
                   binding. Dropped rather than replaced: a hardcover ImageWrap has
-                  paper, end sheet and cover laminate, and nothing else to choose. */}
+                  paper, end sheet and cover laminate, and nothing else to choose.
+                  Paper and Endsheet are no longer buyer choices either — they stay
+                  at ATC_DEFAULTS and still ride along into the cart row's spec. */}
               <div style={{ flex:"1 1 320px", minWidth:0, display:"flex", flexDirection:"column", gap:16 }}>
-                <SelectInput label="Paper"        value={paper}    onChange={setPaper} options={["Standard","Premium Lustre","Premium Matte","ProLine Uncoated"]} />
-                <SelectInput label="Endsheet"     value={endsheet} onChange={setEnd}   options={["Standard White  $0.00","Charcoal (ProLine) +$6.00","Mid-Grey +$6.00"]} />
                 <SelectInput label="Cover finish" value={finish}   onChange={setFinish} options={["Gloss laminate  $0.00","Matte laminate  $0.00"]} />
                 {/* Hidden until the removal fee is confirmed — the +$4.99 was only
                     ever a placeholder, and a made-up price on screen gets quoted
