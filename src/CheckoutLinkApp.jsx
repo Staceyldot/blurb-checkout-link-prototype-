@@ -3242,7 +3242,7 @@ function ConfirmationEmail({ order, onBack }) {
           {/* 40px sides, not 50: Figma's three-card row is 557px, wider than the 550 a
               50px inset leaves, so at 50 the third card wraps */}
           <div style={{ background:EMAIL.foam, padding:"30px 40px", display:"flex", flexDirection:"column", alignItems:"center", gap:30 }}>
-            <p style={{ fontFamily:EMAIL.arial, fontWeight:700, fontSize:26, lineHeight:"30px", color:"#000", textAlign:"center" }}>The Blurb difference</p>
+            <p style={{ fontFamily:EMAIL.arial, fontWeight:700, fontSize:26, lineHeight:"30px", color:"#292929", textAlign:"center" }}>The Blurb difference</p>
             <div style={{ display:"flex", gap:16, justifyContent:"center", flexWrap:"wrap" }}>
               {cards.map(([icon, t, d], i) => (
                 <div key={t} style={{ width:175, height:235, background:"#fff", border:`1px solid ${EMAIL.cardBorder}`, borderRadius:16,
@@ -3309,7 +3309,7 @@ function ConfirmationEmail({ order, onBack }) {
    tooltip and the accessible name. Five full labels can't hold one row on a
    laptop, and a stepper that wraps stops reading as a sequence. */
 const STAGES = [
-  { key:"dashboard", short:"Dashboard (wireframe)", label:"Seller dashboard" },
+  { key:"dashboard", short:"Dashboard", label:"Seller dashboard" },
   { key:"setup",    short:"Setup",    label:"Link setup" },
   { key:"pdp",      short:"PDP",      label:"Product page" },
   { key:"checkout", short:"Checkout", label:"Checkout" },
@@ -4647,7 +4647,7 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
                       All my projects <Ms name="expand_more" size={16} color={WF.body} />
                     </span>
                   </label>
-                  <a href="#" onClick={e => e.preventDefault()} style={{ background:"#555", color:"#fff", border:"1px solid #333",
+                  <a href="#" onClick={e => e.preventDefault()} style={{ background:T.brand, color:"#fff", border:`1px solid ${T.brand}`,
                     borderRadius:4, padding:"9px 18px", fontFamily:WF.font, fontSize:14, fontWeight:600,
                     textDecoration:"none", whiteSpace:"nowrap" }}>+ Start a project</a>
                 </div>
@@ -4676,7 +4676,7 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
                     Shareable links that let customers buy directly from you
                   </p>
                 </div>
-                <a href="#" onClick={e => { e.preventDefault(); setCreateModalOpen(true); }} style={{ background:"#555", color:"#fff", border:"1px solid #333",
+                <a href="#" onClick={e => { e.preventDefault(); setCreateModalOpen(true); }} style={{ background:T.brand, color:"#fff", border:`1px solid ${T.brand}`,
                   borderRadius:4, padding:"6px 13px", fontFamily:WF.font, fontSize:12.5, fontWeight:600,
                   textDecoration:"none", whiteSpace:"nowrap" }}>+ Create Instant Store</a>
               </div>
