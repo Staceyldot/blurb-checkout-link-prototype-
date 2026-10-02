@@ -4788,6 +4788,9 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
      auto-fills it. */
   const authorFilled = !!copyFromStore;
   const [deleteStoreOpen, setDeleteStoreOpen] = useState(false);
+  // Live → Paused goes through a confirm (Figma 6606:107265); Paused → Live is immediate.
+  const [pauseStoreOpen, setPauseStoreOpen] = useState(false);
+  const toggleStoreLive = () => storeVisible ? setPauseStoreOpen(true) : setStoreVisible(true);
   const [mainAuthor, setMainAuthor] = useState(PRODUCT.author);
   const [extraAuthors, setExtraAuthors] = useState([]);
   const MAX_AUTHORS = 3;   // PRODUCT.author counts as the first slot
@@ -4993,7 +4996,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
           )}
           {published && (
             <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
-              <SwitchToggle on={storeVisible} onToggle={() => setStoreVisible(v => !v)} />
+              <SwitchToggle on={storeVisible} onToggle={toggleStoreLive} />
               <span style={{ fontFamily:FONT_SANS, fontSize:18, fontWeight:700, color:T.textBold, whiteSpace:"nowrap" }}>
                 {storeVisible ? "Live" : "Paused"}
               </span>
@@ -5288,6 +5291,8 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
 
     <BookPreviewModal open={!!previewModalKind} kind={previewModalKind} onClose={() => setPreviewModalKind(null)} />
 
+    <PauseStoreModal open={pauseStoreOpen} onClose={() => setPauseStoreOpen(false)}
+      onConfirm={() => { setStoreVisible(false); setPauseStoreOpen(false); }} />
     <DeleteStoreModal open={deleteStoreOpen} onClose={() => setDeleteStoreOpen(false)}
       onConfirm={() => { setDeleteStoreOpen(false); onGoAllProjects?.(); }} />
 
@@ -5378,6 +5383,36 @@ function BookPreviewModal({ open, kind, onClose }) {
         <Flipbook maxWidth={900} pageBadge showFrontCover showBackCover={kind === "full"}
           totalLabel={kind === "full" ? FULL_BOOK_PAGE_COUNT : PREVIEW_LAST_PAGE}
           maxPage={kind === "full" ? PREVIEW_LAST_PAGE_FULL : PREVIEW_LAST_PAGE} />
+      </div>
+    </>
+  );
+}
+
+/* "Pause this Instant Store?" double-confirm (Figma 6606:107265), shown when
+   the header toggle goes Live → Paused. Figma's compact dialog: 16px padding,
+   20px heading, subtle body, small 14px buttons. */
+function PauseStoreModal({ open, onClose, onConfirm }) {
+  if (!open) return null;
+  const btn = { minWidth:70, padding:"8px 16px", borderRadius:T.radius, cursor:"pointer",
+    fontFamily:FONT_SANS, fontSize:14, fontWeight:600, lineHeight:"20px" };
+  return (
+    <>
+      <div onClick={onClose} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.45)", zIndex:140 }} />
+      <div role="dialog" aria-modal="true" aria-labelledby="pause-store-title"
+        style={{ position:"fixed", top:"50%", left:"50%", transform:"translate(-50%,-50%)", zIndex:150,
+        width:382, maxWidth:"92vw", background:T.surface, borderRadius:T.radius, padding:16,
+        boxShadow:"0 8px 32px rgba(0,0,0,.16)", display:"flex", flexDirection:"column", gap:8,
+        fontFamily:FONT_SANS }}>
+        <p id="pause-store-title" style={{ margin:0, fontFamily:FONT_HEADING, fontSize:20, fontWeight:500, lineHeight:1.2, color:T.textBold }}>
+          Pause this Instant Store?
+        </p>
+        <p style={{ margin:0, fontSize:16, color:T.textSubtle, lineHeight:1.4 }}>
+          Buyers won’t be able to see it or place new orders. Orders already placed aren’t affected and will be delivered as planned. You can make it live again anytime.
+        </p>
+        <div style={{ display:"flex", gap:8, justifyContent:"flex-end" }}>
+          <button onClick={onClose} style={{ ...btn, background:T.surface, color:T.textBold, border:`1px solid ${T.textBold}` }}>Cancel</button>
+          <button onClick={onConfirm} style={{ ...btn, background:T.textError, color:"#fff", border:"none" }}>Pause</button>
+        </div>
       </div>
     </>
   );
