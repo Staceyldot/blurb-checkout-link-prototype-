@@ -5113,21 +5113,21 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
             </div>
             {pricingReady ? (
               <>
-                <PriceField label="Listing price" hint="Buyers pay" prefix="$" value={listingPrice} onChange={updatePriceFromPrice}
+                <PriceField label="Listing price" hint="What your buyers pay" prefix="$" value={listingPrice} onChange={updatePriceFromPrice}
                   error={invalidPriceField === "price" ? "Enter a valid price." : null}
                   disabled={invalidPriceField && invalidPriceField !== "price"} />
-                <PriceField label="Profit margin" hint="Percent of listing price" suffix="%" value={profitMargin} onChange={updatePriceFromMargin}
+                <PriceField label="Profit margin" hint="Your share of the listing price" suffix="%" value={profitMargin} onChange={updatePriceFromMargin}
                   error={invalidPriceField === "margin" ? "Enter a valid percentage." : null}
                   disabled={invalidPriceField && invalidPriceField !== "margin"} />
-                <PriceField label="Profit" hint="You earn" prefix="$" value={profit} onChange={updatePriceFromProfit}
+                <PriceField label="Profit" hint="What you earn per copy" prefix="$" value={profit} onChange={updatePriceFromProfit}
                   error={invalidPriceField === "profit" ? "Enter a valid amount." : null}
                   disabled={invalidPriceField && invalidPriceField !== "profit"} />
               </>
             ) : (
               [
-                { label:"Listing price", value:"$ --", hint:"Buyers pay" },
-                { label:"Profit margin", value:"-- %", hint:"Percent of listing price" },
-                { label:"Profit", value:"$ --", hint:"You earn" },
+                { label:"Listing price", value:"$ --", hint:"What your buyers pay" },
+                { label:"Profit margin", value:"-- %", hint:"Your share of the listing price" },
+                { label:"Profit", value:"$ --", hint:"What you earn per copy" },
               ].map(f => (
                 <div key={f.label} style={{ flex:"1 1 140px", minWidth:140, display:"flex", flexDirection:"column", gap:8 }}>
                   <div style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>{f.label}</div>
@@ -5139,7 +5139,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
             )}
           </div>
           <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, color:T.textBold }}>
-            Shipping isn't included here. It's added at checkout based on buyer location.
+            Shipping and tax aren’t included. Both are added at checkout based on location.
           </p>
         </div>
       </SetupSection>
