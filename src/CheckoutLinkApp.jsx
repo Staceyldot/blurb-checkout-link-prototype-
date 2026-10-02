@@ -5398,10 +5398,10 @@ function DeleteStoreModal({ open, onClose, onConfirm }) {
           Delete this Instant Store?
         </p>
         <p style={{ margin:0, fontSize:16, color:T.textBold, lineHeight:1.4 }}>
-          This can't be undone, and buyers will lose access to this link permanently.
+          Your link will stop working and this can’t be undone.
         </p>
         <div style={{ display:"flex", gap:12, justifyContent:"flex-end" }}>
-          <Btn variant="neutral" onClick={onClose}>Cancel</Btn>
+          <Btn variant="neutral" onClick={onClose}>Keep Instant Store</Btn>
           <Btn variant="danger" onClick={onConfirm}>Delete</Btn>
         </div>
       </div>
