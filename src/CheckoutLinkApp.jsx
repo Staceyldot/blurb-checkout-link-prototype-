@@ -4995,7 +4995,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
             <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
               <SwitchToggle on={storeVisible} onToggle={() => setStoreVisible(v => !v)} />
               <span style={{ fontFamily:FONT_SANS, fontSize:18, fontWeight:700, color:T.textBold, whiteSpace:"nowrap" }}>
-                {storeVisible ? "Visible to buyers" : "Hidden from buyers"}
+                {storeVisible ? "Live" : "Paused"}
               </span>
             </div>
           )}
@@ -5252,7 +5252,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
       {published && <SetupSection title="Delete Instant Store">
         <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
           <p style={{ margin:0, fontFamily:FONT_SANS, fontSize:16, color:T.textBold, lineHeight:1.4 }}>
-            Buyers won't be able to purchase through this link. To pause sales without deleting, use the toggle above.
+            This permanently removes your Instant Store and its link. To stop sales for now, set it to Paused at the top of the page instead.
           </p>
           <button onClick={() => setDeleteStoreOpen(true)} style={{ alignSelf:"flex-start", background:"none", border:"none",
             cursor:"pointer", padding:"8px 24px 8px 0", display:"flex", alignItems:"center", gap:8 }}>
