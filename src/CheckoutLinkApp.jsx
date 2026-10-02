@@ -4204,7 +4204,7 @@ function WfActionLink({ icon, label, danger, onClick }) {
 const ALL_PROJECTS = [
   { cover:PRODUCT.img, coverAspect:"square", coverFit:"contain", title:"Liberal Libations",
     desc:"Liberal Libations empowers the cocktail enthusiast to craft bar-quality cocktails for a large crowd or for an intimate gathering. Make-ahead batch recipes mean less time mixing drinks and more time enjoying each sip with friends. Over 85 recipes",
-    meta:[["Project type","Trade Book"],["Project option","8×10 in, 20×25 cm"],["# of pages","160"],["ISBN","9781733372800"],["Created with","BookWright"],["Created","March 14, 2019"]],
+    meta:[["Project type","Photo Book"],["Project option","8×10 in, 20×25 cm"],["# of pages","160"],["ISBN","9781733372800"],["Created with","BookWright"],["Created","March 14, 2019"]],
     actions:[{ icon:"shopping_cart", label:"Order more" }, { icon:"add_link", label:"Create Instant Store" }, { icon:"storefront", label:"Set up retail distribution" }],
     share:true },
   { cover:BOOK_EVERYDAY_MOCKTAILS_MOCKUP, coverAspect:"square", coverFit:"contain", badge:"Selling", title:"Everyday Mocktails: Quick and Delicious Alcohol-Free Drinks",
@@ -4369,7 +4369,7 @@ function InstantStoresTable({ onManageInstantStore }) {
    list. Only Liberal Libations has a real cover; the rest were placeholder
    gray tiles and were cut, same as the All projects cleanup. */
 const AVAILABLE_TO_SELL = [
-  { title:"Liberal Libations", sub:"Trade Book · 8×10 in", cover:BOOK_COVER },
+  { title:"Liberal Libations", sub:"Photo Book · 8×10 in", cover:BOOK_COVER },
 ];
 
 /* "Select a project for your Instant Store" — opens from the Instant Stores
