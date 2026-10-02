@@ -91,17 +91,24 @@ const LINEN_COLORS = [
 ];
 /* Paper stocks (Figma 5270:93546, Materials → Paper). Figma annotation: paper
    is "still in consideration" for Materials, since sellers already pick paper
-   in the creation tools. The two Mohawk stocks carry Figma's +US $6.00. Only
-   Standard has description copy in the design; the rest show none until
-   copy exists. */
+   in the creation tools. The two Mohawk stocks carry Figma's +US $6.00. Copy per
+   stock from Figma 6275:109301 / 109330 / 109359 / 109388. */
 const PAPER_OPTIONS = [
   { name: "Standard", spec: "Standard (80# Semi Matte, 118 GSM)",
     desc: "This lightweight paper features a semi-matte coating that offers less sheen than a gloss-coated paper and much less glare. It’s a perfect combination of quality and affordability.",
     bestFor: "Any lengthy book where text and photography hold equal weight." },
-  { name: "Premium Lustre" },
-  { name: "Premium Matte" },
-  { name: "Mohawk Superfine Eggshell", extra: 6 },
-  { name: "Mohawk proPhoto Pearl", extra: 6 },
+  { name: "Premium Lustre", spec: "Premium Lustre (100# Premium Lustre Gloss, 148 GSM)",
+    desc: "A great choice for any project that includes a lot of full-color images. The semi-gloss coating on this paper type gives your book’s images sharper and brighter colors at a lower price point.",
+    bestFor: "Photography books, cookbooks, comic books, and other image-heavy publications that benefit from a bit more gloss and a heftier page." },
+  { name: "Premium Matte", spec: "Premium Matte (100# Premium Matte, 148 GSM)",
+    desc: "Great for photo books that are text-heavy or art books that need a soft, more subdued look and feel. This medium-weight paper gives off very little shine to keep text legible.",
+    bestFor: "Photography and art books, especially those with paintings and drawings." },
+  { name: "Mohawk Superfine Eggshell", extra: 6, spec: "Mohawk Superfine Eggshell (100# Mohawk Superfine Uncoated, 148 GSM)",
+    desc: "A heavyweight, archival-quality paper with an eggshell-textured, uncoated finish. This ultrabright white, high-opacity paper makes colors truly shine.",
+    bestFor: "Illustration, printmaking, collage, watercolor, or any type of fine art project. Also wonderful for photography books where you want an artisanal look." },
+  { name: "Mohawk proPhoto Pearl", extra: 6, spec: "Mohawk proPhoto Pearl (140# Mohawk Photo Gloss, 190 GSM)",
+    desc: "A luxurious, high-end paper that will make your images pop and your book last more than 200 years without deteriorating. The pearl finish of the paper offers superb vibrancy and color reproduction.",
+    bestFor: "Photo books featuring images with warm colors and skin tones, deep blacks, and silvery greys." },
 ];
 const PAPER_IMG = "/assets/materials/paper-type.jpg";
 const ENDSHEET_COLORS = [
