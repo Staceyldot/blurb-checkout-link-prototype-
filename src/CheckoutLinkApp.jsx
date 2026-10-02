@@ -4767,10 +4767,10 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
   const [linenColor, setLinenColor] = useState(LINEN_COLORS[0].name);
   const [endsheetColor, setEndsheetColor] = useState(ENDSHEET_COLORS[0].name);
   const [paper, setPaper] = useState(PAPER_OPTIONS[0].name);
-  /* Every Materials option is always choosable (Figma 5270:93546); picking a
-     cover finish still opens the Linen row and picking a linen color opens the
-     Endsheet row, and picking an endsheet opens the Paper row, to lead the seller
-     through. Publish only goes active once all four are actually chosen. */
+  /* Every Materials option is always choosable (Figma 5270:93546). Picking an
+     option no longer auto-opens the next row — Linen, Endsheet and Paper stay
+     closed (all three are preselected) until the seller opens them. Publish
+     only goes active once all four are actually chosen. */
   const canPublish = !!(finish && linenColor && endsheetColor && paper);
   const [publishOpen, setPublishOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -4876,18 +4876,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
     setProfitMargin(round2((p / price) * 100).toFixed(1));
   };
 
-  const chooseFinish = f => {
-    setFinish(f);
-    setOpenMaterials(m => ({ ...m, linen: true }));
-  };
-  const chooseLinenColor = c => {
-    setLinenColor(c);
-    setOpenMaterials(m => ({ ...m, endsheet: true }));
-  };
-  const chooseEndsheetColor = c => {
-    setEndsheetColor(c);
-    setOpenMaterials(m => ({ ...m, paper: true }));
-  };
+  const chooseFinish = f => setFinish(f);
 
   // "Draft this for me" panel — prompt -> loading -> results.
   const [aiOpen, setAiOpen] = useState(false);
@@ -5083,14 +5072,14 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
           <MaterialsRow title="Linen cover colors" open={openMaterials.linen} onToggle={() => toggleMaterial("linen")}>
             <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
               {LINEN_COLORS.map(c => (
-                <RadioCardImage key={c.name} {...c} selected={linenColor === c.name} onSelect={() => chooseLinenColor(c.name)} />
+                <RadioCardImage key={c.name} {...c} selected={linenColor === c.name} onSelect={() => setLinenColor(c.name)} />
               ))}
             </div>
           </MaterialsRow>
           <MaterialsRow title="Endsheet colors" open={openMaterials.endsheet} onToggle={() => toggleMaterial("endsheet")}>
             <div style={{ display:"flex", flexWrap:"wrap", gap:"16px 8px" }}>
               {ENDSHEET_COLORS.map(c => (
-                <RadioCardImage key={c.name} {...c} selected={endsheetColor === c.name} onSelect={() => chooseEndsheetColor(c.name)} />
+                <RadioCardImage key={c.name} {...c} selected={endsheetColor === c.name} onSelect={() => setEndsheetColor(c.name)} />
               ))}
             </div>
           </MaterialsRow>
