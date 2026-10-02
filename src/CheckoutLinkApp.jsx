@@ -5258,7 +5258,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
             cursor:"pointer", padding:"8px 24px 8px 0", display:"flex", alignItems:"center", gap:8 }}>
             <Ms name="delete" size={24} color={T.textError} />
             <span style={{ fontSize:16, fontWeight:600, color:T.textError, lineHeight:"24px",
-              borderBottom:`1px solid ${T.textError}`, paddingBottom:2 }}>Delete</span>
+              borderBottom:`1px solid ${T.textError}`, paddingBottom:2 }}>Delete Instant Store</span>
           </button>
         </div>
       </SetupSection>}
