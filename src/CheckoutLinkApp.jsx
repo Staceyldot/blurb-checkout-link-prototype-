@@ -4776,6 +4776,9 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
   const [shareOpen, setShareOpen] = useState(false);
   const [published, setPublished] = useState(false);
   const doPublish = () => { setPublished(true); setPublishOpen(true); };
+  // Save draft reveals the two Preview links — there's a draft to preview only
+  // once it's been saved.
+  const [draftSaved, setDraftSaved] = useState(false);
   const [storeVisible, setStoreVisible] = useState(true);
   const [toast, setToast] = useState(false);
   const [authorVisible, setAuthorVisible] = useState(true);
@@ -4978,8 +4981,16 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
           {/* Store-level visibility toggle only shows up once the link is actually
               live (Figma "Header", publish="On", node 3403:20356) — before that,
               there's nothing yet for a buyer to see or not see. */}
-          {/* No Preview link on the link row while unpublished; once published,
-              "View live page" below opens the PDP. */}
+          {/* Preview link (Figma 6388:46429, "Link L"): right-aligned on the link
+              row once a draft is saved, until publish. Opens the PDP in a new tab
+              in its draft state — once published, "View live page" below takes over. */}
+          {!published && draftSaved && (
+            <a href={`${window.location.pathname}?stage=pdp`} target="_blank" rel="noopener noreferrer"
+              style={{ display:"flex", alignItems:"center", gap:4, flexShrink:0, height:24,
+                color:T.textLink, fontFamily:FONT_SANS, fontSize:16, fontWeight:600, textDecoration:"none" }}>
+              <span style={{ textDecoration:"underline" }}>Preview</span> <Ms name="open_in_new" size={24} color={T.textLink} />
+            </a>
+          )}
           {published && (
             <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
               <SwitchToggle on={storeVisible} onToggle={() => setStoreVisible(v => !v)} />
@@ -5265,7 +5276,8 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
 
     {/* Preview / Save draft / Publish only apply to a draft — once the store is
         live, the header's "View live page" and visibility toggle take over. */}
-    {!published && <StickyCtaBar canPublish={canPublish} onPublish={doPublish} panelOpen={aiOpen} />}
+    {!published && <StickyCtaBar canPublish={canPublish} onPublish={doPublish} panelOpen={aiOpen}
+      showPreview={draftSaved} onPreview={onContinue} onSaveDraft={() => setDraftSaved(true)} />}
 
     <PublishModal open={publishOpen} onClose={() => setPublishOpen(false)} onViewLive={onContinue}
       copied={copied} onCopyLink={copyLink} onShareSocial={() => { setPublishOpen(false); setShareOpen(true); }} />
@@ -5286,18 +5298,25 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
 /* Matches Figma "Sticky CTA Bar" (node 4411:46727), annotated "visible in empty
    state" — Publish stays disabled until the required fields (Listing title,
    Payment & tax info, etc.) are filled in, which this empty-state prototype never
-   reaches. No Preview link here — the draft has no preview before publish;
-   "View live page" after publishing is the way into the PDP. */
-function StickyCtaBar({ canPublish, onPublish, panelOpen }) {
+   reaches. Preview appears once Save draft is clicked (there's a saved draft to
+   preview) and doubles as the demo's bridge into the PDP. */
+function StickyCtaBar({ canPublish, onPublish, panelOpen, showPreview, onPreview, onSaveDraft }) {
   const { isMobile } = useViewport();
   if (panelOpen) return null;
   return (
     <div style={{ position:"fixed", left:0, right:0, bottom:0, zIndex:30, background:T.surface,
       borderTop:`1px solid ${T.borderSubtle}`, boxShadow:"0 -4px 16px rgba(0,0,0,0.08)",
-      display:"flex", alignItems:"center", justifyContent:"flex-end", gap:16,
+      display:"flex", alignItems:"center", justifyContent: showPreview ? "space-between" : "flex-end", gap:16,
       padding: isMobile ? "16px 20px" : "16px 80px", transition:"right .3s ease" }}>
+      {showPreview && (
+        <button onClick={onPreview} style={{ background:"none", border:"none", cursor:"pointer",
+          display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:16,
+          fontFamily:FONT_SANS, padding:0 }}>
+          <span style={{ textDecoration:"underline" }}>Preview</span> <Ms name="open_in_new" color={T.textLink} />
+        </button>
+      )}
       <div style={{ display:"flex", gap:8, flexShrink:0 }}>
-        <Btn variant="secondary" onClick={() => {}}>Save draft</Btn>
+        <Btn variant="secondary" onClick={onSaveDraft}>Save draft</Btn>
         <Btn disabled={!canPublish} onClick={onPublish}>Publish</Btn>
       </div>
     </div>
