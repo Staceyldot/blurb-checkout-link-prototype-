@@ -89,6 +89,21 @@ const LINEN_COLORS = [
   { name: "Oatmeal", img: "/assets/materials/linen-oatmeal.png", extra: 3 },
   { name: "Charcoal", img: "/assets/materials/linen-charcoal.png", extra: 3 },
 ];
+/* Paper stocks (Figma 5270:93546, Materials → Paper). Figma annotation: paper
+   is "still in consideration" for Materials, since sellers already pick paper
+   in the creation tools. The two Mohawk stocks carry Figma's +US $6.00. Only
+   Standard has description copy in the design; the rest show none until
+   copy exists. */
+const PAPER_OPTIONS = [
+  { name: "Standard", spec: "Standard (80# Semi Matte, 118 GSM)",
+    desc: "This lightweight paper features a semi-matte coating that offers less sheen than a gloss-coated paper and much less glare. It’s a perfect combination of quality and affordability.",
+    bestFor: "Any lengthy book where text and photography hold equal weight." },
+  { name: "Premium Lustre" },
+  { name: "Premium Matte" },
+  { name: "Mohawk Superfine Eggshell", extra: 6 },
+  { name: "Mohawk proPhoto Pearl", extra: 6 },
+];
+const PAPER_IMG = "/assets/materials/paper-type.jpg";
 const ENDSHEET_COLORS = [
   { name: "Standard Mid-Grey", img: "/assets/materials/endsheet-standard-mid-grey.png" },
   { name: "Light Grey", img: "/assets/materials/endsheet-light-grey.png", extra: 3 },
@@ -3773,6 +3788,43 @@ function MaterialsRow({ title, first, open, onToggle, children }) {
   );
 }
 
+/* Materials → Paper (Figma 5270:93546): the selected stock's spec and copy,
+   a wrap of text selectors (selected = 2px active ring, bold), then a photo
+   of the paper. */
+function PaperPicker({ value, onChange }) {
+  const sel = PAPER_OPTIONS.find(o => o.name === value);
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+      {sel?.desc && (
+        <div style={{ display:"flex", flexDirection:"column", gap:8, fontFamily:FONT_SANS, fontSize:16, color:T.textBold }}>
+          <div style={{ fontWeight:600, lineHeight:"24px" }}>{sel.spec}</div>
+          <p style={{ margin:0, lineHeight:1.4 }}>{sel.desc}</p>
+          <p style={{ margin:"22px 0 0", lineHeight:1.4 }}>Best for: {sel.bestFor}</p>
+        </div>
+      )}
+      <div role="radiogroup" aria-label="Paper" style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+        {PAPER_OPTIONS.map(o => {
+          const on = o.name === value;
+          return (
+            <button key={o.name} role="radio" aria-checked={on} onClick={() => onChange(o.name)}
+              style={{ height:48, padding:"12px 16px", borderRadius:T.radius, background:T.surface, cursor:"pointer",
+                /* 2px ring drawn inside the edge (1px border + 1px inset shadow):
+                   an outer ring gets clipped by Collapse's overflow:hidden. */
+                border: `1px solid ${on ? T.borderActive : T.border}`,
+                boxShadow: on ? `inset 0 0 0 1px ${T.borderActive}` : "none",
+                fontFamily:FONT_SANS, fontSize:16, lineHeight:"24px", fontWeight: on ? 700 : 600,
+                color:T.textBold, whiteSpace:"nowrap" }}>
+              {o.name}{o.extra ? <span style={{ fontWeight:400 }}> +US ${o.extra.toFixed(2)}</span> : null}
+            </button>
+          );
+        })}
+      </div>
+      <img src={PAPER_IMG} alt="" style={{ display:"block", width:"100%", aspectRatio:"668 / 365.14",
+        objectFit:"cover", background:"#e7e7e7" }} />
+    </div>
+  );
+}
+
 /* Materials' Linen/Endsheet color swatches (Figma "Radio Card / Image") — a
    thumbnail, name, and an optional upcharge, selectable like the plain-text
    Cover finish buttons above them. */
@@ -4702,16 +4754,17 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
   const [copied, setCopied] = useState(false);
   const [preview, setPreview] = useState("sample");
   const [previewModalKind, setPreviewModalKind] = useState(null);   // null | "sample" | "full"
-  const [openMaterials, setOpenMaterials] = useState({ cover: true, linen: false, endsheet: false });
+  const [openMaterials, setOpenMaterials] = useState({ cover: true, linen: false, endsheet: false, paper: false });
   const toggleMaterial = key => setOpenMaterials(m => ({ ...m, [key]: !m[key] }));
   const [finish, setFinish] = useState(null);
   const [linenColor, setLinenColor] = useState(LINEN_COLORS[0].name);
   const [endsheetColor, setEndsheetColor] = useState(ENDSHEET_COLORS[0].name);
+  const [paper, setPaper] = useState(PAPER_OPTIONS[0].name);
   /* Every Materials option is always choosable (Figma 5270:93546); picking a
      cover finish still opens the Linen row and picking a linen color opens the
-     Endsheet row, to lead the seller through. Publish only goes active once
-     all three are actually chosen. */
-  const canPublish = !!(finish && linenColor && endsheetColor);
+     Endsheet row, and picking an endsheet opens the Paper row, to lead the seller
+     through. Publish only goes active once all four are actually chosen. */
+  const canPublish = !!(finish && linenColor && endsheetColor && paper);
   const [publishOpen, setPublishOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [published, setPublished] = useState(false);
@@ -4758,14 +4811,15 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
   const [aboutBook, setAboutBook] = useState("");
   const [keywords, setKeywords] = useState([]);
 
-  /* Pricing calculator. Print cost is the base cost plus any linen/endsheet
+  /* Pricing calculator. Print cost is the base cost plus any linen/endsheet/paper
      upcharge (+US $3 swatches carry an `extra`) — set by format/size/materials,
      not editable here. Listing Price, Profit margin, and Profit are three
      views onto the same number, so editing any one recomputes the other two. */
   const BASE_PRINT_COST = 12.50;
   const endsheetExtra = ENDSHEET_COLORS.find(c => c.name === endsheetColor)?.extra || 0;
   const linenExtra = LINEN_COLORS.find(c => c.name === linenColor)?.extra || 0;
-  const PRINT_COST = BASE_PRINT_COST + linenExtra + endsheetExtra;
+  const paperExtra = PAPER_OPTIONS.find(o => o.name === paper)?.extra || 0;
+  const PRINT_COST = BASE_PRINT_COST + linenExtra + endsheetExtra + paperExtra;
   /* Cover finish doesn't change the price, so pricing is known as soon as a
      linen and endsheet are chosen (both preselected) — no need to wait on the finish. */
   const pricingReady = !!(linenColor && endsheetColor);
@@ -4822,6 +4876,10 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
   const chooseLinenColor = c => {
     setLinenColor(c);
     setOpenMaterials(m => ({ ...m, endsheet: true }));
+  };
+  const chooseEndsheetColor = c => {
+    setEndsheetColor(c);
+    setOpenMaterials(m => ({ ...m, paper: true }));
   };
 
   // "Draft this for me" panel — prompt -> loading -> results.
@@ -5002,7 +5060,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
 
       {/* Materials */}
       <SetupSection title={<>Materials <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:400, color:T.textSubtle, marginLeft:8 }}>
-        {(finish ? 1 : 0) + (linenColor ? 1 : 0) + (endsheetColor ? 1 : 0)} of 3 selected</span></>}>
+        {(finish ? 1 : 0) + (linenColor ? 1 : 0) + (endsheetColor ? 1 : 0) + (paper ? 1 : 0)} of 4 selected</span></>}>
         <div style={{ maxWidth:685, borderBottom:`1px solid ${T.border}` }}>
           <MaterialsRow title="Cover finish" first open={openMaterials.cover} onToggle={() => toggleMaterial("cover")}>
             <div style={{ display:"flex", gap:8 }}>
@@ -5025,9 +5083,12 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
           <MaterialsRow title="Endsheet colors" open={openMaterials.endsheet} onToggle={() => toggleMaterial("endsheet")}>
             <div style={{ display:"flex", flexWrap:"wrap", gap:"16px 8px" }}>
               {ENDSHEET_COLORS.map(c => (
-                <RadioCardImage key={c.name} {...c} selected={endsheetColor === c.name} onSelect={() => setEndsheetColor(c.name)} />
+                <RadioCardImage key={c.name} {...c} selected={endsheetColor === c.name} onSelect={() => chooseEndsheetColor(c.name)} />
               ))}
             </div>
+          </MaterialsRow>
+          <MaterialsRow title="Paper" open={openMaterials.paper} onToggle={() => toggleMaterial("paper")}>
+            <PaperPicker value={paper} onChange={setPaper} />
           </MaterialsRow>
         </div>
       </SetupSection>
