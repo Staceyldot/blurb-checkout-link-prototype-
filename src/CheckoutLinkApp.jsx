@@ -5006,9 +5006,11 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
             <button onClick={onContinue} style={{ background:"none", border:"none", cursor:"pointer",
               display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, fontSize:16,
               fontFamily:FONT_SANS, padding:0 }}>
-              <span style={{ textDecoration:"underline" }}>View live page</span> <Ms name="open_in_new" color={T.textLink} />
+              <span style={{ textDecoration:"underline" }}>{storeVisible ? "View live page" : "Preview"}</span> <Ms name="open_in_new" color={T.textLink} />
             </button>
-            <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+            {/* Paused: nothing to share, so the share actions drop away and the
+                page link reads as a preview rather than a live page. */}
+            {storeVisible && <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
               <button onClick={() => setShareOpen(true)} style={{ display:"flex", alignItems:"center", gap:8,
                 minWidth:100, padding:"8px 24px", border:`1px solid ${T.textBold}`, borderRadius:T.radius,
                 background:T.surface, cursor:"pointer", fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>
@@ -5019,7 +5021,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
                 background:T.surface, cursor:"pointer", fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold }}>
                 <Ms name="download" size={20} color={T.textBold} /> Download QR
               </button>
-            </div>
+            </div>}
           </div>
         )}
       </div>
