@@ -84,6 +84,11 @@ const CROSS_SELL_BOOKS = [
 /* Setup page Materials swatches (Figma node 4806:45519, "Unpublished / Filled"
    state) — downsized to 200px max edge (from multi-MB Figma exports) since they
    only ever render at 88px. */
+const LINEN_COLORS = [
+  { name: "Black",   img: "/assets/materials/linen-black.png" },
+  { name: "Oatmeal", img: "/assets/materials/linen-oatmeal.png", extra: 3 },
+  { name: "Charcoal", img: "/assets/materials/linen-charcoal.png", extra: 3 },
+];
 const ENDSHEET_COLORS = [
   { name: "Standard Mid-Grey", img: "/assets/materials/endsheet-standard-mid-grey.png" },
   { name: "Light Grey", img: "/assets/materials/endsheet-light-grey.png", extra: 3 },
@@ -3768,7 +3773,7 @@ function MaterialsRow({ title, first, open, onToggle, children }) {
   );
 }
 
-/* Materials' Endsheet color swatches (Figma "Radio Card / Image") — a
+/* Materials' Linen/Endsheet color swatches (Figma "Radio Card / Image") — a
    thumbnail, name, and an optional upcharge, selectable like the plain-text
    Cover finish buttons above them. */
 function RadioCardImage({ name, img, extra, selected, onSelect }) {
@@ -4697,14 +4702,16 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
   const [copied, setCopied] = useState(false);
   const [preview, setPreview] = useState("sample");
   const [previewModalKind, setPreviewModalKind] = useState(null);   // null | "sample" | "full"
-  const [openMaterials, setOpenMaterials] = useState({ cover: true, endsheet: false });
+  const [openMaterials, setOpenMaterials] = useState({ cover: true, linen: false, endsheet: false });
   const toggleMaterial = key => setOpenMaterials(m => ({ ...m, [key]: !m[key] }));
   const [finish, setFinish] = useState(null);
+  const [linenColor, setLinenColor] = useState(LINEN_COLORS[0].name);
   const [endsheetColor, setEndsheetColor] = useState(ENDSHEET_COLORS[0].name);
   /* Every Materials option is always choosable (Figma 5270:93546); picking a
-     cover finish still opens the Endsheet row, to lead the seller through.
-     Publish only goes active once both are actually chosen. */
-  const canPublish = !!(finish && endsheetColor);
+     cover finish still opens the Linen row and picking a linen color opens the
+     Endsheet row, to lead the seller through. Publish only goes active once
+     all three are actually chosen. */
+  const canPublish = !!(finish && linenColor && endsheetColor);
   const [publishOpen, setPublishOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [published, setPublished] = useState(false);
@@ -4751,16 +4758,17 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
   const [aboutBook, setAboutBook] = useState("");
   const [keywords, setKeywords] = useState([]);
 
-  /* Pricing calculator. Print cost is the base cost plus any endsheet
+  /* Pricing calculator. Print cost is the base cost plus any linen/endsheet
      upcharge (+US $3 swatches carry an `extra`) — set by format/size/materials,
      not editable here. Listing Price, Profit margin, and Profit are three
      views onto the same number, so editing any one recomputes the other two. */
   const BASE_PRINT_COST = 12.50;
   const endsheetExtra = ENDSHEET_COLORS.find(c => c.name === endsheetColor)?.extra || 0;
-  const PRINT_COST = BASE_PRINT_COST + endsheetExtra;
-  /* Cover finish doesn't change the price, so pricing is known as soon as an
-     endsheet is chosen (preselected) — no need to wait on the finish. */
-  const pricingReady = !!endsheetColor;
+  const linenExtra = LINEN_COLORS.find(c => c.name === linenColor)?.extra || 0;
+  const PRINT_COST = BASE_PRINT_COST + linenExtra + endsheetExtra;
+  /* Cover finish doesn't change the price, so pricing is known as soon as a
+     linen and endsheet are chosen (both preselected) — no need to wait on the finish. */
+  const pricingReady = !!(linenColor && endsheetColor);
   const [listingPrice, setListingPrice] = useState(PRINT_COST.toFixed(2));
   const [profitMargin, setProfitMargin] = useState("0");
   const [profit, setProfit] = useState("0.00");
@@ -4809,6 +4817,10 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
 
   const chooseFinish = f => {
     setFinish(f);
+    setOpenMaterials(m => ({ ...m, linen: true }));
+  };
+  const chooseLinenColor = c => {
+    setLinenColor(c);
     setOpenMaterials(m => ({ ...m, endsheet: true }));
   };
 
@@ -4990,7 +5002,7 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
 
       {/* Materials */}
       <SetupSection title={<>Materials <span style={{ fontFamily:FONT_SANS, fontSize:16, fontWeight:400, color:T.textSubtle, marginLeft:8 }}>
-        {(finish ? 1 : 0) + (endsheetColor ? 1 : 0)} of 2 selected</span></>}>
+        {(finish ? 1 : 0) + (linenColor ? 1 : 0) + (endsheetColor ? 1 : 0)} of 3 selected</span></>}>
         <div style={{ maxWidth:685, borderBottom:`1px solid ${T.border}` }}>
           <MaterialsRow title="Cover finish" first open={openMaterials.cover} onToggle={() => toggleMaterial("cover")}>
             <div style={{ display:"flex", gap:8 }}>
@@ -5000,6 +5012,13 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
                   background:T.surface, fontFamily:FONT_SANS, fontSize:16, fontWeight:600, color:T.textBold, cursor:"pointer" }}>
                   {f}
                 </button>
+              ))}
+            </div>
+          </MaterialsRow>
+          <MaterialsRow title="Linen cover colors" open={openMaterials.linen} onToggle={() => toggleMaterial("linen")}>
+            <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+              {LINEN_COLORS.map(c => (
+                <RadioCardImage key={c.name} {...c} selected={linenColor === c.name} onSelect={() => chooseLinenColor(c.name)} />
               ))}
             </div>
           </MaterialsRow>
