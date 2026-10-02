@@ -5323,7 +5323,7 @@ function StickyCtaBar({ canPublish, onPublish, panelOpen, showPreview, onPreview
   );
 }
 
-/* "Your Instant Store is published" success modal (Figma node 5285:83721), shown after
+/* "Your Instant Store is live" success modal (Figma node 5285:83721), shown after
    Publish. Same overlay pattern as CartDrawer/DraftPanel, centered instead of
    a side drawer since this is a one-off confirmation, not a form. */
 /* Confirms the AI draft actually landed in the real fields once the panel closes
@@ -5424,7 +5424,7 @@ function PublishModal({ open, onClose, onViewLive, copied, onCopyLink, onShareSo
         <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:16 }}>
           <img src={PUBLISH_CELEBRATION} alt="" style={{ width:216, height:177, maxWidth:"100%" }} />
           <p style={{ margin:0, fontFamily:FONT_HEADING, fontSize:24, fontWeight:400, lineHeight:1.2, color:T.textBold, textAlign:"center" }}>
-            Your Instant Store is published
+            Your Instant Store is live
           </p>
         </div>
         <button onClick={onCopyLink} style={{ background:"none", border:"none", cursor:"pointer",
