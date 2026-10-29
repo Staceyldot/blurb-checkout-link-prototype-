@@ -69,6 +69,11 @@ const US_FLAG = "/assets/us-flag.png";  // Codex dashboard nav region flag (node
 const BOOK_EVERYDAY_MOCKTAILS_MOCKUP = "/assets/book-everyday-mocktails-mockup.png";
 const BOOK_UPGRADED_SNACKS_MOCKUP = "/assets/book-upgraded-snacks-mockup.png";
 const PUBLISH_CELEBRATION = "/assets/publish-celebration.png";
+/* Marketing landing page for Instant Stores — linked from the Instant Stores
+   page subtitle and the Setup breadcrumb row so early-access sellers who reach
+   the feature from the Dashboard can see what it is. Opens in a new tab so
+   unsaved Setup edits aren't lost. */
+const INSTANT_STORES_LANDING_URL = "https://website-v2-git-main-rpi-print-daf707f9.vercel.app/website-v2-test/instant-store";
 
 /* Other titles on the seller's Instant Store — the cross-sell cards a buyer
    sees below this listing in the PDP's "More from" carousel (Figma 3709:18021). */
@@ -4732,7 +4737,12 @@ function DashboardHomePage({ onContinue, subPage, setSubPage }) {
                 <div>
                   <span style={{ display:"block", fontFamily:WF.font, fontSize:22, fontWeight:700, color:WF.text }}>Instant Stores</span>
                   <p style={{ margin:"4px 0 0", fontFamily:WF.font, fontSize:13, color:"#6d6d6d" }}>
-                    Shareable links that let customers buy directly from you
+                    Shareable links that let customers buy directly from you.{" "}
+                    <a href={INSTANT_STORES_LANDING_URL} target="_blank" rel="noopener noreferrer"
+                      style={{ display:"inline-flex", alignItems:"center", gap:2, color:T.textLink, fontWeight:600, textDecoration:"none" }}>
+                      <span style={{ textDecoration:"underline" }}>Learn more about Instant Stores</span>
+                      <Ms name="open_in_new" size={14} color={T.textLink} />
+                    </a>
                   </p>
                 </div>
                 <a href="#" onClick={e => { e.preventDefault(); setCreateModalOpen(true); }} style={{ background:T.brand, color:"#fff", border:`1px solid ${T.brand}`,
@@ -4944,10 +4954,18 @@ function LinkSetupPage({ onContinue, onGoAllProjects, onGoInstantStores }) {
     <div style={{ flex:1, minWidth:0, minHeight:"100vh", background:T.surface, fontFamily:FONT_SANS }}>
       {/* Header: breadcrumb, title, and the auto-generated link field */}
       <div style={{ background:T.surface, padding: isMobile ? "16px 20px 24px" : "32px 16px 24px" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:4, fontFamily:FONT_SANS, fontSize:14, marginBottom:16 }}>
-          <a href="#" onClick={e => { e.preventDefault(); onGoInstantStores?.(); }} style={{ color:T.textLink }}>Instant Stores</a>
-          <Ms name="chevron_right" size={16} color={T.textSubtle} />
-          <span style={{ color:T.textSubtle }}>{PRODUCT.title}</span>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:"8px 16px", flexWrap:"wrap",
+          fontFamily:FONT_SANS, fontSize:14, marginBottom:16 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+            <a href="#" onClick={e => { e.preventDefault(); onGoInstantStores?.(); }} style={{ color:T.textLink }}>Instant Stores</a>
+            <Ms name="chevron_right" size={16} color={T.textSubtle} />
+            <span style={{ color:T.textSubtle }}>{PRODUCT.title}</span>
+          </div>
+          <a href={INSTANT_STORES_LANDING_URL} target="_blank" rel="noopener noreferrer"
+            style={{ display:"flex", alignItems:"center", gap:4, color:T.textLink, fontWeight:600, textDecoration:"none" }}>
+            <span style={{ textDecoration:"underline" }}>Learn more about Instant Stores</span>
+            <Ms name="open_in_new" size={16} color={T.textLink} />
+          </a>
         </div>
         <h1 style={{ fontFamily:FONT_HEADING, fontSize: isMobile ? 26 : 32, fontWeight:500, color:T.textBold, margin:"0 0 16px" }}>
           {PRODUCT.title}
