@@ -3337,7 +3337,8 @@ function ConfirmationEmail({ order, onBack }) {
    laptop, and a stepper that wraps stops reading as a sequence. */
 const STAGES = [
   { key:"dashboard", short:"Dashboard", label:"Seller dashboard" },
-  { key:"setup",    short:"Setup",    label:"Link setup" },
+  { key:"instant-stores", short:"Instant Stores", label:"Instant Stores homepage" },
+  { key:"setup",   short:"Setup",    label:"Link setup" },
   { key:"pdp",      short:"PDP",      label:"Product page" },
   { key:"checkout", short:"Checkout", label:"Checkout" },
   { key:"confirm",  short:"Confirm",  label:"Confirmation" },
@@ -3480,7 +3481,7 @@ function DemoBar({ view, onJump, skippedStages = [] }) {
 }
 
 /* ═══════════════════════════ ROOT ═══════════════════════════ */
-/* ?stage=<setup|pdp|checkout|confirm|email> opens the fork on that screen.
+/* ?stage=<instant-stores|setup|pdp|checkout|confirm|email> opens the fork on that screen.
 
    The seller-side link setup page and the hosted PDP live in a different
    prototype, so a demo of the whole journey has to cross from there into this
@@ -5701,15 +5702,22 @@ function CheckoutLinkApp() {
       <DemoBar view={view} onJump={jump}
         skippedStages={checkoutSkipped ? ["checkout"] : []} />
 
-      {view === "dashboard" && (
+      {/* The Instant Stores homepage is a Dashboard sub-page but gets its own
+          stepper stop, so side-nav clicks route through the stage rather than
+          the sub-page state — otherwise the stepper would highlight the wrong stop. */}
+      {(view === "dashboard" || view === "instant-stores") && (
         <DashboardHomePage onContinue={() => jump("setup")}
-          subPage={dashboardSubPage} setSubPage={setDashboardSubPage} />
+          subPage={view === "instant-stores" ? "instant-stores" : dashboardSubPage}
+          setSubPage={p => {
+            if (p === "instant-stores") jump("instant-stores");
+            else { setDashboardSubPage(p); if (view !== "dashboard") jump("dashboard"); }
+          }} />
       )}
 
       {view === "setup" && (
         <LinkSetupPage onContinue={() => jump("pdp")}
           onGoAllProjects={() => { setDashboardSubPage("all-projects"); jump("dashboard"); }}
-          onGoInstantStores={() => { setDashboardSubPage("instant-stores"); jump("dashboard"); }} />
+          onGoInstantStores={() => jump("instant-stores")} />
       )}
 
       {view === "pdp" && (
